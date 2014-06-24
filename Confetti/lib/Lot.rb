@@ -1,30 +1,41 @@
 
-require 'nokogiri'
+# require 'nokogiri'
 require 'Bento'
 
 module Confetti
 
+META_DIR = "."
 LOT_XML_VIEWPATH = "/nbu.meta/confetti/lots.xml"
+LOT_NEXP_VIEWPATH = "/nbu.meta/confetti/lots.ne"
 
 #----------------------------------------------------------------------------------------------
 
+# (lot L1
+#    (vobs v1..vk)
+#    (lots l1..lm))
+
 class Lot
 	class DB
-		def initialize
-			view = ClearCASE::CurrentView.new
-			@xml = Nokogiri::XML(File.open(view.fullPath + LOT_XML_VIEWPATH))
+		def initialize(name)
+			@name = name
+			# view = ClearCASE::CurrentView.new
+			# @xml = Nokogiri::XML(File.open(view.fullPath + LOT_XML_VIEWPATH))
+			@ne = Nexp.from_file(META_DIR + LOT_NEXP_VIEWPATH)
 		end
 
 		def exists?
-			!@xml.xpath("//lots/lot[@name='#{name}']").empty?
+			# !@xml.xpath("//lots/lot[@name='#{name}']").empty?
+			@ne[:lots][@name] != nil
 		end
 	
 		def vobNames(name)
-			@xml.xpath("//lots/lot[@name='#{name}']/vob/@name").map { |x| x.to_s }
+			# @xml.xpath("//lots/lot[@name='#{name}']/vob/@name").map { |x| x.to_s }
+			~@ne[:lots][@name][:vobs]
 		end
 	
 		def lotNames(name)
-			@xml.xpath("//lots/lot[@name='#{name}']/lot/@name").map { |x| x.to_s }
+			# @xml.xpath("//lots/lot[@name='#{name}']/lot/@name").map { |x| x.to_s }
+			~@ne[:lots][@name][:lots]
 		end
 	end # DB
 
