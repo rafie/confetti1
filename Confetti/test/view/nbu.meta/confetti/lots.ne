@@ -72,11 +72,12 @@
 
 	(lot nbu.tools
 		(vobs
-			nbu.tools)
+			nbu.tools))
 
 	(lot nbu.bsp
-		bspLinuxIntel
-		bspLinuxARM
+		(vobs
+			bspLinuxIntel
+			bspLinuxARM))
 
 	(lot nbu.tests
 		(vobs

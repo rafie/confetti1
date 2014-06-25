@@ -1,43 +1,20 @@
 
-# require 'nokogiri'
-require 'Bento'
+require_relative 'Common'
 
 module Confetti
 
-META_DIR = "."
+TEST_META_DIR = "view"
 LOT_XML_VIEWPATH = "/nbu.meta/confetti/lots.xml"
 LOT_NEXP_VIEWPATH = "/nbu.meta/confetti/lots.ne"
 
 #----------------------------------------------------------------------------------------------
 
-# (lot L1
-#    (vobs v1..vk)
-#    (lots l1..lm))
+# (lots
+#   (lot name
+#      (vobs v1..vk)
+#      (lots l1..lm)))
 
 class Lot
-	class DB
-		def initialize(name)
-			@name = name
-			# view = ClearCASE::CurrentView.new
-			# @xml = Nokogiri::XML(File.open(view.fullPath + LOT_XML_VIEWPATH))
-			@ne = Nexp.from_file(META_DIR + LOT_NEXP_VIEWPATH)
-		end
-
-		def exists?
-			# !@xml.xpath("//lots/lot[@name='#{name}']").empty?
-			@ne[:lots][@name] != nil
-		end
-	
-		def vobNames(name)
-			# @xml.xpath("//lots/lot[@name='#{name}']/vob/@name").map { |x| x.to_s }
-			~@ne[:lots][@name][:vobs]
-		end
-	
-		def lotNames(name)
-			# @xml.xpath("//lots/lot[@name='#{name}']/lot/@name").map { |x| x.to_s }
-			~@ne[:lots][@name][:lots]
-		end
-	end # DB
 
 	attr_reader :name
 
@@ -48,6 +25,7 @@ class Lot
 	end
 
 	def vobs
+		byebug
 		names = db.vobNames(@name)
 		return ClearCASE::VOBs.new(names)
 	end
@@ -70,24 +48,50 @@ class Lot
 	private
 
 	def db
-		@db = DB.new if ! @db
+		db = Lots::DB.new if ! @db
 		return @db
 	end
 
+	def exists?(name)
+		@ne[:lots][name] != nil
+	end
+
+	def vobNames(name)
+		~@ne[:lots][name][:vobs]
+	end
+
+	def lotNames(name)
+		~@ne[:lots][name][:lots]
+	end
+	
+	def nexp
+		@ne
+	end
 end # Lot
 
 #----------------------------------------------------------------------------------------------
 
 class Lots
+	include Enumerable
 
-	def initialize(names)
-		@names = names
+	def initialize(names: nil)
+		@ne = Lots.db
+		@names = names == nil ? @ne.cdr.map(:lot) { |lot| ~lot.cadr } : names
 	end
 
 	def each
 		@names.each { |name| yield Lot.new(name) }
 	end
 
+	def Lots.db
+		if !CONFETTI_TEST
+			view = ClearCASE::CurrentView.new
+			meta_dir = view.fullPath
+		else
+			meta_dir = TEST_META_DIR
+		end
+		Nexp.from_file(meta_dir + LOT_NEXP_VIEWPATH, :single)
+	end
 end # Lots
 
 #----------------------------------------------------------------------------------------------
