@@ -18,21 +18,22 @@ class Lot
 
 	attr_reader :name
 
-	def initialize(name)
-		# raise "Lot #{name} does not exist" unless DB.exists?(name)
+	def initialize(name, db: nil)
+		# raise "Lot #{name} does not exist" unless exists?(name)
 		@name = name
-		@db = nil
+		@db = db
 	end
 
 	def vobs
-		byebug
-		names = db.vobNames(@name)
+		names = db[:vobs]
+		names = !names ? [] : ~names
 		return ClearCASE::VOBs.new(names)
 	end
 
 	def lots
-		names = db.lotNames(@name)
-		return Lots.new(names)
+		names = db[:lots]
+		names = !names ? [] : ~names
+		return Lots.new(names: names)
 	end
 	
 	# Filter out elements not contained in lot
@@ -48,8 +49,12 @@ class Lot
 	private
 
 	def db
-		db = Lots::DB.new if ! @db
-		return @db
+		if @db == nil
+			lots = Lots::db if @db == nil
+			@db = (lots/:lot).select { |lot| lot.cadr.to_s == @name }[0]
+			raise "lot #{@name} does not exist" if !@db
+		end
+		@db
 	end
 
 	def exists?(name)
@@ -75,12 +80,21 @@ class Lots
 	include Enumerable
 
 	def initialize(names: nil)
-		@ne = Lots.db
-		@names = names == nil ? @ne.cdr.map(:lot) { |lot| ~lot.cadr } : names
+		@db = Lots.db
+		@names = names == nil ? (@db[:lots]/:lot).map { |lot| ~lot.cadr } : names
 	end
 
 	def each
-		@names.each { |name| yield Lot.new(name) }
+		@names.each { |name| yield Lot.new(name, db: @db[:lots].select { |lot| lot.cadr.to_s == name }) }
+	end
+
+	def [](x)
+		return @names[x] if x.is_a? Fixnum
+		Lot.new(x, db: @db)
+	end
+
+	def each
+		@names.each { |name| yield Lot.new(name, db: @db) }
 	end
 
 	def Lots.db

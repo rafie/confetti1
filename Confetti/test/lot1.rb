@@ -11,9 +11,8 @@ end
 class Lot1 < Minitest::Test
 
 	def setup
-		x = Nexp.from_file("view/nbu.meta/confetti/lots.ne", :single)
+		@x = Nexp.from_file("view/nbu.meta/confetti/lots.ne", :single)
 #		names = x.cdr.each(:lot) { |lot| ~lot.cadr } # (lot name ...)
-		byebug
 		@lots = Confetti::Lots.new
 		mcu = Confetti::Lot.new('nbu.mcu')
 		a = 1
@@ -25,8 +24,12 @@ class Lot1 < Minitest::Test
 
 	def test_lot
 		mcu = Confetti::Lot.new('nbu.mcu')
+		bb
 		assert_equal mcu.name, 'nbu.mcu'
-		assert_equal mcu.vobs.to_a, %w(nbu.mcu nbu.web nbu.media nbu.dsp nbu.infra nbu.bsp nbu.tools nbu.tests)
+		assert_equal mcu.vobs.map {|x| x.name}.sort, %w(adapters dialingInfo mcu mediaCtrlInfo nbu.proto.jingle-stack)
+
+		nbu_prod_mcu = Confetti::Lot.new('nbu.prod.mcu')
+		assert_equal nbu_prod_mcu.lots.map {|x| x.name}.sort, %w(nbu.bsp nbu.dsp nbu.infra nbu.mcu nbu.media nbu.tests nbu.tools nbu.web)
 	end
 	
 end
