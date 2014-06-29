@@ -1,6 +1,5 @@
 
-require 'nokogiri'
-require 'Bento'
+require_relative 'Common'
 
 module Confetti
 

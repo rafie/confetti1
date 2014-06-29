@@ -4,7 +4,6 @@ require_relative 'Common'
 module Confetti
 
 TEST_META_DIR = "view"
-LOT_XML_VIEWPATH = "/nbu.meta/confetti/lots.xml"
 LOT_NEXP_VIEWPATH = "/nbu.meta/confetti/lots.ne"
 
 #----------------------------------------------------------------------------------------------
@@ -56,22 +55,6 @@ class Lot
 		end
 		@db
 	end
-
-	def exists?(name)
-		@ne[:lots][name] != nil
-	end
-
-	def vobNames(name)
-		~@ne[:lots][name][:vobs]
-	end
-
-	def lotNames(name)
-		~@ne[:lots][name][:lots]
-	end
-	
-	def nexp
-		@ne
-	end
 end # Lot
 
 #----------------------------------------------------------------------------------------------
@@ -81,20 +64,17 @@ class Lots
 
 	def initialize(names: nil)
 		@db = Lots.db
-		@names = names == nil ? (@db[:lots]/:lot).map { |lot| ~lot.cadr } : names
+		@names = names == nil ? (@db[:lots]/:lot).rank1 : names
 	end
 
 	def each
 		@names.each { |name| yield Lot.new(name, db: @db[:lots].select { |lot| lot.cadr.to_s == name }) }
+		@db["lots/lot/#{@name}"]
 	end
 
 	def [](x)
 		return @names[x] if x.is_a? Fixnum
 		Lot.new(x, db: @db)
-	end
-
-	def each
-		@names.each { |name| yield Lot.new(name, db: @db) }
 	end
 
 	def Lots.db

@@ -22,14 +22,15 @@ class Lot1 < Minitest::Test
 		assert_equal @lots.count, 11
 	end
 
-	def test_lot
+	def test_lot_vobs
 		mcu = Confetti::Lot.new('nbu.mcu')
-		bb
 		assert_equal mcu.name, 'nbu.mcu'
 		assert_equal mcu.vobs.map {|x| x.name}.sort, %w(adapters dialingInfo mcu mediaCtrlInfo nbu.proto.jingle-stack)
 
+	end
+
+	def test_lot_lots
 		nbu_prod_mcu = Confetti::Lot.new('nbu.prod.mcu')
 		assert_equal nbu_prod_mcu.lots.map {|x| x.name}.sort, %w(nbu.bsp nbu.dsp nbu.infra nbu.mcu nbu.media nbu.tests nbu.tools nbu.web)
 	end
-	
 end
