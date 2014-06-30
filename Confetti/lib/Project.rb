@@ -1,10 +1,10 @@
 
-require 'nokogiri'
-require 'Bento'
+require_relative 'Common'
 
 module Confetti
 
-PROJECT_XML_VIEWPATH = "/nbu.meta/confetti/project.xml"
+TEST_META_DIR = "view"
+PROJECT_NEXP_VIEWPATH = "/nbu.meta/confetti/project.ne"
 
 #----------------------------------------------------------------------------------------------
 
