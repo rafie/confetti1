@@ -4,22 +4,31 @@ BEGIN TRANSACTION;
 -----------------------------------------------------------------------------------------------
 
 CREATE TABLE "projects" (
-	[name] text PRIMARY KEY NOT NULL UNIQUE,
-	int_branch text NOT NULL,
+	[id] integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE, 
+	[name] text NOT NULL UNIQUE,
+	branch text NOT NULL,
 	root_vob text,
-	cspec text NOT NULL);
+	cspec text /*NOT NULL*/);
+
+CREATE TABLE "project_versions" (
+	[id] PRIMARY KEY NOT NULL UNIQUE,
+	project_id integer NOT NULL,
+	version text NOT NULL,
+	cspec text NOT NULL,
+	UNIQUE(project_id, version));
 
 -----------------------------------------------------------------------------------------------
-
+/*
 CREATE TABLE activities (
-	name text PRIMARY KEY NOT NULL UNIQUE, 
+	id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,  
+	name text NOT NULL UNIQUE, 
 	view text UNIQUE NOT NULL, 
 	branch text UNIQUE NOT NULL, 
 	root text,
 	project text NOT NULL,
 	user text NOT NULL, 
 	last_mark integer);
-
+*/
 -----------------------------------------------------------------------------------------------
 
 COMMIT;

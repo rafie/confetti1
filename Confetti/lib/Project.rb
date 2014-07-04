@@ -9,13 +9,25 @@ PROJECT_NEXP_VIEWPATH = "/nbu.meta/confetti/project.ne"
 #----------------------------------------------------------------------------------------------
 
 class Project
-	attr_reader :name, :roots
-	attr_writer :roots
+	attr_reader :name
+	attr_writer :cspec
 
 	def initialize(name)
 		@name = name
-		@roots = []
+		@branch = ''
+		@root_vob = ''
 	end
+
+	def new_activity(name, project, version: nil)
+	end
+
+	def cspec=(s)
+
+	end
+
+	def Project.create(name, branch: nil, root_vob: nil, cspec: nil)
+	end
+
 
 end # Project
 
