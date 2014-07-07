@@ -1,5 +1,7 @@
 
 # require 'nokogiri'
+require 'sqlite3'
+
 require 'Bento'
 require 'Nexp'
 

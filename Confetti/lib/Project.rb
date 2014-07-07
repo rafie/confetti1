@@ -1,14 +1,12 @@
 
-require_relative 'Common'
+require_relative 'Confetti'
+require_relative 'Stream'
 
 module Confetti
 
-TEST_META_DIR = "view"
-PROJECT_NEXP_VIEWPATH = "/nbu.meta/confetti/project.ne"
-
 #----------------------------------------------------------------------------------------------
 
-class Project
+class Project < Stream
 	attr_reader :name
 	attr_writer :cspec
 
@@ -25,9 +23,26 @@ class Project
 
 	end
 
-	def Project.create(name, branch: nil, root_vob: nil, cspec: nil)
+	def check!
 	end
 
+	def new_version
+	end
+
+	def Project.create(name, branch: nil, root_vob: nil, cspec: nil)
+		# create management view
+		# establish project ne
+		# create db record
+	end
+
+	private
+
+	# management view
+	def mview
+	end
+
+	def label
+	end
 
 end # Project
 
@@ -53,7 +68,7 @@ class CurrentProject < Project
 	class DB
 		def initialize
 			view = ClearCASE::CurrentView.new
-			@xml = Nokogiri::XML(File.open(view.fullPath + PROJECT_XML_VIEWPATH))
+			@ne = Nokogiri::XML(File.open(view.fullPath + PROJECT_NEXP_VIEWPATH))
 		end
 
 		def version
@@ -91,6 +106,8 @@ module All
 
 class Projects
 
+	include Enumerable
+
 	def initialize
 		@rows = db.execute("select name from projects")
 		fail "Cannot determine all projets" if @rows == nil
@@ -102,6 +119,7 @@ class Projects
 
 	def db
 		Confetti::DB.global
+#		Nexp.from_file(Confetti::Config.view_path + "/projects.ne", :single)
 	end
 
 end # Projects

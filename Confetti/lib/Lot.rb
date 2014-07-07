@@ -1,5 +1,5 @@
 
-require_relative 'Common'
+require_relative 'Confetti'
 
 module Confetti
 
@@ -45,6 +45,11 @@ class Lot
 		return ClearCASE::Elements.new(files)
 	end
 	
+
+	def label(name, view: nil)
+		raise "unimplemented"
+	end
+
 	private
 
 	def db
@@ -56,6 +61,22 @@ class Lot
 		@db
 	end
 end # Lot
+
+#----------------------------------------------------------------------------------------------
+
+class Lots
+	def initialize(names)
+		@names = names
+	end
+
+	def each
+		@names.each { |name| yield Lot.new(name) }
+	end
+end
+
+#----------------------------------------------------------------------------------------------
+
+module All
 
 #----------------------------------------------------------------------------------------------
 

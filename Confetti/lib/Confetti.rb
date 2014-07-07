@@ -1,16 +1,8 @@
 
-require 'sqlite3'
 
-require 'Bento'
+require_relative 'Common'
 
 module Confetti
-
-$confetti_test = false
-
-GLOBAL_DB_PATH = "R:/Build/sys/scripts/ruby/Confetti/db/global.db"
-GLOBAL_TEST_DB_PATH = "R:/Build/sys/scripts/ruby/Confetti/db/test/global.db"
-
-DB_VIEWPATH = "/nbu.meta/confetti/db/local.db"
 
 #----------------------------------------------------------------------------------------------
 
@@ -42,10 +34,34 @@ class DB
 	end
 	
 	def DB.global_path
-		$confetti_test_mode ? GLOBAL_TEST_DB_PATH : GLOBAL_DB_PATH
+		Config.db_path + "/global.db"
 	end
 
 end # DB
+
+#----------------------------------------------------------------------------------------------
+
+class Config
+	def Config.db_path
+		if !CONFETTI_TEST
+			view = ClearCASE::CurrentView.new
+			path = "R:/Build/cfg"
+		else
+			path = "net"
+		end
+		path + "/confetti"
+	end
+
+	def Config.view_path
+		if !CONFETTI_TEST
+			view = ClearCASE::CurrentView.new
+			path = view.fullPath
+		else
+			path = "view"
+		end
+		path + "/nbu.meta/confetti"
+	end
+end # Config
 
 #----------------------------------------------------------------------------------------------
 
