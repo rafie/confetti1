@@ -50,7 +50,17 @@ class CSpec
 	end
 
 	def tag(lot = '')
-		~db[:tag]
+		if lot == ''
+			t = ~db[:tag]
+		else
+			t = lots[lot]
+			t = ~db[:tag] if t == ''
+		end
+		t
+	end
+
+	def tag=(t)
+		db[:tag] = t
 	end
 
 	def stem
@@ -58,7 +68,7 @@ class CSpec
 	end
 
 	def lots
-		db[:lots].map {|x| ~x.car}
+		Hash[ db[:lots].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
 	end
 
 	def checks

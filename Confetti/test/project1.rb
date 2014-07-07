@@ -10,8 +10,10 @@ end
 class Projects1 < Minitest::Test
 
 	def setup
-#		byebug
+		@all_projects_names = %w(main ucgw-7.7 ucgw-8.0 mcu-7.7 mcu-8.0 test).sort
+
 		@projects = Confetti::All::Projects.new
+
 		p = @projects.first
 		puts p.name
 		a = 1
@@ -19,6 +21,6 @@ class Projects1 < Minitest::Test
 
 	def test_all_projects
 		names = @projects.map { |project| project.name }
-		assert_equal %w(main ucgw-7.7 ucgw-8.0 mcu-7.7 mcu-8.0 test).sort, names.sort
+		assert_equal @all_projects_names, names.sort
 	end
 end
