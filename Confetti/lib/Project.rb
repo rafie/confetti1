@@ -7,13 +7,17 @@ module Confetti
 #----------------------------------------------------------------------------------------------
 
 class Project < Stream
+	include Bento::Class
+
 	attr_reader :name
 	attr_writer :cspec
 
-	def initialize(name)
+	def initialize(name, *opt, row: nil)
+		return if tagged_init(:create, opt, [name, *opt])
+
 		@name = name
-		@branch = ''
-		@root_vob = ''
+		@branch = '' # take from db
+		@root_vob = '' # take from db
 	end
 
 	def new_activity(name, project, version: nil)
@@ -26,22 +30,29 @@ class Project < Stream
 	def check!
 	end
 
-	def new_version
+	def new_version!
 	end
 
-	def Project.create(name, branch: nil, root_vob: nil, cspec: nil)
-		# create management view
-		# establish project ne
+	def tag!
+	end
+
+	def Project.create(name, *opt, branch: nil, root_vob: nil, cspec: nil)
 		# create db record
+		# establish project ne
+		# create control view
+	end
+
+	def by_row(row, *opt)
+		
 	end
 
 	private
 
-	# management view
-	def mview
+	def create(name, *opt, branch: nil, root_vob: nil, cspec: nil)
 	end
 
-	def label
+	# control view
+	def ctl_view
 	end
 
 end # Project
@@ -122,6 +133,18 @@ class Projects
 #		Nexp.from_file(Confetti::Config.view_path + "/projects.ne", :single)
 	end
 
+	def Projects.create(name, cspec: nil, branch: nil, roov_vob: nil)
+		branch = name + "_int_br" if !branch
+		root_vob = root_vob.to_s
+		stm = Confetti::DB.global.execute("insert into projects (name, branch, root_vob, cspec) values (?, ?, ?, ?)",
+			[name, branch, root_vob, cspec])
+
+#		q = DB::Query.new("insert into projects (name, branch, root_vob, cspec) values (?, ?, ?, ?)"), 
+#			name, branch, root_vob, cspec
+#		q.exec!
+		rescue
+			raise "failed to create project"
+	end
 end # Projects
 
 #----------------------------------------------------------------------------------------------

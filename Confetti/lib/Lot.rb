@@ -3,9 +3,6 @@ require_relative 'Confetti'
 
 module Confetti
 
-TEST_META_DIR = "view"
-LOT_NEXP_VIEWPATH = "/nbu.meta/confetti/lots.ne"
-
 #----------------------------------------------------------------------------------------------
 
 # (lots
@@ -90,7 +87,7 @@ class Lots
 
 	def each
 		@names.each { |name| yield Lot.new(name, db: @db[:lots].select { |lot| lot.cadr.to_s == name }) }
-		@db["lots/lot/#{@name}"]
+		# @db["lots/lot/#{@name}"]
 	end
 
 	def [](x)
@@ -99,13 +96,7 @@ class Lots
 	end
 
 	def Lots.db
-		if !CONFETTI_TEST
-			view = ClearCASE::CurrentView.new
-			meta_dir = view.fullPath
-		else
-			meta_dir = TEST_META_DIR
-		end
-		Nexp.from_file(meta_dir + LOT_NEXP_VIEWPATH, :single)
+		Nexp.from_file(Config.view_path + '/lots.ne', :single)
 	end
 end # Lots
 

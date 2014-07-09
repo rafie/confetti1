@@ -27,14 +27,29 @@ class DB
 
 	def DB.global
 		if DB.global_db == nil
-			class_variable_set(:@@global_db, SQLite3::Database.new(DB.global_path))
-			DB.global_db.results_as_hash = true
+			if !CONFETTI_TEST
+				db = Bento::DB.new(DB.global_path)
+			else
+				db = Bento::DB.create(schema: '../db/global.schema.sql', data: 'net/confetti/global.data.sql')
+			end
+			class_variable_set(:@@global_db, db)
 		end
 		DB.global_db
 	end
 	
 	def DB.global_path
-		Config.db_path + "/global.db"
+		if !CONFETTI_TEST
+			Config.db_path + "/global.db"
+		else
+			Config.db_path + "/global.db"
+		end
+	end
+
+	def DB.cleanup
+		if CONFETTI_TEST
+			DB.global_db.cleanup
+			class_variable_set(:@@global_db, nil)
+		end
 	end
 
 end # DB

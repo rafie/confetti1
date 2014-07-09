@@ -25,7 +25,7 @@ class Lot1 < Minitest::Test
 	def test_lot_vobs
 		mcu = Confetti::Lot.new('nbu.mcu')
 		assert_equal mcu.name, 'nbu.mcu'
-		assert_equal mcu.vobs.map {|x| x.name}.sort, %w(adapters dialingInfo mcu mediaCtrlInfo nbu.proto.jingle-stack)
+		assert_equal mcu.vobs.map {|x| x.name}.sort, %w(adapters dialingInfo mcu mediaCtrlInfo)
 
 	end
 

@@ -11,7 +11,7 @@
 			nbu.dsp
 			nbu.infra
 			nbu.bsp
-			nbu.tools
+			nbu.contrib
 			nbu.tests))
 
 	(lot nbu.mcu
@@ -19,8 +19,7 @@
 			mcu
 			adapters
 			dialingInfo
-			mediaCtrlInfo
-			nbu.proto.jingle-stack))
+			mediaCtrlInfo))
 
 	(lot nbu.web
 		(vobs
@@ -50,12 +49,6 @@
 			NetraVideoCODEC
 			swAudioCodecs))
 
-	(lot nbu.tbu-stacks
-		(vobs
-			NBU_COMMON_CORE
-			NBU_SIP_STACK
-			NBU_H323_STACK))
-
 	(lot nbu.infra
 		(vobs
 			nbu.infra
@@ -63,9 +56,15 @@
 			configInfra
 			swInfra
 			loggerInfra
-			rvfc
-			nbu.contrib))
+			rvfc))
 
+	(lot nbu.contrib
+		(vobs
+			nbu.contrib
+			NBU_COMMON_CORE
+			NBU_SIP_STACK
+			NBU_H323_STACK))
+		
 	(lot nbu.build
 		(vobs
 			freemasonBuild))
