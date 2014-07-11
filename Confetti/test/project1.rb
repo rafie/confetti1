@@ -15,10 +15,6 @@ class Projects1 < Minitest::Test
 		@all_projects_names = %w(main ucgw-7.7 ucgw-8.0 mcu-7.7 mcu-8.0 test).sort
 
 		@projects = Confetti::All::Projects.new
-
-		p = @projects.first
-		puts p.name
-		a = 1
 	end
 
 	def test_all_projects
@@ -54,15 +50,12 @@ END
 	def setup
 	end
 
-	def teardown
-	end
-
 	def test_create
 		byebug
 		Confetti::All::Projects.create('test1', cspec: @@cspec)
-		project = Confetti::Project('test1')
+		project = Confetti::Project.new('test1')
 		assert_equal 'test1', project.name
-		assert_equal 'test1_int_br', project.name
+		assert_equal 'test1_int_br', project.branch
 		assert_equal '', project.root_vob
 		assert_equal @@cspec, project.cspec
 	end

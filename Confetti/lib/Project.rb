@@ -9,15 +9,17 @@ module Confetti
 class Project < Stream
 	include Bento::Class
 
-	attr_reader :name
-	attr_writer :cspec
+	attr_reader :name, :branch, :root_vob
+	attr_accessor :cspec
 
 	def initialize(name, *opt, row: nil)
 		return if tagged_init(:create, opt, [name, *opt])
 
 		@name = name
-		@branch = '' # take from db
-		@root_vob = '' # take from db
+
+		row = Confetti::DB.global.single("select * from projects where name=?", [name]) if !row
+		@branch = row[:branch]
+		@root_vob = row[:root_vob]
 	end
 
 	def new_activity(name, project, version: nil)
@@ -37,9 +39,22 @@ class Project < Stream
 	end
 
 	def Project.create(name, *opt, branch: nil, root_vob: nil, cspec: nil)
+		raise "invalid project name" if name.to_s.strip == ''
+
+		branch = name + "_int_br" if !branch
+		root_vob = root_vob.to_s
+
+		Confetti::DB.global.execute("insert into projects (name, branch, root_vob, cspec) values (?, ?, ?, ?)",
+			[name, branch, root_vob, cspec])
+
+
+		Project.new(name)
+		rescue
+			raise "failed to create project"
+
 		# create db record
-		# establish project ne
 		# create control view
+		# establish project ne
 	end
 
 	def by_row(row, *opt)
@@ -120,12 +135,12 @@ class Projects
 	include Enumerable
 
 	def initialize
-		@rows = db.execute("select name from projects")
+		@rows = db["select * from project"]
 		fail "Cannot determine all projets" if @rows == nil
 	end
 
 	def each
-		@rows.each { |row| yield Project.new(row["name"]) }
+		@rows.each { |row| yield Project.new(row[:name], row: row) }
 	end
 
 	def db
@@ -136,12 +151,8 @@ class Projects
 	def Projects.create(name, cspec: nil, branch: nil, roov_vob: nil)
 		branch = name + "_int_br" if !branch
 		root_vob = root_vob.to_s
-		stm = Confetti::DB.global.execute("insert into projects (name, branch, root_vob, cspec) values (?, ?, ?, ?)",
+		Confetti::DB.global.execute("insert into projects (name, branch, root_vob, cspec) values (?, ?, ?, ?)",
 			[name, branch, root_vob, cspec])
-
-#		q = DB::Query.new("insert into projects (name, branch, root_vob, cspec) values (?, ?, ?, ?)"), 
-#			name, branch, root_vob, cspec
-#		q.exec!
 		rescue
 			raise "failed to create project"
 	end
