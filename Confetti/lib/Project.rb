@@ -41,19 +41,20 @@ class Project < Stream
 	def Project.create(name, *opt, branch: nil, root_vob: nil, cspec: nil)
 		raise "invalid project name" if name.to_s.strip == ''
 
+		# create db record
 		branch = name + "_int_br" if !branch
 		root_vob = root_vob.to_s
 
+		Bento::ClearCAse.View.create()
 		Confetti::DB.global.execute("insert into projects (name, branch, root_vob, cspec) values (?, ?, ?, ?)",
 			[name, branch, root_vob, cspec])
 
-
+		# create control view
+		View.create('confetti_project_' + name, root_vob: root_vob)
 		Project.new(name)
 		rescue
 			raise "failed to create project"
 
-		# create db record
-		# create control view
 		# establish project ne
 	end
 
