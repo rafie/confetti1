@@ -2,13 +2,7 @@
 require 'minitest/autorun'
 require '../lib/Lot.rb'
 
-module Confetti
-
-CONFETTI_TEST = 1
-
-end
-
-class Lot1 < Minitest::Test
+class Lot1 < Confetti::Test
 
 	def setup
 		@x = Nexp.from_file("view/nbu.meta/confetti/lots.ne", :single)

@@ -27,10 +27,11 @@ class DB
 
 	def DB.global
 		if DB.global_db == nil
-			if !CONFETTI_TEST
+			if !TEST_MODE
 				db = Bento::DB.new(DB.global_path)
 			else
-				db = Bento::DB.create(schema: '../db/global.schema.sql', data: 'net/confetti/global.data.sql')
+				db = Bento::DB.create(path: DB.global_path,schema: '../db/global.schema.sql', 
+					data: Config.db_path + '/global.data.sql')
 			end
 			class_variable_set(:@@global_db, db)
 		end
@@ -38,7 +39,7 @@ class DB
 	end
 	
 	def DB.global_path
-		if !CONFETTI_TEST
+		if !TEST_MODE
 			Config.db_path + "/global.db"
 		else
 			Config.db_path + "/global.db"
@@ -46,7 +47,7 @@ class DB
 	end
 
 	def DB.cleanup
-		if CONFETTI_TEST
+		if TEST_MODE
 			DB.global_db.cleanup
 			class_variable_set(:@@global_db, nil)
 		end
@@ -58,25 +59,28 @@ end # DB
 
 class Config
 	def Config.db_path
-		if !CONFETTI_TEST
+		if !TEST_MODE
 			view = ClearCASE::CurrentView.new
 			path = "R:/Build/cfg"
 		else
-			path = "net"
+			path = Test.current.path + "/net"
 		end
 		path + "/confetti"
 	end
 
-	def Config.view_path
-		if !CONFETTI_TEST
-			view = ClearCASE::CurrentView.new
+	def Config.view_path(view = nil)
+		if !TEST_MODE
+			view = ClearCASE::CurrentView.new if !view
 			path = view.fullPath
 		else
-			path = "view"
+			path = Test.current.path + "/"
+			view_name = !view ? '' : view.name
+			path += !view ? "view" : "views/#{view_name}"
 		end
 		path + "/nbu.meta/confetti"
 	end
 end # Config
+
 
 #----------------------------------------------------------------------------------------------
 

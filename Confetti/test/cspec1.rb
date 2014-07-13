@@ -1,13 +1,9 @@
 require 'minitest/autorun'
 require '../lib/CSpec.rb'
 
-module Confetti
+#----------------------------------------------------------------------------------------------
 
-CONFETTI_TEST = 1
-
-end
-
-class CSpec1 < Minitest::Test
+class CSpec1 < Confetti::Test
 
 	@@nexp = <<END
 (cspec
@@ -99,3 +95,5 @@ END
 		assert_equal @@configspec, $cspec.configspec
 	end
 end
+
+#----------------------------------------------------------------------------------------------

@@ -1,16 +1,43 @@
 
+require 'erb'
+
 require_relative 'Confetti'
+# require 'Bento'
 require_relative 'Stream'
 
 module Confetti
 
 #----------------------------------------------------------------------------------------------
 
+# (project project-name
+# 	(baseline cspec)
+# 
+# 	:icheck N
+# 	:itag N
+# 	
+# 	(lots
+# 		lot-names ...)
+# 	
+# 	(products
+# 		(product product-name :lot product-lot))
+# )
+
 class Project < Stream
 	include Bento::Class
 
 	attr_reader :name, :branch, :root_vob
 	attr_accessor :cspec
+
+	@@ne_template = %{
+	(project <%= @name %>
+		(baseline <%= cspec.to_s %>)
+		:itag 0
+		:icheck 0
+		(lots 
+			<%for @lot in @lots -%>
+			<%= @lot %>
+			<% end -%>))
+	}
 
 	def initialize(name, *opt, row: nil)
 		return if tagged_init(:create, opt, [name, *opt])
@@ -25,8 +52,12 @@ class Project < Stream
 	def new_activity(name, project, version: nil)
 	end
 
-	def cspec=(s)
+	def cspec
+		@cspec.to_s
+	end
 
+	def cspec=(s)
+		@cspec = CSpec.new(s)
 	end
 
 	def check!
@@ -41,27 +72,37 @@ class Project < Stream
 	def Project.create(name, *opt, branch: nil, root_vob: nil, cspec: nil)
 		raise "invalid project name" if name.to_s.strip == ''
 
+		@cspec = CSpec.from_file(cspec) if cspec
+
 		# create db record
 		branch = name + "_int_br" if !branch
 		root_vob = root_vob.to_s
 
-		Bento::ClearCAse.View.create()
 		Confetti::DB.global.execute("insert into projects (name, branch, root_vob, cspec) values (?, ?, ?, ?)",
 			[name, branch, root_vob, cspec])
 
 		# create control view
-		View.create('confetti_project_' + name, root_vob: root_vob)
-		Project.new(name)
-		rescue
-			raise "failed to create project"
+		view = View.create('.project_' + name, root_vob: root_vob)
 
 		# establish project ne
+		project_ne = ERB.new(@ne_template, 0, "%<>").result(binding)
+		File.write(Config.view_path(view) + '/project.ne', project_ne)
+
+		Project.new(name)
+
+		rescue
+			raise "failed to create project"
 	end
 
 	def by_row(row, *opt)
 		
 	end
 
+	def local_db_file
+		Config.view_path + '/project.ne'
+	end
+
+	#------------------------------------------------------------------------------------------
 	private
 
 	def create(name, *opt, branch: nil, root_vob: nil, cspec: nil)
@@ -69,8 +110,19 @@ class Project < Stream
 
 	# control view
 	def ctl_view
+		if !TEST_MODE
+			ClearCASE::View.new(".project_#{@name}", :ready)
+		else
+			nil
+		end
 	end
 
+	def db
+		Nexp.from_file(Config.view_path + '/project.ne', :single)
+	end
+
+	def global_db
+	end
 end # Project
 
 #----------------------------------------------------------------------------------------------
@@ -113,6 +165,7 @@ end # CurrentProject
 #----------------------------------------------------------------------------------------------
 
 class Projects
+	include Enumerable
 
 	def initialize(names)
 		@names = names
@@ -121,7 +174,6 @@ class Projects
 	def each
 		@names.each { |name| yield Proejct.new(name) }
 	end
-
 end # Projects
 
 

@@ -62,6 +62,8 @@ end # Lot
 #----------------------------------------------------------------------------------------------
 
 class Lots
+	include Enumerable
+
 	def initialize(names)
 		@names = names
 	end

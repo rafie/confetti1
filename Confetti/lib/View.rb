@@ -2,6 +2,8 @@ require_relative 'Common'
 
 module Confetti
 
+#----------------------------------------------------------------------------------------------
+
 class View
 	attr_reader :name
 
@@ -9,6 +11,10 @@ class View
 		@name = name
 	end
 
+	def View.create(name)
+	end
 end
+
+#----------------------------------------------------------------------------------------------
 
 end # module Confetti

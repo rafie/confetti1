@@ -1,15 +1,12 @@
+
 require 'minitest/autorun'
 require '../lib/Project.rb'
-
-module Confetti
-
-CONFETTI_TEST = 1
-
-end
+require '../lib/Test.rb'
+require 'byebug'
 
 #----------------------------------------------------------------------------------------------
 
-class Projects1 < Minitest::Test
+class Projects1 < Confetti::Test
 
 	def setup
 		@all_projects_names = %w(main ucgw-7.7 ucgw-8.0 mcu-7.7 mcu-8.0 test).sort
@@ -26,7 +23,7 @@ end
 
 #----------------------------------------------------------------------------------------------
 
-class Projects2 < Minitest::Test
+class Projects2 < Confetti::Test
 
 	@@cspec = <<END
 (cspec
@@ -47,17 +44,26 @@ class Projects2 < Minitest::Test
 )
 END
 
-	def setup
-	end
+@@project_ne = <<END
+END
 
-	def test_create
-		byebug
-		Confetti::All::Projects.create('test1', cspec: @@cspec)
-		project = Confetti::Project.new('test1')
+	def _test_project(proejct)
 		assert_equal 'test1', project.name
 		assert_equal 'test1_int_br', project.branch
 		assert_equal '', project.root_vob
 		assert_equal @@cspec, project.cspec
+		assert_equal @@project_ne, File.read(@project.local_db_file)
+	end
+
+	def test_create1
+		byebug
+		project = Confetti::All::Projects.create('test1', cspec: @@cspec)
+		_test_project(project)
+	end
+
+	def test_create2
+		Confetti::All::Projects.create('test2', cspec: @@cspec)
+		_test_project(Confetti::Project.new('test2'))
 	end
 end
 
