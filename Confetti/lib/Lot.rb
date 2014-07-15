@@ -1,4 +1,6 @@
 
+require '../lib/Test.rb'
+
 require_relative 'Confetti'
 
 module Confetti
@@ -29,7 +31,7 @@ class Lot
 	def lots
 		names = db[:lots]
 		names = !names ? [] : ~names
-		return Lots.new(names: names)
+		return Lots.new(names)
 	end
 	
 	# Filter out elements not contained in lot
@@ -51,7 +53,7 @@ class Lot
 
 	def db
 		if @db == nil
-			lots = Lots::db if @db == nil
+			lots = All::Lots::db if @db == nil
 			@db = (lots/:lot).select { |lot| lot.cadr.to_s == @name }[0]
 			raise "lot #{@name} does not exist" if !@db
 		end
@@ -101,6 +103,10 @@ class Lots
 		Nexp.from_file(Config.view_path + '/lots.ne', :single)
 	end
 end # Lots
+
+#----------------------------------------------------------------------------------------------
+
+end # module All
 
 #----------------------------------------------------------------------------------------------
 

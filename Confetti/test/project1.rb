@@ -8,7 +8,13 @@ require 'byebug'
 
 class Projects1 < Confetti::Test
 
+#	def keep?; true; end
+
+
 	def setup
+		puts 'Projects1: ' + @path
+		puts 'Projects1 DB: ' + Confetti::Config.db_path
+
 		@all_projects_names = %w(main ucgw-7.7 ucgw-8.0 mcu-7.7 mcu-8.0 test).sort
 
 		@projects = Confetti::All::Projects.new
@@ -24,6 +30,8 @@ end
 #----------------------------------------------------------------------------------------------
 
 class Projects2 < Confetti::Test
+
+#	def keep?; true; end
 
 	@@cspec = <<END
 (cspec
@@ -47,23 +55,28 @@ END
 @@project_ne = <<END
 END
 
-	def _test_project(proejct)
-		assert_equal 'test1', project.name
-		assert_equal 'test1_int_br', project.branch
+	def setup
+		puts 'Projects2: ' + @path
+	end
+
+	def _test_project(project, name)
+		assert_equal name, project.name
+		assert_equal name + '_int_br', project.branch
 		assert_equal '', project.root_vob
-		assert_equal @@cspec, project.cspec
-		assert_equal @@project_ne, File.read(@project.local_db_file)
+#		assert_equal @@cspec, project.cspec
+#		assert_equal @@project_ne, File.read(@project.local_db_file)
 	end
 
 	def test_create1
-		byebug
-		project = Confetti::All::Projects.create('test1', cspec: @@cspec)
-		_test_project(project)
+		#byebug
+		project = Confetti::Project.create('test1', cspec: @@cspec)
+		_test_project(project, 'test1')
 	end
 
 	def test_create2
-		Confetti::All::Projects.create('test2', cspec: @@cspec)
-		_test_project(Confetti::Project.new('test2'))
+		#byebug
+		Confetti::Project.create('test2', cspec: @@cspec)
+		_test_project(Confetti::Project.new('test2'), 'test2')
 	end
 end
 

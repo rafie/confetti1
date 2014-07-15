@@ -28,6 +28,9 @@ module Confetti
 class CSpec
 	include Bento::Class
 
+	@@configspec_t = ERB.new <<-END
+END
+
 	def initialize(text, *opt)
 		return if tagged_init(:from_file, opt, [text, *opt])
 

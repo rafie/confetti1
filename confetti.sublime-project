@@ -2,13 +2,13 @@
 	"folders":
 	[
 		{
-			"path": "/h/prj/github/confetti1"
+			"path": "../confetti1"
 		},
 		{
-			"path": "/h/prj/github/classico1/Classico"
+			"path": "../classico1/Classico"
 		},
 		{
-			"path": "/h/prj/github/nexp"
+			"path": "../nexp"
 		}
 	]
 }

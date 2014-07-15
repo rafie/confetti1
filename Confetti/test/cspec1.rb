@@ -1,4 +1,5 @@
 require 'minitest/autorun'
+require '../lib/Test.rb'
 require '../lib/CSpec.rb'
 
 #----------------------------------------------------------------------------------------------
@@ -92,6 +93,7 @@ END
 	end
 
 	def test_configspec
+		skip "unimplemented"
 		assert_equal @@configspec, $cspec.configspec
 	end
 end

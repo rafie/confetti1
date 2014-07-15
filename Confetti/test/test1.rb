@@ -58,3 +58,33 @@ class Test2 < Confetti::Test
 end
 
 #----------------------------------------------------------------------------------------------
+
+class Test3 < Confetti::Test
+
+	def keep?; true; end
+
+	def setup
+	end
+
+	def test_db_1
+		db = Confetti::DB.global
+		assert_equal Confetti::Test::current.path + '/net/confetti/global.db', db.path
+	end
+end
+	
+#----------------------------------------------------------------------------------------------
+
+class Test3 < Confetti::Test
+
+	def keep?; true; end
+
+	def setup
+	end
+
+	def test_db_2
+		db = Confetti::DB.global
+		assert_equal Confetti::Test::current.path + '/net/confetti/global.db', db.path
+	end
+end
+	
+#----------------------------------------------------------------------------------------------

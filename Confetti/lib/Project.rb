@@ -1,16 +1,17 @@
 
-require 'erb'
-
 require_relative 'Confetti'
-# require 'Bento'
 require_relative 'Stream'
+require_relative 'CSpec'
+require_relative 'View'
+require_relative 'Lot'
 
 module Confetti
 
 #----------------------------------------------------------------------------------------------
 
 # (project project-name
-# 	(baseline cspec)
+# 	(baseline
+#		cspec)
 # 
 # 	:icheck N
 # 	:itag N
@@ -28,28 +29,44 @@ class Project < Stream
 	attr_reader :name, :branch, :root_vob
 	attr_accessor :cspec
 
-	@@ne_template = %{
-	(project <%= @name %>
-		(baseline <%= cspec.to_s %>)
-		:itag 0
-		:icheck 0
-		(lots 
-			<%for @lot in @lots -%>
-			<%= @lot %>
-			<% end -%>))
-	}
+	@@ne_template = <<-END
+(project <%= @name %>
+	(baseline 
+		<%= cspec.to_s %>)
+	:itag 0
+	:icheck 0
+	(lots 
+		<%for lot in @lots %> <%= lot %> <% end %>))
+END
 
-	def initialize(name, *opt, row: nil)
-		return if tagged_init(:create, opt, [name, *opt])
+	#------------------------------------------------------------------------------------------
+
+	def initialize(name, *opt, db_row: nil,
+			branch: nil, root_vob: nil, cspec: nil)
+		return if tagged_init(:create, opt, [name, *opt, branch: branch, root_vob: root_vob, cspec: cspec])
 
 		@name = name
+		@row = db_row if !!db_row
+		if row == nil
+			byebug
+		end
 
-		row = Confetti::DB.global.single("select * from projects where name=?", [name]) if !row
 		@branch = row[:branch]
 		@root_vob = row[:root_vob]
+
 	end
 
+	def Project.create(name, *opt, branch: nil, root_vob: nil, cspec: nil)
+		Project.new(name, *opt << :create, branch: branch, root_vob: root_vob, cspec: cspec)
+	end
+
+	#------------------------------------------------------------------------------------------
+
 	def new_activity(name, project, version: nil)
+	end
+
+	def lots
+		Lots.new(~db[:lots])
 	end
 
 	def cspec
@@ -69,35 +86,6 @@ class Project < Stream
 	def tag!
 	end
 
-	def Project.create(name, *opt, branch: nil, root_vob: nil, cspec: nil)
-		raise "invalid project name" if name.to_s.strip == ''
-
-		@cspec = CSpec.from_file(cspec) if cspec
-
-		# create db record
-		branch = name + "_int_br" if !branch
-		root_vob = root_vob.to_s
-
-		Confetti::DB.global.execute("insert into projects (name, branch, root_vob, cspec) values (?, ?, ?, ?)",
-			[name, branch, root_vob, cspec])
-
-		# create control view
-		view = View.create('.project_' + name, root_vob: root_vob)
-
-		# establish project ne
-		project_ne = ERB.new(@ne_template, 0, "%<>").result(binding)
-		File.write(Config.view_path(view) + '/project.ne', project_ne)
-
-		Project.new(name)
-
-		rescue
-			raise "failed to create project"
-	end
-
-	def by_row(row, *opt)
-		
-	end
-
 	def local_db_file
 		Config.view_path + '/project.ne'
 	end
@@ -106,23 +94,51 @@ class Project < Stream
 	private
 
 	def create(name, *opt, branch: nil, root_vob: nil, cspec: nil)
+		raise "invalid project name" if name.to_s.strip == ''
+
+		@name = name
+		@branch = name + "_int_br" if !branch
+		@root_vob = root_vob.to_s
+		@cspec = CSpec.new(cspec) if cspec
+
+		# create db record
+		Confetti::DB.global.execute("insert into projects (name, branch, root_vob, cspec) values (?, ?, ?, ?)",
+			[@name, @branch, @root_vob, cspec])
+
+		# create control view
+		@ctl_view = ProjectControlView.create(project_name: @name, branch: @branch, root_vob: @root_vob)
+
+#		byebug
+
+		# establish project ne
+		@lots = @cspec.lots.keys
+		project_ne = ERB.new(@@ne_template, 0, "-").result(binding)
+		File.write(Config.view_path(@ctl_view.name) + '/project.ne', project_ne)
+
+#		rescue Exception => x
+#			byebug
+#			raise "failed to create project"
 	end
 
 	# control view
 	def ctl_view
+		return @ctl_view if @ctl_view
 		if !TEST_MODE
-			ClearCASE::View.new(".project_#{@name}", :ready)
+			@ctl_view = View.new(".project_#{@name}", :ready)
 		else
-			nil
+			@ctl_view = ProjectControlView.new(name)
 		end
 	end
 
 	def db
-		Nexp.from_file(Config.view_path + '/project.ne', :single)
+		Nexp.from_file(Config.view_path(ctl_view.name) + '/project.ne', :single)
 	end
 
-	def global_db
+	def row
+		@row = Confetti::DB.global.single("select * from projects where name=?", [@name]) if !@row
+		@row
 	end
+
 end # Project
 
 #----------------------------------------------------------------------------------------------
@@ -188,12 +204,12 @@ class Projects
 	include Enumerable
 
 	def initialize
-		@rows = db["select * from project"]
+		@rows = db["select * from projects"]
 		fail "Cannot determine all projets" if @rows == nil
 	end
 
 	def each
-		@rows.each { |row| yield Project.new(row[:name], row: row) }
+		@rows.each { |row| yield Project.new(row[:name], db_row: row) }
 	end
 
 	def db
@@ -201,14 +217,6 @@ class Projects
 #		Nexp.from_file(Confetti::Config.view_path + "/projects.ne", :single)
 	end
 
-	def Projects.create(name, cspec: nil, branch: nil, roov_vob: nil)
-		branch = name + "_int_br" if !branch
-		root_vob = root_vob.to_s
-		Confetti::DB.global.execute("insert into projects (name, branch, root_vob, cspec) values (?, ?, ?, ?)",
-			[name, branch, root_vob, cspec])
-		rescue
-			raise "failed to create project"
-	end
 end # Projects
 
 #----------------------------------------------------------------------------------------------

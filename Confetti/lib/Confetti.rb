@@ -30,10 +30,16 @@ class DB
 			if !TEST_MODE
 				db = Bento::DB.new(DB.global_path)
 			else
-				db = Bento::DB.create(path: DB.global_path,schema: '../db/global.schema.sql', 
+				db = Bento::DB.create(path: DB.global_path, 
+					schema: '../db/global.schema.sql', 
 					data: Config.db_path + '/global.data.sql')
 			end
 			class_variable_set(:@@global_db, db)
+		else
+				if DB.global_path != @@global_db.path
+					DB.cleanup
+					DB.global # recursively try again
+				end
 		end
 		DB.global_db
 	end
@@ -47,6 +53,7 @@ class DB
 	end
 
 	def DB.cleanup
+#		puts @@global_db.path + " cleanup"
 		if TEST_MODE
 			DB.global_db.cleanup
 			class_variable_set(:@@global_db, nil)
@@ -68,16 +75,21 @@ class Config
 		path + "/confetti"
 	end
 
-	def Config.view_path(view = nil)
+	def Config.view_path(view_name = nil)
 		if !TEST_MODE
-			view = ClearCASE::CurrentView.new if !view
+			if !view_name
+				view = ClearCASE::CurrentView.new
+			else
+				view = ClearCASE::View.new(view_name)
+			end
 			path = view.fullPath
 		else
 			path = Test.current.path + "/"
-			view_name = !view ? '' : view.name
-			path += !view ? "view" : "views/#{view_name}"
+			path += !view_name ? "view" : "views/#{view_name}"
 		end
-		path + "/nbu.meta/confetti"
+		path += "/nbu.meta/confetti"
+		FileUtils.mkdir_p(path) if !File.directory?(path)
+		path
 	end
 end # Config
 

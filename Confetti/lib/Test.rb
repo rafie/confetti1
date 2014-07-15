@@ -14,6 +14,9 @@ class Test < MiniTest::Test
 
 	def initialize(name)
 		@path = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S")
+		while File.directory?(path)
+			@path = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S%L")
+		end
 		FileUtils.mkdir_p(@path)
 		Bento.unzip(testzip, @path)
 
@@ -34,7 +37,7 @@ class Test < MiniTest::Test
 		@@current_test = nil
 
 		return if keep?
-		FileUtils.rm_r(@path)
+		FileUtils.rm_r(@path) rescue ''
 	end
 	
 	def teardown
