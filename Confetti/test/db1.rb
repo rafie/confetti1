@@ -17,3 +17,23 @@ class Test1 < Confetti::Test
 end
 
 #----------------------------------------------------------------------------------------------
+
+class Test2 < Confetti::Test
+
+	def test_is_the_right_db
+		db = Confetti::DB.global
+		assert_equal Confetti::Test::current.path + '/net/confetti/global.db', db.path
+	end
+end
+	
+#----------------------------------------------------------------------------------------------
+
+class Test3 < Confetti::Test
+
+	def test_is_the_right_db
+		db = Confetti::DB.global
+		assert_equal Confetti::Test::current.path + '/net/confetti/global.db', db.path
+	end
+end
+	
+#----------------------------------------------------------------------------------------------

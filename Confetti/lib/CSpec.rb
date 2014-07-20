@@ -34,7 +34,7 @@ END
 	def initialize(text, *opt)
 		return if tagged_init(:from_file, opt, [text, *opt])
 
-		@ne = Nexp.from_string(text, :single)
+		@ne = Nexp::Nexp.from_string(text, :single)
 	end
 
 	def CSpec.from_file(fname)
@@ -42,7 +42,7 @@ END
 	end
 
 	def to_s
-		@ne.to_s
+		@ne.text
 	end
 
 	def db
@@ -81,7 +81,7 @@ END
 	private
 
 	def from_file(fname, *opt)
-		@ne = Nexp.from_file(fname, :single)
+		@ne = Nexp::Nexp.from_file(fname, :single)
 	end
 
 end # CSpec

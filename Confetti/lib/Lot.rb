@@ -100,7 +100,7 @@ class Lots
 	end
 
 	def Lots.db
-		Nexp.from_file(Config.view_path + '/lots.ne', :single)
+		Nexp::Nexp.from_file(Config.view_path + '/lots.ne', :single)
 	end
 end # Lots
 

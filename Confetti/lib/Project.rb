@@ -56,8 +56,12 @@ END
 
 	end
 
-	def Project.create(name, *opt, branch: nil, root_vob: nil, cspec: nil)
+	def self.create(name, *opt, branch: nil, root_vob: nil, cspec: nil)
 		Project.new(name, *opt << :create, branch: branch, root_vob: root_vob, cspec: cspec)
+	end
+
+	def self.create_from_project(name, *opt, branch: nil, root_vob: nil, project: nil)
+		raise "unimplemented"
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -69,9 +73,9 @@ END
 		Lots.new(~db[:lots])
 	end
 
-	def cspec
-		@cspec.to_s
-	end
+#	def cspec
+#		@cspec.to_s
+#	end
 
 	def cspec=(s)
 		@cspec = CSpec.new(s)
@@ -131,7 +135,7 @@ END
 	end
 
 	def db
-		Nexp.from_file(Config.view_path(ctl_view.name) + '/project.ne', :single)
+		Nexp::Nexp.from_file(Config.view_path(ctl_view.name) + '/project.ne', :single)
 	end
 
 	def row
@@ -214,7 +218,7 @@ class Projects
 
 	def db
 		Confetti::DB.global
-#		Nexp.from_file(Confetti::Config.view_path + "/projects.ne", :single)
+#		Nexp::Nexp.from_file(Confetti::Config.view_path + "/projects.ne", :single)
 	end
 
 end # Projects

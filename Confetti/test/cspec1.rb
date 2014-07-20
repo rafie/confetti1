@@ -92,6 +92,11 @@ END
 		assert_equal 'nbu.mcu-8.3.1.4.0', @cspec.tag
 	end
 
+	def test_cspec
+		byebug
+		assert_equal @@nexp, @cspec.to_s
+	end
+
 	def test_configspec
 		skip "unimplemented"
 		assert_equal @@configspec, $cspec.configspec

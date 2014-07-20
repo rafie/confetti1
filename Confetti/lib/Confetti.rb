@@ -22,7 +22,7 @@ class DB
 	@@global_db = nil
 
 	def DB.global_db
-		class_variable_get(:@@global_db)
+		@@global_db
 	end
 
 	def DB.global
@@ -36,10 +36,10 @@ class DB
 			end
 			class_variable_set(:@@global_db, db)
 		else
-				if DB.global_path != @@global_db.path
-					DB.cleanup
-					DB.global # recursively try again
-				end
+			if DB.global_path != @@global_db.path
+				DB.cleanup
+				DB.global # recursively try again
+			end
 		end
 		DB.global_db
 	end
@@ -56,7 +56,7 @@ class DB
 #		puts @@global_db.path + " cleanup"
 		if TEST_MODE
 			DB.global_db.cleanup
-			class_variable_set(:@@global_db, nil)
+			@@global_db =  nil
 		end
 	end
 
