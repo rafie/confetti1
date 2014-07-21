@@ -29,7 +29,7 @@ class Mark
 		act_name = options.name if !act_name && !!options.name
 		if !act_name
 			begin
-				act = Confetti::CurrentActivity.new
+				act = Confetti.CurrentActivity
 				act_name = act.anme
 			rescue
 				raise "Cannot determine activity. Please specify activity name"
@@ -40,7 +40,7 @@ class Mark
 
 		say "Marking activity #{act_name} ..."
 		
-		act = Confetti::Activity.new(name: act_name)
+		act = Confetti.Activity(act_name)
 		mark = act.mark!(nil, flags)
 		
 		say "Activity #{act_name} marked with #{mark}."

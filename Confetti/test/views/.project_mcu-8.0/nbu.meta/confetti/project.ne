@@ -10,12 +10,10 @@
 		nbu.web
 		nbu.media
 		nbu.dsp
-		nbu.tbu-stacks
 		nbu.infra
-		nbu.tools
 		nbu.bsp
+		nbu.contrib
 		nbu.tests)
 	
 	(products
-		(product mcu :lot nbu.prod.mcu))
-)
+		(product mcu :lot nbu.prod.mcu)))

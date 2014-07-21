@@ -15,6 +15,11 @@ module Confetti
 #   (checks 10 11 12) # yields tags like stem_check_10
 # )
 
+# :tag specifies a global tag over all vobs
+# :stem specifies prefix of checks
+# checks specify partial labels in ascending times order (oldest first)
+# lot tags apply on lots what are possibly unmarked by global tag
+
 ### translated into configspec:
 
 # element * stem_check_12
@@ -31,15 +36,15 @@ class CSpec
 	@@configspec_t = ERB.new <<-END
 END
 
-	def initialize(text, *opt)
-		return if tagged_init(:from_file, opt, [text, *opt])
-
+	def is(text, *opt)
 		@ne = Nexp::Nexp.from_string(text, :single)
 	end
 
-	def CSpec.from_file(fname)
-		CSpec.new(fname, :from_file)
+	def from_file(fname, *opt)
+		@ne = Nexp::Nexp.from_file(fname, :single)
 	end
+
+	#-------------------------------------------------------------------------------------------
 
 	def to_s
 		@ne.text
@@ -78,13 +83,23 @@ END
 		db[:checks].map { |x| x.to_i }
 	end
 
-	private
+	#-------------------------------------------------------------------------------------------
 
-	def from_file(fname, *opt)
-		@ne = Nexp::Nexp.from_file(fname, :single)
+	def self.is(*args)
+		x = self.new; x.send(:is, *args); x
 	end
 
+	def self.create(*args)
+		x = self.send(:new); x.send(:create, *args); x
+	end
+	
+	private :is, :from_file
+	private_class_method :new
 end # CSpec
+
+def self.CSpec(*args)
+	x = CSpec.send(:new); x.send(:is, *args); x
+end
 
 #----------------------------------------------------------------------------------------------
 

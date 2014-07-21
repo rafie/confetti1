@@ -75,7 +75,7 @@ element /nbu.test/...                nbu.tests_1.7.3
 END
 
 	def setup
-		@cspec = Confetti::CSpec.new(@@nexp)
+		@cspec = Confetti.CSpec(@@nexp)
 	end
 
 	def test_basics

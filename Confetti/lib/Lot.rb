@@ -16,11 +16,13 @@ class Lot
 
 	attr_reader :name
 
-	def initialize(name, db: nil)
+	def is(name, db: nil)
 		# raise "Lot #{name} does not exist" unless exists?(name)
 		@name = name
 		@db = db
 	end
+
+	#-------------------------------------------------------------------------------------------
 
 	def vobs
 		names = db[:vobs]
@@ -49,7 +51,7 @@ class Lot
 		raise "unimplemented"
 	end
 
-	private
+	#-------------------------------------------------------------------------------------------
 
 	def db
 		if @db == nil
@@ -59,7 +61,21 @@ class Lot
 		end
 		@db
 	end
+
+	#-------------------------------------------------------------------------------------------
+
+	def self.is(*args)
+		x = self.new; x.send(:is, *args); x
+	end
+
+	private :db
+	private :is
+	private_class_method :new
 end # Lot
+
+def self.Lot(*args)
+	x = Lot.send(:new); x.send(:is, *args); x
+end
 
 #----------------------------------------------------------------------------------------------
 
@@ -71,7 +87,7 @@ class Lots
 	end
 
 	def each
-		@names.each { |name| yield Lot.new(name) }
+		@names.each { |name| yield Confetti.Lot(name) }
 	end
 end
 
@@ -90,7 +106,7 @@ class Lots
 	end
 
 	def each
-		@names.each { |name| yield Lot.new(name, db: @db[:lots].select { |lot| lot.cadr.to_s == name }) }
+		@names.each { |name| yield Confetti.Lot(name, db: @db[:lots].select { |lot| lot.cadr.to_s == name }) }
 		# @db["lots/lot/#{@name}"]
 	end
 

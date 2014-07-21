@@ -45,7 +45,7 @@ def checkin_file(file, *opt)
 
 	rc = true
 	begin
-		elem = ClearCASE::Element.new(file)
+		elem = ClearCASE.Element(file)
 		if !elem.changed?
 			if keepco
 				print "#{file} (no changes, kept checked-out)"
@@ -175,9 +175,9 @@ begin
 	raise "Conflicting options: --all et al." if options.all && (options.dirs || options.vobs || options.argfiles)
 
 	if options.view
-		view = ClearCASE::View.new(options.view)
+		view = ClearCASE.View(options.view)
 	else
-		view = ClearCASE::CurrentView.new
+		view = ClearCASE.CurrentView
 	end
 
 	cwd = Dir.pwd;

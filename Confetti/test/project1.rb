@@ -31,7 +31,9 @@ end
 
 class Projects2 < Confetti::Test
 
-#	def keep?; true; end
+	def create_vob?; true; end
+
+	def keep?; true; end
 
 	@@cspec = <<END
 (cspec
@@ -48,8 +50,7 @@ class Projects2 < Confetti::Test
 		(nbu.tests   nbu.tests_1.7.3)
 		(nbu.build   nbu.build_1.4.19)
 	)
-	(checks 16 17 18)
-)
+	(checks 16 17 18))
 END
 
 @@project_ne = <<END
@@ -59,13 +60,22 @@ END
 #		puts 'Projects2: ' + @path
 	end
 
+	def teardown
+		Confetti::Project('test1').ctl_view.remove! rescue ''
+		Confetti::Project('test2').ctl_view.remove! rescue ''
+
+		super()
+	end
+
+	def t(x)
+		x.gsub(/[\t \n]+/," ")
+	end
+
 	def _test_project(project, name)
 		assert_equal name, project.name
 		assert_equal name + '_int_br', project.branch
-		assert_equal '', project.root_vob
-		byebug
-		assert_equal @@cspec, project.cspec.to_s
-#		assert_equal @@project_ne, File.read(@project.local_db_file)
+		assert_equal t(@@cspec.strip), t(project.cspec.to_s)
+		# assert_equal @@project_ne, File.read(project.local_db_file)
 	end
 
 	def test_create1
@@ -75,7 +85,7 @@ END
 
 	def test_create2
 		Confetti::Project.create('test2', cspec: @@cspec)
-		_test_project(Confetti::Project.new('test2'), 'test2')
+		_test_project(Confetti.Project('test2'), 'test2')
 	end
 end
 

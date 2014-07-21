@@ -1,6 +1,7 @@
 
 require 'minitest/autorun'
 require 'Confetti/lib/Test.rb'
+require 'Confetti/lib/View.rb'
 require 'byebug'
 
 #----------------------------------------------------------------------------------------------
@@ -56,5 +57,56 @@ class Test2 < Confetti::Test
 	end
 
 end
+
+#----------------------------------------------------------------------------------------------
+
+if Confetti::TEST_WITH_CLEARCASE
+
+#----------------------------------------------------------------------------------------------
+
+class Test3 < Confetti::Test
+
+	def create_vob?; true; end
+
+	def setup
+		@vob_name = @root_vob.name
+		@view = ClearCASE::View.create('', root_vob: root_vob)
+	end
+
+	def teardown
+		super()
+		raise "VOB #{@vob_name} not removed" if ClearCASE.VOB(@vob_name).exist?
+		@view.remove!
+	end
+
+	def test_vob
+		assert_equal true, File.directory?(@view.path + '/rvfc')
+	end
+end
+
+#----------------------------------------------------------------------------------------------
+
+class Test4 < Confetti::Test
+
+	def create_vob?; true; end
+
+	def setup
+		@vob_name = @root_vob.name
+		@view = Confetti::View.create('')
+	end
+
+	def teardown
+		super()
+		@view.remove!
+	end
+
+	def test_vob
+		assert_equal true, File.directory?(@view.path + '/rvfc')
+	end
+end
+
+#----------------------------------------------------------------------------------------------
+
+end # Confetti::TEST_WITH_CLEARCASE
 
 #----------------------------------------------------------------------------------------------

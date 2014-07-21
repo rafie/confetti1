@@ -26,7 +26,7 @@ module Confetti
 class Project < Stream
 	include Bento::Class
 
-	attr_reader :name, :branch, :root_vob
+	attr_reader :name, :branch
 	attr_accessor :cspec
 
 	@@ne_template = <<-END
@@ -41,27 +41,52 @@ END
 
 	#------------------------------------------------------------------------------------------
 
-	def initialize(name, *opt, db_row: nil,
-			branch: nil, root_vob: nil, cspec: nil)
-		return if tagged_init(:create, opt, [name, *opt, branch: branch, root_vob: root_vob, cspec: cspec])
-
+	def is(name, *opt, db_row: nil)
 		@name = name
 		@row = db_row if !!db_row
-		if row == nil
-			byebug
-		end
 
 		@branch = row[:branch]
-		@root_vob = row[:root_vob]
+		@cspec = row[:cspec]
 
+		@ctl_view = Confetti.ProjectControlView(project_name: @name, branch: @branch)
+
+		assert_ready
 	end
 
-	def self.create(name, *opt, branch: nil, root_vob: nil, cspec: nil)
-		Project.new(name, *opt << :create, branch: branch, root_vob: root_vob, cspec: cspec)
+	def create(name, *opt, branch: nil, cspec: nil)
+		raise "invalid project name" if name.to_s.strip == ''
+
+		@name = name
+		@branch = name + "_int_br" if !branch
+		@cspec = Confetti.CSpec(cspec) if cspec
+
+		# create db record
+		Confetti::DB.global.execute("insert into projects (name, branch, cspec) values (?, ?, ?)",
+			[@name, @branch, cspec])
+
+		# create control view
+		@ctl_view = ProjectControlView.create(project_name: @name, branch: @branch)
+
+		# establish project ne
+		@lots = @cspec.lots.keys
+		project_ne = ERB.new(@@ne_template, 0, "-").result(binding)
+		File.write(Config.view_path(@ctl_view.name) + '/project.ne', project_ne)
+
+		assert_ready
+
+#		rescue Exception => x
+#			byebug
+#			raise "failed to create project"
 	end
 
-	def self.create_from_project(name, *opt, branch: nil, root_vob: nil, project: nil)
+	def create_from_project(name, *opt, branch: nil, project: nil)
 		raise "unimplemented"
+		assert_ready
+	end
+
+	def assert_ready
+#		byebug
+#		raise "not ready" if !@name || !@row || !@branch || !@ctl_view || !@cspec
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -78,7 +103,7 @@ END
 #	end
 
 	def cspec=(s)
-		@cspec = CSpec.new(s)
+		@cspec = Confetti.CSpec(s)
 	end
 
 	def check!
@@ -95,43 +120,11 @@ END
 	end
 
 	#------------------------------------------------------------------------------------------
-	private
-
-	def create(name, *opt, branch: nil, root_vob: nil, cspec: nil)
-		raise "invalid project name" if name.to_s.strip == ''
-
-		@name = name
-		@branch = name + "_int_br" if !branch
-		@root_vob = root_vob.to_s
-		@cspec = CSpec.new(cspec) if cspec
-
-		# create db record
-		Confetti::DB.global.execute("insert into projects (name, branch, root_vob, cspec) values (?, ?, ?, ?)",
-			[@name, @branch, @root_vob, cspec])
-
-		# create control view
-		@ctl_view = ProjectControlView.create(project_name: @name, branch: @branch, root_vob: @root_vob)
-
-#		byebug
-
-		# establish project ne
-		@lots = @cspec.lots.keys
-		project_ne = ERB.new(@@ne_template, 0, "-").result(binding)
-		File.write(Config.view_path(@ctl_view.name) + '/project.ne', project_ne)
-
-#		rescue Exception => x
-#			byebug
-#			raise "failed to create project"
-	end
 
 	# control view
 	def ctl_view
 		return @ctl_view if @ctl_view
-		if !TEST_MODE
-			@ctl_view = View.new(".project_#{@name}", :ready)
-		else
-			@ctl_view = ProjectControlView.new(name)
-		end
+		@ctl_view = Confetti.ProjectControlView(name, :ready)
 	end
 
 	def db
@@ -143,7 +136,29 @@ END
 		@row
 	end
 
+	#-------------------------------------------------------------------------------------------
+
+	def self.is(*args)
+		x = self.new; x.send(:is, *args); x
+	end
+
+	def self.create(*args)
+		x = self.send(:new); x.send(:create, *args); x
+	end
+
+	def self.create_from_project(*args)
+		x = self.send(:new); x.send(:create, *args); x
+	end
+
+	private :db, :row, :assert_ready
+
+	private :is, :create, :create_from_project
+	private_class_method :new
 end # Project
+
+def self.Project(*args)
+	x = Project.send(:new); x.send(:is, *args); x
+end
 
 #----------------------------------------------------------------------------------------------
 
@@ -191,11 +206,14 @@ class Projects
 		@names = names
 	end
 
+	def self.all
+		raise "unimplemented"
+	end
+
 	def each
-		@names.each { |name| yield Proejct.new(name) }
+		@names.each { |name| yield Confetti.Proejct(name) }
 	end
 end # Projects
-
 
 #----------------------------------------------------------------------------------------------
 
@@ -213,7 +231,7 @@ class Projects
 	end
 
 	def each
-		@rows.each { |row| yield Project.new(row[:name], db_row: row) }
+		@rows.each { |row| yield Confetti.Project(row[:name], db_row: row) }
 	end
 
 	def db

@@ -35,7 +35,7 @@ begin
 	# Sanity: Verify the activity exists in the meta-data
 	print "Testing whether the activity #{activityName} already exists.."
 	Activity.create(name)
-	act = Confetti::Activity.new(activityName)
+	act = Confetti.Activity(activityName)
 	if myActivity.exists?()
 		puts "Activity with this name (#{myActivity.name}) already exists. Aborting."
 		exit

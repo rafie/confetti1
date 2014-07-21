@@ -41,7 +41,7 @@ noOp = opts[:noop]
 
 # Sanity: Verify we're in a view
 begin
-	currentViewName = ClearCASE::CurrentView.new().name
+	currentViewName = ClearCASE.CurrentView.name
 rescue
 	Trollop::die "Please run the script from within a view. Aborting."			
 end
@@ -51,12 +51,12 @@ checkoutComment = ""
 checkoutComment = opts[:checkoutcomment] unless !opts[:checkoutcomment]
 
 # Sanity: Check that the label exists
-myLabel = ClearCASE::Label.new(labelName)
+myLabel = ClearCASE.Label(labelName)
 Trollop::die "Can't find label (#{labelName}) in Clearcase. Aborting." unless myLabel.exists?
 
 # Sanity: Check that the lot exists
 begin
-	myLot = Confetti::Lot.new(lotName)		
+	myLot = Confetti.Lot(lotName)		
 	print "Merging from Lot #{lotName}"
 rescue
 	Trollop::die "Must specify a valid lot name. Aborting"	

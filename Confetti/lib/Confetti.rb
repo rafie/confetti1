@@ -67,7 +67,7 @@ end # DB
 class Config
 	def Config.db_path
 		if !TEST_MODE
-			view = ClearCASE::CurrentView.new
+			view = ClearCASE.CurrentView
 			path = "R:/Build/cfg"
 		else
 			path = Test.current.path + "/net"
@@ -78,9 +78,9 @@ class Config
 	def Config.view_path(view_name = nil)
 		if !TEST_MODE
 			if !view_name
-				view = ClearCASE::CurrentView.new
+				view = ClearCASE.CurrentView
 			else
-				view = ClearCASE::View.new(view_name)
+				view = ClearCASE.View(view_name)
 			end
 			path = view.fullPath
 		else
