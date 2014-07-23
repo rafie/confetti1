@@ -1,4 +1,4 @@
-(project .test
+(project test
 	(lots
 		nbu.prod.mcu
 		nbu.mcu

@@ -127,6 +127,38 @@ end
 
 #----------------------------------------------------------------------------------------------
 
+class CurrentView < View
+
+	def is(*opt)
+		if !TEST_MODE
+			@view = ClearCASE.CurrentView
+
+		elsif TEST_WITH_CLEARCASE
+			raise "no active test" if !Test.current
+			@view = ClearCASE.CurrentView(root_vob: Test.current.root_vob)
+
+		else
+			@view = Confetti.TestView(name)
+		end
+	end
+
+	#-------------------------------------------------------------------------------------------
+
+	def self.is(*args)
+		x = self.new; x.send(:is, *args); x
+	end
+
+	protected :is, :create
+	private_class_method :new
+
+end # CurrentView
+
+def self.CurrentView(*args)
+	x = CurrentView.send(:new); x.send(:is, *args); x
+end
+
+#----------------------------------------------------------------------------------------------
+
 class ProjectControlView < View
 	include Bento::Class
 

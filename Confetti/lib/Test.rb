@@ -4,8 +4,6 @@ require 'Confetti/lib/Confetti.rb'
 
 module Confetti
 
-TEST_MODE = true
-
 #----------------------------------------------------------------------------------------------
 
 class Test < MiniTest::Test

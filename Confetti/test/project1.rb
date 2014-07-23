@@ -57,7 +57,6 @@ END
 END
 
 	def setup
-#		puts 'Projects2: ' + @path
 	end
 
 	def teardown

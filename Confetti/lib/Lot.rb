@@ -16,22 +16,22 @@ class Lot
 
 	attr_reader :name
 
-	def is(name, db: nil)
+	def is(name, nexp: nil)
 		# raise "Lot #{name} does not exist" unless exists?(name)
 		@name = name
-		@db = db
+		@nexp = nexp
 	end
 
 	#-------------------------------------------------------------------------------------------
 
 	def vobs
-		names = db[:vobs]
+		names = nexp[:vobs]
 		names = !names ? [] : ~names
 		return ClearCASE::VOBs.new(names)
 	end
 
 	def lots
-		names = db[:lots]
+		names = nexp[:lots]
 		names = !names ? [] : ~names
 		return Lots.new(names)
 	end
@@ -53,13 +53,11 @@ class Lot
 
 	#-------------------------------------------------------------------------------------------
 
-	def db
-		if @db == nil
-			lots = All::Lots::db if @db == nil
-			@db = (lots/:lot).select { |lot| lot.cadr.to_s == @name }[0]
-			raise "lot #{@name} does not exist" if !@db
-		end
-		@db
+	def nexp
+		return @nexp if @nexp
+		lots = All::Lots::nexp
+		@nexp = (lots/:lot).select { |lot| lot.cadr.to_s == @name }[0]
+		raise "lot #{@name} does not exist" if !@nexp
 	end
 
 	#-------------------------------------------------------------------------------------------
@@ -68,7 +66,7 @@ class Lot
 		x = self.new; x.send(:is, *args); x
 	end
 
-	private :db
+	private :nexp
 	private :is
 	private_class_method :new
 end # Lot

@@ -53,12 +53,13 @@ END
 		assert_ready
 	end
 
-	def create(name, *opt, branch: nil, cspec: nil)
+	def create(name, *opt, branch: nil, cspec: nil, lspec: nil)
 		raise "invalid project name" if name.to_s.strip == ''
 
 		@name = name
 		@branch = name + "_int_br" if !branch
 		@cspec = Confetti.CSpec(cspec) if cspec
+		@lspec = Confetti.Lots.from_file(lspec) if lspec
 
 		# create db record
 		Confetti::DB.global.execute("insert into projects (name, branch, cspec) values (?, ?, ?)",
@@ -87,6 +88,10 @@ END
 	def assert_ready
 #		byebug
 #		raise "not ready" if !@name || !@row || !@branch || !@ctl_view || !@cspec
+	end
+
+	def self.current
+		CurrentProject.new
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -128,7 +133,8 @@ END
 	end
 
 	def db
-		Nexp::Nexp.from_file(Config.view_path(ctl_view.name) + '/project.ne', :single)
+		return @project_ne if @project_ne
+		@project_ne = Nexp::Nexp.from_file(Config.view_path(ctl_view.name) + '/project.ne', :single)
 	end
 
 	def row
@@ -168,6 +174,10 @@ class CurrentProject < Project
 		@db = nil
 	end
 
+	def is
+
+	end
+
 	def version
 		db.version
 	end
@@ -175,8 +185,7 @@ class CurrentProject < Project
 	private
 
 	def db
-		@db = DB.new if ! @db
-		@db
+		Nexp::Nexp.from_file(Config.view_path(ctl_view.name) + '/project.ne', :single)
 	end
 
 	class DB
@@ -196,6 +205,10 @@ class CurrentProject < Project
 	end # DB
 
 end # CurrentProject
+
+def self.CurrentProject(*args)
+	x = CurrentProject.send(:new); x.send(:is, *args); x
+end
 
 #----------------------------------------------------------------------------------------------
 
