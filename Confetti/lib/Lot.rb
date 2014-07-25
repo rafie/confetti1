@@ -46,7 +46,6 @@ class Lot
 		return ClearCASE::Elements.new(files)
 	end
 	
-
 	def label(name, view: nil)
 		raise "unimplemented"
 	end
@@ -98,22 +97,22 @@ module All
 class Lots
 	include Enumerable
 
-	def initialize(names: nil)
-		@db = Lots.db
-		@names = names == nil ? (@db[:lots]/:lot).rank1 : names
+	def initialize(names: nil, project: nil)
+		@nexp = Lots.nexp
+		@names = names == nil ? (@nexp[:lots]/:lot).rank1 : names
 	end
 
 	def each
-		@names.each { |name| yield Confetti.Lot(name, db: @db[:lots].select { |lot| lot.cadr.to_s == name }) }
-		# @db["lots/lot/#{@name}"]
+		@names.each { |name| yield Confetti.Lot(name, nexp: @nexp[:lots].select { |lot| lot.cadr.to_s == name }) }
+		# @nexp["lots/lot/#{@name}"]
 	end
 
 	def [](x)
 		return @names[x] if x.is_a? Fixnum
-		Lot.new(x, db: @db)
+		Lot.new(x, nexp: @nexp)
 	end
 
-	def Lots.db
+	def Lots.nexp
 		Nexp::Nexp.from_file(Config.view_path + '/lots.ne', :single)
 	end
 end # Lots

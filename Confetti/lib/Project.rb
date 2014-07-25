@@ -100,7 +100,7 @@ END
 	end
 
 	def lots
-		Lots.new(~db[:lots])
+		Lots.new(~nexp[:lots])
 	end
 
 #	def cspec
@@ -132,7 +132,7 @@ END
 		@ctl_view = Confetti.ProjectControlView(name, :ready)
 	end
 
-	def db
+	def nexp
 		return @project_ne if @project_ne
 		@project_ne = Nexp::Nexp.from_file(Config.view_path(ctl_view.name) + '/project.ne', :single)
 	end
@@ -156,7 +156,7 @@ END
 		x = self.send(:new); x.send(:create, *args); x
 	end
 
-	private :db, :row, :assert_ready
+	private :nexp, :row, :assert_ready
 
 	private :is, :create, :create_from_project
 	private_class_method :new
@@ -170,22 +170,14 @@ end
 
 class CurrentProject < Project
 
-	def initialize
-		@db = nil
-	end
-
 	def is
 
 	end
 
-	def version
-		db.version
-	end
-
 	private
 
-	def db
-		Nexp::Nexp.from_file(Config.view_path(ctl_view.name) + '/project.ne', :single)
+	def nexp
+		@ne = Nexp::Nexp.from_file(Config.view_path(ctl_view.name) + '/project.ne', :single)
 	end
 
 	class DB
@@ -194,14 +186,6 @@ class CurrentProject < Project
 			@ne = Nokogiri::XML(File.open(view.fullPath + PROJECT_NEXP_VIEWPATH))
 		end
 
-		def version
-			@xml.xpath("/project/@version").to_s
-		end
-
-		def roots(name)
-			@xml.xpath("//lots/lot[@name='#{name}']/vob/@name").map { |x| x.to_s }
-		end
-	
 	end # DB
 
 end # CurrentProject

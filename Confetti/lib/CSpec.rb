@@ -50,7 +50,7 @@ END
 		@ne.text
 	end
 
-	def db
+	def nexp
 		@ne
 	end
 
@@ -59,28 +59,28 @@ END
 
 	def tag(lot = '')
 		if lot == ''
-			t = ~db[:tag]
+			t = ~nexp[:tag]
 		else
 			t = lots[lot]
-			t = ~db[:tag] if t == ''
+			t = ~nexp[:tag] if t == ''
 		end
 		t
 	end
 
 	def tag=(t)
-		db[:tag] = t
+		nexp[:tag] = t
 	end
 
 	def stem
-		~db[:stem]
+		~nexp[:stem]
 	end
 
 	def lots
-		Hash[ db[:lots].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
+		Hash[ nexp[:lots].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
 	end
 
 	def checks
-		db[:checks].map { |x| x.to_i }
+		nexp[:checks].map { |x| x.to_i }
 	end
 
 	#-------------------------------------------------------------------------------------------

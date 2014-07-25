@@ -29,19 +29,19 @@ class LSpec
 	#-------------------------------------------------------------------------------------------
 
 	def to_s
-		@ne.text
+		nexp.text
 	end
 
-	def db
+	def nexp
 		@ne
 	end
 
 	def vobs
-		Hash[ db[:vobs].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
+		Hash[ nexp[:vobs].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
 	end
 
 	def lots
-		Hash[ db[:lots].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
+		Hash[ nexp[:lots].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
 	end
 
 	#-------------------------------------------------------------------------------------------
