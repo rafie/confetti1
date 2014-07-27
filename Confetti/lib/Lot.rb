@@ -18,47 +18,43 @@ class Lot
 
 	attr_reader :name
 
-	def is(name, nexp: nil)
+	def is(name, lspec: nil)
+		raise "invalid lspec" if !lspec
 		# raise "Lot #{name} does not exist" unless exists?(name)
 		@name = name
-		@nexp = nexp
+		@lspec = lspec
+		@lot_spec = @lspec.lots[name]
+		raise "Lot #{name} does not exist in LSpec" if !@lot_spec
 	end
 
 	#-------------------------------------------------------------------------------------------
 
 	def vobs
-		names = nexp[:vobs]
-		names = !names ? [] : ~names
-		return ClearCASE::VOBs.new(names)
+		ClearCASE::VOBs.new(@lot_spec.vobs)
 	end
 
 	def lots
-		names = nexp[:lots]
-		names = !names ? [] : ~names
-		return Lots.new(names)
+		Lots.new(@lot_spec.lots, lspec: @lspec)
 	end
 	
-	# Filter out elements not contained in lot
-
-	def filterElements(elements)
-		files = []
-		vobs.each do |vob|
-			files.merge!(elements.filterByVOB(vob))
-		end
-		return ClearCASE::Elements.new(files)
-	end
-	
-	def label(name, view: nil)
-		raise "unimplemented"
+	def nexp
+		@lspec.nexp[@name]
 	end
 
 	#-------------------------------------------------------------------------------------------
 
-	def nexp
-		return @nexp if @nexp
-		lots = All::Lots::nexp
-		@nexp = (lots/:lot).select { |lot| lot.cadr.to_s == @name }[0]
-		raise "lot #{@name} does not exist" if !@nexp
+	# Filter out elements not contained in lot
+
+	def filter_elements(elements)
+		files = []
+		vobs.each do |vob|
+			files.merge!(elements.filter_by_vob(vob))
+		end
+		ClearCASE::Elements.new(files)
+	end
+	
+	def label(name, view: nil)
+		raise "unimplemented"
 	end
 
 	#-------------------------------------------------------------------------------------------
@@ -81,47 +77,56 @@ end
 class Lots
 	include Enumerable
 
-	def initialize(names)
+	attr_reader :names
+
+	def initialize(names, lspec: nil)
+		raise "invalid lspec" if !lspec
+		names = lspec.lots.keys if !names
 		@names = names
+		@lspec = lspec
+	end
+
+	def count
+		@names.count
 	end
 
 	def each
-		@names.each { |name| yield Confetti.Lot(name) }
+		@names.each { |name| yield Confetti.Lot(name, @lspec) }
 	end
 end
 
 #----------------------------------------------------------------------------------------------
 
-module All
-
-#----------------------------------------------------------------------------------------------
-
-class Lots
-	include Enumerable
-
-	def initialize(names: nil, project: nil)
-		@nexp = Lots.nexp
-		@names = names == nil ? (@nexp[:lots]/:lot).rank1 : names
-	end
-
-	def each
-		@names.each { |name| yield Confetti.Lot(name, nexp: @nexp[:lots].select { |lot| lot.cadr.to_s == name }) }
-		# @nexp["lots/lot/#{@name}"]
-	end
-
-	def [](x)
-		return @names[x] if x.is_a? Fixnum
-		Lot.new(x, nexp: @nexp)
-	end
-
-	def Lots.nexp
-		Nexp::Nexp.from_file(Config.view_path + '/lots.ne', :single)
-	end
-end # Lots
-
-#----------------------------------------------------------------------------------------------
-
-end # module All
+# module All
+# 
+# #----------------------------------------------------------------------------------------------
+# 
+# class Lots
+# 	include Enumerable
+# 
+# 	def initialize(names: nil, project: nil)
+# 		@nexp = Lots.nexp
+# 		@names = names == nil ? (@nexp[:lots]/:lot).rank1 : names
+# 	end
+# 
+# 	def each
+# 		@names.each { |name| yield Confetti.Lot(name, nexp: @nexp[:lots].select { |lot| lot.cadr.to_s == name }) }
+# 		# @nexp["lots/lot/#{@name}"]
+# 	end
+# 
+# 	def [](x)
+# 		return @names[x] if x.is_a? Fixnum
+# 		Lot.new(x, nexp: @nexp)
+# 	end
+# 
+# 	def Lots.nexp
+# 		Nexp::Nexp.from_file(Config.view_path + '/lots.ne', :single)
+# 	end
+# end # Lots
+# 
+# #----------------------------------------------------------------------------------------------
+# 
+# end # module All
 
 #----------------------------------------------------------------------------------------------
 
