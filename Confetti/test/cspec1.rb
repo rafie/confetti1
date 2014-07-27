@@ -6,6 +6,9 @@ require '../lib/CSpec.rb'
 
 class CSpec1 < Confetti::Test
 
+	def create_fs?; false; end
+	def create_vob?; false; end
+
 	@@nexp = <<END
 (cspec
 	:tag nbu.mcu-8.3.1.3.5
@@ -21,8 +24,7 @@ class CSpec1 < Confetti::Test
 		(nbu.tests   nbu.tests_1.7.3)
 		(nbu.build   nbu.build_1.4.19)
 	)
-	(checks 16 17 18)
-)
+	(checks 16 17 18))
 END
 
 	@@configspec = <<END
@@ -93,8 +95,7 @@ END
 	end
 
 	def test_cspec
-		byebug
-		assert_equal @@nexp, @cspec.to_s
+		assert_equal @@nexp.strip, @cspec.to_s
 	end
 
 	def test_configspec
