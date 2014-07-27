@@ -7,10 +7,23 @@ module Confetti
 
 class Stream
 
-	def initialize
+	def is(name, *opt)
 	end
 
+	#-------------------------------------------------------------------------------------------
+
+	def self.is(*args)
+		x = self.new; x.send(:is, *args); x
+	end
+
+	private :is
+	private_class_method :new
+
 end # class Stream
+
+def self.Stream(*args)
+	x = Stream.send(:new); x.send(:is, *args); x
+end
 
 #----------------------------------------------------------------------------------------------
 

@@ -36,12 +36,16 @@ class LSpec
 		@ne
 	end
 
-	def vobs
-		Hash[ nexp[:vobs].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
-	end
+#	def vobs
+#		Hash[ nexp[:vobs].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
+#	end
 
 	def lots
-		Hash[ nexp[:lots].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
+		# Hash[x.nexp[:lots].map {|lot| [~lot.car, OpenStruct.new(:vobs => lot[:vobs], :lots => lot[:lots])]}]
+		# ~x.cdr == [] ? '' : ~x.cadr
+		# OpenStruct.new(:vobs => x[:vobs], :lots => x[:lots])
+		# Hash[ nexp[:lots].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
+		Hash[nexp[:lots].map {|lot| [~lot.car, OpenStruct.new(:vobs => ~lot[:vobs], :lots => ~lot[:lots])]}]
 	end
 
 	#-------------------------------------------------------------------------------------------

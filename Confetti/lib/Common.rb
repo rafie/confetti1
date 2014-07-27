@@ -1,7 +1,8 @@
 
+require 'erb'
+require 'ostruct'
 # require 'nokogiri'
 require 'sqlite3'
-require 'erb'
 
 require 'Bento'
 require 'Nexp'

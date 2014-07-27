@@ -1,6 +1,6 @@
 scenarios:
-- verify project at current view
-- verify project using control view
+- verify (test) project at current view
+- verify (test) project using control view
 - create project from initial (vob-based) cspec and lspec
 - create project from another project
 - apply check on a project

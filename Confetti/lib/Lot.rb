@@ -12,6 +12,8 @@ module Confetti
 #      (vobs v1..vk)
 #      (lots l1..lm)))
 
+# Q: should lot have project/stream association?
+
 class Lot
 
 	attr_reader :name
