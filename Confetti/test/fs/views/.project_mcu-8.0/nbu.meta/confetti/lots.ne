@@ -1,31 +1,17 @@
 
 (lots
-	(lot nbu.prod.mcu
-		(vobs
-			nbu.prod.mcu)
-
-		(lots
-			nbu.mcu
-			nbu.web
-			nbu.media
-			nbu.dsp
-			nbu.infra
-			nbu.bsp
-			nbu.contrib
-			nbu.tests))
-
-	(lot nbu.mcu
+	(nbu.mcu
 		(vobs
 			mcu
 			adapters
 			dialingInfo
 			mediaCtrlInfo))
 
-	(lot nbu.web
+	(nbu.web
 		(vobs
 			web))
 
-	(lot nbu.media
+	(nbu.media
 		(vobs
 			nbu.media
 			mvp
@@ -37,7 +23,7 @@
 			NBU_RTP_RTCP_STACK
 			NBU_ICE))
 
-	(lot nbu.dsp
+	(nbu.dsp
 		(vobs
 			dspIcsVideo
 			dspInfra
@@ -49,7 +35,7 @@
 			NetraVideoCODEC
 			swAudioCodecs))
 
-	(lot nbu.infra
+	(nbu.infra
 		(vobs
 			nbu.infra
 			boardInfra
@@ -58,27 +44,22 @@
 			loggerInfra
 			rvfc))
 
-	(lot nbu.contrib
+	(nbu.contrib
 		(vobs
 			nbu.contrib
 			NBU_COMMON_CORE
 			NBU_SIP_STACK
 			NBU_H323_STACK))
 		
-	(lot nbu.build
+	(nbu.build
 		(vobs
 			freemasonBuild))
 
-	(lot nbu.tools
-		(vobs
-			nbu.tools))
-
-	(lot nbu.bsp
+	(nbu.bsp
 		(vobs
 			bspLinuxIntel
 			bspLinuxARM))
 
-	(lot nbu.tests
+	(nbu.tests
 		(vobs
-			nbu.test))
-)
+			nbu.test)))

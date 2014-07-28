@@ -8,16 +8,12 @@ require 'byebug'
 
 class Projects1 < Confetti::Test
 
-#	def keep?; true; end
-
-
 	def setup
-#		puts 'Projects1: ' + @path
-#		puts 'Projects1 DB: ' + Confetti::Config.db_path
-
 		@all_projects_names = %w(main ucgw-7.7 ucgw-8.0 mcu-7.7 mcu-8.0 test).sort
 
+		byebug
 		@projects = Confetti::All::Projects.new
+		a = 1
 	end
 
 	def test_all_projects
@@ -31,9 +27,30 @@ end
 
 class Projects2 < Confetti::Test
 
+	@@cspec = <<END
+(cspec
+	(vobs
+		(mcu                      mcu_8.0.0.49.5_SP2)
+		(adapters                 adapter_7.49.52_8.0.0.49.5_SP2)
+		(dialingInfo              dialingInfo_7.44_SP2_28Feb13)
+		(mediaCtrlInfo            mediaCtrlInfo_7.41.9_SP2_28Feb13)))
+END
+
+	@@lspec = <<END
+END
+end
+
+#----------------------------------------------------------------------------------------------
+
+if Confetti::TEST_WITH_CLEARCASE
+
+#----------------------------------------------------------------------------------------------
+
+class Projects2 < Confetti::Test
+
 	def create_vob?; true; end
 
-	def keep?; true; end
+#	def keep?; true; end
 
 	@@cspec = <<END
 (cspec
@@ -87,5 +104,9 @@ END
 		_test_project(Confetti.Project('test2'), 'test2')
 	end
 end
+
+#----------------------------------------------------------------------------------------------
+
+end # if Confetti::TEST_WITH_CLEARCASE
 
 #----------------------------------------------------------------------------------------------
