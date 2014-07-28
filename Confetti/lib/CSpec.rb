@@ -9,7 +9,7 @@ module Confetti
 #   :tag tag1
 #   :stem stem
 #   (vobs
-		(vob1 tag2))
+#		(vob1 tag2))
 # 	(lots
 # 		lot1
 # 		(lot2 tag3)

@@ -31,6 +31,8 @@ class Project < Stream
 	attr_accessor :cspec
 
 	#------------------------------------------------------------------------------------------
+	# constructors
+	#------------------------------------------------------------------------------------------
 
 	# opt:
 	# :verify - verify project existsance
@@ -44,7 +46,7 @@ class Project < Stream
 		@branch = row[:branch]
 		@cspec = row[:cspec]
 
-		@ctl_view = Confetti.ProjectControlView(project_name: @name, branch: @branch)
+		@ctl_view = Confetti.ProjectControlView(project_name: @name)
 
 		assert_ready
 	end
@@ -52,10 +54,10 @@ class Project < Stream
 	def create(name, *opt, branch: nil, cspec: nil, lspec: nil)
 		raise "invalid project name" if name.to_s.strip == ''
 
-		raise "Project #{name} exists." if exist? != nil
-
 		@name = name
-		@branch = name + "_int_br" if !branch
+		raise "Project #{name} exists." if exist?
+
+		@branch = std_branch_name if !branch
 		@cspec = Confetti.CSpec(cspec) if cspec
 		@lspec = Confetti.LSpec(lspec) if lspec
 
@@ -65,8 +67,8 @@ class Project < Stream
 
 		assert_ready
 
-		rescue Exception => x
-			raise "failed to create project #{name}: " + x.to_s
+#		rescue Exception => x
+#			raise "failed to create project #{name}: " + x.to_s
 	end
 
 	def create_from_project(name, *opt, branch: nil, from_project: nil)
@@ -78,17 +80,12 @@ class Project < Stream
 			raise "failed to create project #{name}: " + x.to_s
 	end
 
-	def self.current
-		CurrentProject.new
-	end
-
 	#------------------------------------------------------------------------------------------
 	# construction
 	#------------------------------------------------------------------------------------------
 
-	def exist?(name)
-		rec = Confetti::DB.global.single("select * from project where name=?", [@name])
-		rec != nil
+	def exist?
+		!!Confetti::DB.global.single("select * from projects where name=?", [@name])
 	end
 
 	def create_db_record
@@ -111,15 +108,13 @@ class Project < Stream
 END
 
 	def create_config_files
-		cfg_root = Config.view_path(@ctl_view.name)
-
 		@lots = @lspec.lots.keys
-		project_ne = ERB.new(@@ne_template, 0, "-").result(binding)
-		project_ne_path = cfg_root + '/project.ne'
+		project_ne = Bento.mold(@@ne_template, binding)
+		project_ne_path = config_file('project.ne')
 		File.write(project_ne_path, project_ne)
 		@ctl_view.add_file(project_ne_path)
 
-		lspec_path = cfg_root + '/lots.ne'
+		lspec_path = config_file('lots.ne')
 		File.write(lspec_path, @lspec)
 		@ctl_view.add_file(lspec_path)
 	end
@@ -130,20 +125,60 @@ END
 	end
 
 	#------------------------------------------------------------------------------------------
+	# configuration
+	#------------------------------------------------------------------------------------------
 
-	def new_activity(name, project, version: nil)
+	def std_branch_name
+		@name + "_int_br"
 	end
 
-	def lots
-		Lots.new(~nexp[:lots])
+	def lspec_file
+	end
+
+	def ctl_view
+		return @ctl_view if @ctl_view
+		@ctl_view = Confetti.ProjectControlView(name, :ready)
+	end
+
+	def config_path
+		Config.view_path(ctl_view.name)
+	end
+
+	def config_file(file)
+		config_path + "/" + file
+	end
+
+	def nexp
+		return @project_ne if @project_ne
+		@project_ne = Nexp::Nexp.from_file(config_file('project.ne'), :single)
+	end
+
+	def lotspec
+		Confetti::LSpec.from_file(config_file('lots.ne'))
+	end
+
+	def row
+		@row = Confetti::DB.global.single("select * from projects where name=?", [@name]) if !@row
+		@row
 	end
 
 #	def cspec
 #		@cspec.to_s
 #	end
 
-	def cspec=(s)
-		@cspec = Confetti.CSpec(s)
+#	def cspec=(text)
+#		@cspec = Confetti.CSpec(text)
+#	end
+
+	#------------------------------------------------------------------------------------------
+	# operations
+	#------------------------------------------------------------------------------------------
+
+	def new_activity(name, project, version: nil)
+	end
+
+	def lots
+		Lots.new(~nexp[:lots])
 	end
 
 	def check!
@@ -155,26 +190,10 @@ END
 	def tag!
 	end
 
-	def local_db_file
-		Config.view_path + '/project.ne'
-	end
-
 	#------------------------------------------------------------------------------------------
 
-	# control view
-	def ctl_view
-		return @ctl_view if @ctl_view
-		@ctl_view = Confetti.ProjectControlView(name, :ready)
-	end
-
-	def nexp
-		return @project_ne if @project_ne
-		@project_ne = Nexp::Nexp.from_file(Config.view_path(ctl_view.name) + '/project.ne', :single)
-	end
-
-	def row
-		@row = Confetti::DB.global.single("select * from projects where name=?", [@name]) if !@row
-		@row
+	def self.current
+		CurrentProject.new
 	end
 
 	#-------------------------------------------------------------------------------------------
@@ -191,7 +210,7 @@ END
 		x = self.send(:new); x.send(:create, *args); x
 	end
 
-	private :nexp, :row, :assert_ready
+#	private :nexp, :row, :assert_ready
 
 	private :is, :create, :create_from_project
 	private_class_method :new
@@ -206,10 +225,7 @@ end
 class CurrentProject < Project
 
 	def is
-	end
-
-	def nexp
-		@ne = Nexp::Nexp.from_file(Config.view_path(ctl_view.name) + '/project.ne', :single)
+		raise "unimplemented"
 	end
 
 	private :is

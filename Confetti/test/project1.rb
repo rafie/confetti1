@@ -29,7 +29,6 @@ class Test2 < Confetti::Test
 	def create_vob?; false; end
 
 	def setup
-		byebug
 		@project = Confetti::Project.create('test1', 
 			cspec: File.read('project1-test2.cspec'),
 			lspec: File.read('project1-test2.lspec'))
@@ -39,17 +38,26 @@ class Test2 < Confetti::Test
 		assert_equal 'test1', @project.name
 	end
 
-#	def test_record_exist_in_db
-#	end
-#
-#	def test_control_view
-#	end
-#
-#	def test_project_ne
-#	end
-#
-#	def test_lspec
-#	end
+	def test_record_exist_in_db
+		assert_equal true, @project.exist?
+	end
+
+	def test_control_view
+		assert_equal true, Dir.exists?(@project.ctl_view.root)
+	end
+
+	def test_project_ne
+		assert_equal @project.name, @project.nexp[:project].car.to_s
+		assert_equal ~@project.cspec.nexp, ~@project.nexp[:baseline]
+		assert_equal 0, @project.nexp[:itag].to_i
+		assert_equal 0, @project.nexp[:icheck].to_i
+		assert_equal %w(nbu.mcu nbu.web nbu.media nbu.dsp nbu.infra nbu.bsp nbu.contrib nbu.build nbu.tests).sort,
+			(~@project.nexp[:lots]).sort
+	end
+
+	def test_lspec
+		assert_equal ~Confetti::LSpec.from_file('project1-test2.lspec').nexp, ~@project.lotspec.nexp
+	end
 
 end
 

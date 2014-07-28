@@ -187,12 +187,10 @@ element * /main/0
 end mkbranch
 END
 
-	def is(*opt, project_name: nil, branch: nil)
+	def is(*opt, project_name: nil)
 		raise "invalid project name" if !project_name
-		raise "invalid branch" if !branch
 
 		@project_name = project_name
-		@branch = branch
 
 		super(view_name, *opt << :raw)
 	end

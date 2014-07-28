@@ -1,7 +1,5 @@
 
-require 'Confetti'
+require 'Nexp'
 
-# x = Confetti::LSpec.from_file('fs/view/nbu.meta/confetti/lots.ne.1')
-
-x = Confetti::Lot('nbu.mcu')
-puts x.vobs
+x = Nexp::Nexp.from_file('.tests/140728-213132/views/.project_test1/nbu.meta/confetti/lots.ne')
+a = 1
