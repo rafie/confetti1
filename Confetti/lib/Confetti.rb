@@ -55,7 +55,7 @@ class DB
 	def DB.cleanup
 #		puts @@global_db.path + " cleanup"
 		if TEST_MODE
-			DB.global_db.cleanup
+			DB.global_db.cleanup if @@global_db
 			@@global_db =  nil
 		end
 	end

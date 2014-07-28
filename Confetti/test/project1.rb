@@ -6,14 +6,13 @@ require 'byebug'
 
 #----------------------------------------------------------------------------------------------
 
-class Projects1 < Confetti::Test
+class Test1 < Confetti::Test
+
+	def create_vob?; false; end
 
 	def setup
-		@all_projects_names = %w(main ucgw-7.7 ucgw-8.0 mcu-7.7 mcu-8.0 test).sort
-
-		byebug
+		@all_projects_names = %w(ucgw-7.7 mcu-8.0 mcu-8.3).sort
 		@projects = Confetti::All::Projects.new
-		a = 1
 	end
 
 	def test_all_projects
@@ -25,19 +24,33 @@ end
 
 #----------------------------------------------------------------------------------------------
 
-class Projects2 < Confetti::Test
+class Test2 < Confetti::Test
 
-	@@cspec = <<END
-(cspec
-	(vobs
-		(mcu                      mcu_8.0.0.49.5_SP2)
-		(adapters                 adapter_7.49.52_8.0.0.49.5_SP2)
-		(dialingInfo              dialingInfo_7.44_SP2_28Feb13)
-		(mediaCtrlInfo            mediaCtrlInfo_7.41.9_SP2_28Feb13)))
-END
+	def create_vob?; false; end
 
-	@@lspec = <<END
-END
+	def setup
+		byebug
+		@project = Confetti::Project.create('test1', 
+			cspec: File.read('project1-test2.cspec'),
+			lspec: File.read('project1-test2.lspec'))
+	end
+
+	def test_1
+		assert_equal 'test1', @project.name
+	end
+
+#	def test_record_exist_in_db
+#	end
+#
+#	def test_control_view
+#	end
+#
+#	def test_project_ne
+#	end
+#
+#	def test_lspec
+#	end
+
 end
 
 #----------------------------------------------------------------------------------------------
@@ -46,7 +59,7 @@ if Confetti::TEST_WITH_CLEARCASE
 
 #----------------------------------------------------------------------------------------------
 
-class Projects2 < Confetti::Test
+class Test3 < Confetti::Test
 
 	def create_vob?; true; end
 

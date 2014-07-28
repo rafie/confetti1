@@ -59,4 +59,5 @@
 		nbu.infra
 		nbu.bsp
 		nbu.contrib
+		nbu.build
 		nbu.tests))

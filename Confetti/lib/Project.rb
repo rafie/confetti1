@@ -2,6 +2,7 @@
 require_relative 'Confetti'
 require_relative 'Stream'
 require_relative 'CSpec'
+require_relative 'LSpec'
 require_relative 'View'
 require_relative 'Lot'
 
@@ -29,19 +30,14 @@ class Project < Stream
 	attr_reader :name, :branch
 	attr_accessor :cspec
 
-	@@ne_template = <<-END
-(project <%= @name %>
-	(baseline 
-		<%= cspec.to_s %>)
-	:itag 0
-	:icheck 0
-	(lots 
-		<%for lot in @lots %> <%= lot %> <% end %>))
-END
-
 	#------------------------------------------------------------------------------------------
 
+	# opt:
+	# :verify - verify project existsance
+
 	def is(name, *opt, db_row: nil)
+		init_flags([:verify], opt)
+
 		@name = name
 		@row = db_row if !!db_row
 
@@ -56,42 +52,81 @@ END
 	def create(name, *opt, branch: nil, cspec: nil, lspec: nil)
 		raise "invalid project name" if name.to_s.strip == ''
 
+		raise "Project #{name} exists." if exist? != nil
+
 		@name = name
 		@branch = name + "_int_br" if !branch
 		@cspec = Confetti.CSpec(cspec) if cspec
-		@lspec = Confetti.Lots.from_file(lspec) if lspec
+		@lspec = Confetti.LSpec(lspec) if lspec
 
-		# create db record
-		Confetti::DB.global.execute("insert into projects (name, branch, cspec) values (?, ?, ?)",
-			[@name, @branch, cspec])
-
-		# create control view
-		@ctl_view = ProjectControlView.create(project_name: @name, branch: @branch)
-
-		# establish project ne
-		@lots = @cspec.lots.keys
-		project_ne = ERB.new(@@ne_template, 0, "-").result(binding)
-		File.write(Config.view_path(@ctl_view.name) + '/project.ne', project_ne)
+		create_db_record
+		create_control_view
+		create_config_files
 
 		assert_ready
 
-#		rescue Exception => x
-#			byebug
-#			raise "failed to create project"
+		rescue Exception => x
+			raise "failed to create project #{name}: " + x.to_s
 	end
 
-	def create_from_project(name, *opt, branch: nil, project: nil)
+	def create_from_project(name, *opt, branch: nil, from_project: nil)
 		raise "unimplemented"
+
 		assert_ready
+
+		rescue Exception => x
+			raise "failed to create project #{name}: " + x.to_s
+	end
+
+	def self.current
+		CurrentProject.new
+	end
+
+	#------------------------------------------------------------------------------------------
+	# construction
+	#------------------------------------------------------------------------------------------
+
+	def exist?(name)
+		rec = Confetti::DB.global.single("select * from project where name=?", [@name])
+		rec != nil
+	end
+
+	def create_db_record
+		Confetti::DB.global.execute("insert into projects (name, branch, cspec) values (?, ?, ?)",
+			[@name, @branch, @cspec.to_s])
+	end
+
+	def create_control_view
+		@ctl_view = ProjectControlView.create(project_name: @name, branch: @branch)
+	end
+
+	@@ne_template = <<-END
+(project <%= @name %>
+	(baseline 
+		<%= cspec.to_s %>)
+	:itag 0
+	:icheck 0
+	(lots 
+		<%for lot in @lots %> <%= lot %> <% end %>))
+END
+
+	def create_config_files
+		cfg_root = Config.view_path(@ctl_view.name)
+
+		@lots = @lspec.lots.keys
+		project_ne = ERB.new(@@ne_template, 0, "-").result(binding)
+		project_ne_path = cfg_root + '/project.ne'
+		File.write(project_ne_path, project_ne)
+		@ctl_view.add_file(project_ne_path)
+
+		lspec_path = cfg_root + '/lots.ne'
+		File.write(lspec_path, @lspec)
+		@ctl_view.add_file(lspec_path)
 	end
 
 	def assert_ready
 #		byebug
 #		raise "not ready" if !@name || !@row || !@branch || !@ctl_view || !@cspec
-	end
-
-	def self.current
-		CurrentProject.new
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -171,22 +206,14 @@ end
 class CurrentProject < Project
 
 	def is
-
 	end
-
-	private
 
 	def nexp
 		@ne = Nexp::Nexp.from_file(Config.view_path(ctl_view.name) + '/project.ne', :single)
 	end
 
-	class DB
-		def initialize
-			view = ClearCASE::CurrentView.new
-			@ne = Nokogiri::XML(File.open(view.fullPath + PROJECT_NEXP_VIEWPATH))
-		end
-
-	end # DB
+	private :is
+	private_class_method :new
 
 end # CurrentProject
 

@@ -1,8 +1,11 @@
 scenarios:
-- verify (test) project at current view
+
+- verify (test) project in current view
 - verify (test) project using control view
+
 - create project from initial (vob-based) cspec and lspec
 - create project from another project
+
 - apply check on a project
 - create a project version
 - create an activity from project head

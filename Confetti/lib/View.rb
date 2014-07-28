@@ -14,8 +14,8 @@ class TestView
 	end
 
 	def create(name, *opt)
-		FileUtils.mkdir_p(path)
 		@name = name
+		FileUtils.mkdir_p(path)
 	end
 
 	#-------------------------------------------------------------------------------------------
@@ -30,6 +30,10 @@ class TestView
 
 	def remove!
 		# do nothing
+	end
+
+	def add_file(path)
+		# no nothing
 	end
 
 	#-------------------------------------------------------------------------------------------
@@ -105,6 +109,16 @@ class View
 
 	def remove!
 		@view.remove!
+	end
+
+	#-------------------------------------------------------------------------------------------
+
+	def add_file(path)
+		if !TEST_MODE || TEST_WITH_CLEARCASE
+			@view.add_file(path)
+		else
+			@view.add_file(path)
+		end
 	end
 
 	#-------------------------------------------------------------------------------------------

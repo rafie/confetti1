@@ -8,9 +8,11 @@ module Confetti
 # (cspec 
 #   :tag tag1
 #   :stem stem
+#   (vobs
+		(vob1 tag2))
 # 	(lots
 # 		lot1
-# 		(lot2 tag2)
+# 		(lot2 tag3)
 # 	)
 #   (checks 10 11 12) # yields tags like stem_check_10
 # )

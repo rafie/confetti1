@@ -1,4 +1,4 @@
-(project mcu-8.0
+(stream mcu-8.0
 	(baseline 
 		(cspec
 			(vobs
@@ -59,4 +59,5 @@
 		nbu.infra
 		nbu.bsp
 		nbu.contrib
+		nbu.build
 		nbu.tests))
