@@ -26,12 +26,19 @@ end
 
 class Test2 < Confetti::Test
 
-	def create_vob?; false; end
+	def create_vob?; true; end
 
 	def setup
+		byebug
 		@project = Confetti::Project.create('test1', 
 			cspec: File.read('project1-test2.cspec'),
 			lspec: File.read('project1-test2.lspec'))
+	end
+
+	def teardown
+		Confetti::Project('test1').ctl_view.remove! rescue ''
+
+		super()
 	end
 
 	def test_1
@@ -63,7 +70,7 @@ end
 
 #----------------------------------------------------------------------------------------------
 
-if Confetti::TEST_WITH_CLEARCASE
+if Confetti::TEST_WITH_CLEARCASE && false
 
 #----------------------------------------------------------------------------------------------
 

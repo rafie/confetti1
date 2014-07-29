@@ -13,6 +13,6 @@ CONFETTI_CLEARCASE = true
 CONFETTI_GIT = false
 
 TEST_MODE = false
-TEST_WITH_CLEARCASE = false
+TEST_WITH_CLEARCASE = true
 
 end # module Confetti

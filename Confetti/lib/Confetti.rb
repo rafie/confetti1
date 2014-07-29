@@ -82,7 +82,7 @@ class Config
 			else
 				view = ClearCASE.View(view_name)
 			end
-			path = view.fullPath
+			path = view.path
 
 		else
 			path = Test.current.path + "/"
