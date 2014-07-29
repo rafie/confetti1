@@ -10,23 +10,27 @@ class Test1 < Confetti::Test
 
 	def keep?; false; end
 
-	def setup
-	end
-	
-	def teardown
+	def before
 		super()
-		raise "failed in cleanup, Test1: #{@path}" if File.directory?(@path)
-		FileUtils.rm_r(@path) rescue ''
+	end
+
+	def after
+		super()
+
+		if !keep?
+			raise "failed in cleanup, Test1: #{@path}" if File.directory?(root)
+			FileUtils.rm_r(root) rescue ''
+		end
 		raise "current_test is not nil" if Confetti::Test.current != nil
 	end
 
 	def test_confetti_test
-		assert_equal 1, Confetti::TEST_MODE
+		assert_equal true, Confetti::TEST_MODE
 		assert_equal self, Confetti::Test.current
 	end
 
 	def test_testdir_exists
-		assert_equal true, File.directory?(@path)
+		assert_equal true, File.directory?(root)
 	end
 
 end

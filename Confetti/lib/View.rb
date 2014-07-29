@@ -73,9 +73,7 @@ class View
 			raise "no active test" if !Test.current
 			view_opt = filter_flags([:raw], opt)
 			@view = ClearCASE.View(name, root_vob: Test.current.root_vob)
-			byebug
 			@name = @view.name
-
 		else
 			@view = Confetti.TestView(name)
 		end

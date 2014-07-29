@@ -1,5 +1,6 @@
 
-require 'minitest'
+require 'byebug'
+require 'Bento/lib/Test'
 require 'Confetti/lib/Confetti.rb'
 
 module Confetti
@@ -8,42 +9,48 @@ TEST_MODE = true
 
 #----------------------------------------------------------------------------------------------
 
-class Test < MiniTest::Test
+class Test < Bento::Test
 	attr_reader :path, :root_vob
 
-	def initialize(name)
+	def before
 		if create_fs?
-			@path = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S")
-			while File.directory?(path)
-				@path = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S%L")
+			@@path = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S")
+			while File.directory?(@@path)
+				@@path = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S%L")
 			end
-			FileUtils.mkdir_p(@path)
-			Bento.unzip(fs_zip, @path)
+			FileUtils.mkdir_p(@@path)
+			Bento.unzip(fs_zip, @@path)
 		end
 
 		if create_vob? && TEST_WITH_CLEARCASE
-			@root_vob = ClearCASE::VOB.create('', file: vob_zip)
+			@@root_vob = ClearCASE::VOB.create('', file: vob_zip)
 		end
 
-		super(name)
-		
+	end
+
+	def after
+		cleanup
+	end
+
+	def setup
+		super()
+		puts "setup " + self.class.name
 		@@current_test = self
 	end
 
 	def teardown
-		cleanup
-	end
-
-	def cleanup
+		puts "teardown " + self.class.name
 		@@current_test = nil
-
+	end
+		
+	def cleanup
 		return if keep?
 		if create_fs?
 			Confetti::DB.cleanup
-			FileUtils.rm_r(@path) rescue ''
+			FileUtils.rm_r(@@path) rescue ''
 		end
 		if create_vob?
-			@root_vob.remove!
+			@@root_vob.remove!
 		end
 	end
 
@@ -72,11 +79,11 @@ class Test < MiniTest::Test
 	#------------------------------------------------------------------------------------------	
 
 	def root
-		@path
+		@@path
 	end
 	
 	def root_vob
-		@root_vob
+		@@root_vob
 	end
 
 	def Test.current
