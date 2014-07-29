@@ -70,7 +70,7 @@ class Config
 			view = ClearCASE.CurrentView
 			path = "R:/Build/cfg"
 		else
-			path = Test.current.path + "/net"
+			path = Test.root + "/net"
 		end
 		path + "/confetti"
 	end
@@ -85,7 +85,7 @@ class Config
 			path = view.path
 
 		else
-			path = Test.current.path + "/"
+			path = Test.root + "/"
 			path += !view_name ? "view" : "views/#{view_name}"
 		end
 

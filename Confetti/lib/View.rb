@@ -45,7 +45,7 @@ class TestView
 	def self.create(*args)
 		x = self.send(:new); x.send(:create, *args); x
 	end
-	
+
 	protected :is, :create
 	private_class_method :new
 end
@@ -72,7 +72,7 @@ class View
 		elsif TEST_WITH_CLEARCASE
 			raise "no active test" if !Test.current
 			view_opt = filter_flags([:raw], opt)
-			@view = ClearCASE.View(name, root_vob: Test.current.root_vob)
+			@view = ClearCASE.View(name, root_vob: Test.root_vob)
 			@name = @view.name
 		else
 			@view = Confetti.TestView(name)
@@ -90,7 +90,7 @@ class View
 
 		elsif TEST_WITH_CLEARCASE
 			raise "no active test" if !Test.current
-			@view = ClearCASE::View.create(name, root_vob: Test.current.root_vob)
+			@view = ClearCASE::View.create(name, root_vob: Test.root_vob)
 
 		else
 			@view  = Confetti::TestView.create(name)

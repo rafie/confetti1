@@ -12,47 +12,59 @@ TEST_MODE = true
 class Test < Bento::Test
 	attr_reader :path, :root_vob
 
-	def before
-		if create_fs?
-			@@path = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S")
-			while File.directory?(@@path)
-				@@path = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S%L")
+	def _before
+		super(false)
+
+		begin
+			if create_fs?
+				@@root = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S")
+				while File.directory?(@@root)
+					@@root = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S%L")
+				end
+				FileUtils.mkdir_p(@@root)
+				Bento.unzip(fs_zip, @@root)
 			end
-			FileUtils.mkdir_p(@@path)
-			Bento.unzip(fs_zip, @@path)
-		end
 
-		if create_vob? && TEST_WITH_CLEARCASE
-			@@root_vob = ClearCASE::VOB.create('', file: vob_zip)
-		end
+			if create_vob? && TEST_WITH_CLEARCASE
+				@@root_vob = ClearCASE::VOB.create('', file: vob_zip)
+			end
 
+			before
+		rescue => x
+		end
 	end
 
-	def after
-		cleanup
+	def _after
+		super(false)
+		after rescue ''
+		cleanup rescue ''
+		after_cleanup rescue ''
 	end
 
 	def setup
 		super()
-		puts "setup " + self.class.name
-		@@current_test = self
 	end
 
 	def teardown
-		puts "teardown " + self.class.name
-		@@current_test = nil
 	end
-		
+
+	#------------------------------------------------------------------------------------------	
+
 	def cleanup
-		return if keep?
-		if create_fs?
-			Confetti::DB.cleanup
-			FileUtils.rm_r(@@path) rescue ''
+		if !keep?
+			if create_fs?
+				Confetti::DB.cleanup rescue ''
+				FileUtils.rm_r(@@root) rescue ''
+			end
+			if create_vob?
+				@@root_vob.remove! rescue ''
+			end
 		end
-		if create_vob?
-			@@root_vob.remove!
-		end
+		# @@root_vob = nil
+		# @@root = nil
 	end
+
+	def after_cleanup; end
 
 	#------------------------------------------------------------------------------------------	
 
@@ -79,15 +91,23 @@ class Test < Bento::Test
 	#------------------------------------------------------------------------------------------	
 
 	def root
-		@@path
+		@@root
 	end
-	
+
 	def root_vob
 		@@root_vob
 	end
 
-	def Test.current
-		@@current_test
+	def self.root
+		@@root
+	end
+	
+	def self.root_vob
+		@@root_vob
+	end
+
+	def self.current
+		@@test_object
 	end
 end
 
