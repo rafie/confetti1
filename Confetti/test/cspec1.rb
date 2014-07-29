@@ -76,31 +76,32 @@ element /bspLinuxARM/...             nbu.bsp_1.0.0.7.9
 element /nbu.test/...                nbu.tests_1.7.3
 END
 
-	def setup
-		@cspec = Confetti.CSpec(@@nexp)
+	def before
+		@@cspec = Confetti.CSpec(@@nexp)
 	end
 
 	def test_basics
-		assert_equal 'nbu.mcu-8.3.1.3.5', @cspec.tag
-		assert_equal 'nbu.mcu-8.3', @cspec.stem
-		assert_equal %w(nbu.bsp nbu.build nbu.contrib nbu.dsp nbu.infra nbu.mcu nbu.media nbu.tests nbu.web), @cspec.lots.keys.sort
-		assert_equal [16, 17, 18], @cspec.checks
-		assert_equal 'nbu.bsp_1.0.0.7.9', @cspec.tag('nbu.bsp')
+		cspec = @@cspec
+		assert_equal 'nbu.mcu-8.3.1.3.5', cspec.tag
+		assert_equal 'nbu.mcu-8.3', cspec.stem
+		assert_equal %w(nbu.bsp nbu.build nbu.contrib nbu.dsp nbu.infra nbu.mcu nbu.media nbu.tests nbu.web), cspec.lots.keys.sort
+		assert_equal [16, 17, 18], cspec.checks
+		assert_equal 'nbu.bsp_1.0.0.7.9', cspec.tag('nbu.bsp')
 	end
 
 	def test_mods
 		skip "Node.[]= is broken"
-		@cspec.tag = 'nbu.mcu-8.3.1.4.0'
-		assert_equal 'nbu.mcu-8.3.1.4.0', @cspec.tag
+		@@cspec.tag = 'nbu.mcu-8.3.1.4.0'
+		assert_equal 'nbu.mcu-8.3.1.4.0', @@cspec.tag
 	end
 
 	def test_cspec
-		assert_equal @@nexp.strip, @cspec.to_s
+		assert_equal @@nexp.strip, @@cspec.to_s
 	end
 
 	def test_configspec
 		skip "unimplemented"
-		assert_equal @@configspec, $cspec.configspec
+		assert_equal @@configspec, @@cspec.configspec
 	end
 end
 

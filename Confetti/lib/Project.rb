@@ -112,11 +112,11 @@ END
 		project_ne = Bento.mold(@@ne_template, binding)
 		project_ne_path = config_file('project.ne')
 		File.write(project_ne_path, project_ne)
-		@ctl_view.add_file(project_ne_path)
+		@ctl_view.add_files(project_ne_path)
 
 		lspec_path = config_file('lots.ne')
 		File.write(lspec_path, @lspec)
-		@ctl_view.add_file(lspec_path)
+		@ctl_view.add_files(lspec_path)
 	end
 
 	def assert_ready

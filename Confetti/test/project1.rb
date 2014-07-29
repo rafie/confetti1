@@ -10,14 +10,14 @@ class Test1 < Confetti::Test
 
 	def create_vob?; false; end
 
-	def setup
-		@all_projects_names = %w(ucgw-7.7 mcu-8.0 mcu-8.3).sort
-		@projects = Confetti::All::Projects.new
+	def before
+		@@all_projects_names = %w(ucgw-7.7 mcu-8.0 mcu-8.3).sort
+		@@projects = Confetti::All::Projects.new
 	end
 
 	def test_all_projects
-		names = @projects.map { |project| project.name }
-		assert_equal @all_projects_names, names.sort
+		names = @@projects.map { |project| project.name }
+		assert_equal @@all_projects_names, names.sort
 	end
 
 end
@@ -28,42 +28,40 @@ class Test2 < Confetti::Test
 
 	def create_vob?; true; end
 
-	def setup
-		byebug
-		@project = Confetti::Project.create('test1', 
+	def before
+		@@project = Confetti::Project.create('test1', 
 			cspec: File.read('project1-test2.cspec'),
 			lspec: File.read('project1-test2.lspec'))
 	end
 
-	def teardown
-		Confetti::Project('test1').ctl_view.remove! rescue ''
-
-		super()
+	def after_cleanup
+		Confetti::Project('test1').ctl_view.remove!
 	end
 
 	def test_1
-		assert_equal 'test1', @project.name
+		assert_equal 'test1', @@project.name
 	end
 
 	def test_record_exist_in_db
-		assert_equal true, @project.exist?
+		assert_equal true, @@project.exist?
 	end
 
 	def test_control_view
-		assert_equal true, Dir.exists?(@project.ctl_view.root)
+		assert_equal true, Dir.exists?(@@project.ctl_view.root)
 	end
 
 	def test_project_ne
-		assert_equal @project.name, @project.nexp[:project].car.to_s
-		assert_equal ~@project.cspec.nexp, ~@project.nexp[:baseline]
-		assert_equal 0, @project.nexp[:itag].to_i
-		assert_equal 0, @project.nexp[:icheck].to_i
+		project = @@project
+		assert_equal project.name, project.nexp[:project].car.to_s
+		assert_equal ~project.cspec.nexp, ~project.nexp[:baseline]
+		assert_equal 0, project.nexp[:itag].to_i
+		assert_equal 0, project.nexp[:icheck].to_i
 		assert_equal %w(nbu.mcu nbu.web nbu.media nbu.dsp nbu.infra nbu.bsp nbu.contrib nbu.build nbu.tests).sort,
-			(~@project.nexp[:lots]).sort
+			(~project.nexp[:lots]).sort
 	end
 
 	def test_lspec
-		assert_equal ~Confetti::LSpec.from_file('project1-test2.lspec').nexp, ~@project.lotspec.nexp
+		assert_equal ~Confetti::LSpec.from_file('project1-test2.lspec').nexp, ~@@project.lotspec.nexp
 	end
 
 end
@@ -101,14 +99,9 @@ END
 @@project_ne = <<END
 END
 
-	def setup
-	end
-
-	def teardown
+	def after_cleanup
 		Confetti::Project('test1').ctl_view.remove! rescue ''
 		Confetti::Project('test2').ctl_view.remove! rescue ''
-
-		super()
 	end
 
 	def t(x)
