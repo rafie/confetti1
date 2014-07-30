@@ -42,3 +42,11 @@ scenarios:
 - create an activity from project head
 
 - create an activity from a project version
+
+production:
+
+- classico structure
+- classico ruby factory
+- devito structure
+- deployment mechanism
+- how to deploy database changes
