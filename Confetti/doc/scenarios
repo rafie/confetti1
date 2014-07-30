@@ -1,17 +1,44 @@
 scenarios:
 
-- verify (test) project in current view
-- verify (test) project using control view
+== project
 
-- create project from initial cspec and lspec files
-	- create mcu-8.3 project
-- create project from another project
-	- create mcu-8.3.1 project from mcu-8.3 [low pri]
+- verify project:
+	- what to test:
+		- project config file (project.ne)
+		- project db record
+		- lspec file
+		- control view
+	
+	- project test contexts
+		- Confetti.Project('name') - out of view context
+		- given integration view: Confetti.CurrentView.project
+		- given activity view
+
+- create project
+	- from initial cspec and lspec files
+		- create mcu-8.3 project
+
+	- from another project head
+		- create mcu-8.3.1 project from mcu-8.3 [low pri]
+
+	- from another project version
+		- create mcu-8.3.1 project from mcu-8.3.0.100.0
+
+- apply check on a project
+	- use integration view
+	- find elements on branch
+	- find directory closure of elements on branch
+	- apply check label
+
+== project version
 
 - create project version from initial cspec
 	- project db may hold a default lspec, while version table can hold custom lspec to override it
-- apply check on a project
+
 - create a project version
 
+== activity
+
 - create an activity from project head
+
 - create an activity from a project version
