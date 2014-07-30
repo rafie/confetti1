@@ -3,10 +3,15 @@ scenarios:
 - verify (test) project in current view
 - verify (test) project using control view
 
-- create project from initial (vob-based) cspec and lspec
+- create project from initial cspec and lspec files
+	- create mcu-8.3 project
 - create project from another project
+	- create mcu-8.3.1 project from mcu-8.3 [low pri]
 
+- create project version from initial cspec
+	- project db may hold a default lspec, while version table can hold custom lspec to override it
 - apply check on a project
 - create a project version
+
 - create an activity from project head
 - create an activity from a project version
