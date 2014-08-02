@@ -1,4 +1,4 @@
-(stream mcu-8.0
+(project mcu-8.0
 	(baseline 
 		(cspec
 			(vobs

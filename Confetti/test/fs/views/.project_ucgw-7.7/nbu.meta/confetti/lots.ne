@@ -15,13 +15,6 @@
 			nbu.tests))
 
 	(nbu.mcu
-		(lots
-			nbu.media
-			nbu.dsp
-			nbu.infra
-			nbu.bsp
-			nbu.contrib
-			nbu.build)
 		(vobs
 			mcu
 			adapters
@@ -38,7 +31,8 @@
 			nbu.infra
 			nbu.bsp
 			nbu.contrib
-			nbu.build)
+			nbu.build
+			nbu.tests)
 		(vobs
 			nbu.media
 			mvp
@@ -52,19 +46,10 @@
 			swAudioCodecs))
 
 	(nbu.dsp
-		(lots
-			nbu.infra
-			nbu.bsp
-			nbu.contrib
-			nbu.build)
 		(vobs
-			NetraVideoCODEC
-			dspIcsVideo
-			dspInfra
+			dspUCGW
 			dspIntelInfra
-			dspNetraAudio
-			dspNetraInfra
-			dspNetraVideo
+			dspUCGW
 			mpDsp))
 
 	(nbu.infra
@@ -77,7 +62,9 @@
 			configInfra
 			swInfra
 			loggerInfra
-			rvfc))
+			rvfc
+			securityApp
+			securityInfra))
 
 	(nbu.contrib
 		(lots
@@ -94,8 +81,7 @@
 
 	(nbu.bsp
 		(vobs
-			bspLinuxIntel
-			bspLinuxARM))
+			bspLinuxIntel))
 
 	(nbu.tests
 		(vobs
