@@ -1,7 +1,9 @@
 
 require 'erb'
-require 'ostruct'
+require 'fileutils'
 # require 'nokogiri'
+require 'ostruct'
+require 'pathname'
 require 'sqlite3'
 
 require 'Bento'
@@ -12,7 +14,7 @@ module Confetti
 CONFETTI_CLEARCASE = true
 CONFETTI_GIT = false
 
-# TEST_MODE = false # (in Test.rb)
+# TEST_MODE = false # (instead, in Test.rb)
 TEST_WITH_CLEARCASE = true
 
 end # module Confetti

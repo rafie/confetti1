@@ -1,4 +1,6 @@
 require_relative 'Common'
+require_relative 'Branch'
+require_relative 'view'
 
 module Confetti
 
@@ -178,32 +180,41 @@ class ProjectControlView < View
 
 	attr_reader :project_name
 
-	@@configspec_t = ERB.new <<-END
+	@@configspec_t = <<-END
 element * CHECKEDOUT
 element * .../<%= branch_name %>/LATEST
 mkbranch <%= branch_name %>
-element /nbu.meta/... /main/0
+element /<%= @view.root_vob %>/nbu.meta/... /main/0
 element * /main/0
 end mkbranch
 END
 
-	def is(*opt, project_name: nil)
-		raise "invalid project name" if !project_name
+	# opt: :ready - make view available
 
-		@project_name = project_name
+	def is(project, *opt)
+		raise "invalid project specification" if !project
 
-		super(view_name, *opt << :raw)
+		@project_name = project.name
+		@branch = project.branch
+
+		opt1 = filter_flags([:ready], opt)
+
+		opt1 << :raw if !(TEST_MODE && TEST_WITH_CLEARCASE)
+		super(view_name, *opt1)
 	end
 
-	def create(*opt, project_name: nil, branch: nil)
-		raise "invalid branch" if !branch
+	def create(project, *opt)
+		raise "invalid project specification" if !project
 
-		@project_name = project_name
-		@branch = branch
-		super(view_name, *opt)
+		@project_name = project.name
+		@branch = project.branch
 
-		if !TEST_MODE && TEST_WITH_CLEARCASE
-			configspec = @@configspec_t.result(binding)
+		opt1 = []
+		opt1 << :raw if !(TEST_MODE && TEST_WITH_CLEARCASE)
+		super(view_name, *opt1)
+
+		if !TEST_MODE || TEST_WITH_CLEARCASE
+			@configspec = Bento.mold(@@configspec_t, binding)
 			@view.configspec = @configspec
 		end
 	end
@@ -218,12 +229,12 @@ END
 		if !TEST_MODE || !TEST_WITH_CLEARCASE
 			'.project_' + project_name
 		else
-			'_confetti-project_' + project_name
+			'confetti-project_' + project_name
 		end
 	end
 
 	def branch_name
-		@branch
+		@branch.name
 	end
 
 	#-------------------------------------------------------------------------------------------

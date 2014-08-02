@@ -1,5 +1,7 @@
 
 require_relative 'Confetti/lib/Confetti.rb'
+require_relative 'Confetti/lib/Branch.rb'
+require_relative 'Confetti/lib/View.rb'
 require_relative 'Confetti/lib/CSpec.rb'
 require_relative 'Confetti/lib/LSpec.rb'
 require_relative 'Confetti/lib/Stream.rb'

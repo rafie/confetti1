@@ -43,10 +43,10 @@ class Project < Stream
 		@name = name
 		@row = db_row if !!db_row
 
-		@branch = row[:branch]
-		@cspec = row[:cspec]
+		@branch = Confetti.Branch(row[:branch])
+		@cspec = Confetti.CSpec(row[:cspec])
 
-		@ctl_view = Confetti.ProjectControlView(project_name: @name)
+		@ctl_view = Confetti.ProjectControlView(self)
 
 		assert_ready
 	end
@@ -57,7 +57,7 @@ class Project < Stream
 		@name = name
 		raise "Project #{name} exists." if exist?
 
-		@branch = std_branch_name if !branch
+		@branch = Confetti.Branch(!branch ? std_branch_name : branch)
 		@cspec = Confetti.CSpec(cspec) if cspec
 		@lspec = Confetti.LSpec(lspec) if lspec
 
@@ -90,14 +90,14 @@ class Project < Stream
 
 	def create_db_record
 		Confetti::DB.global.execute("insert into projects (name, branch, cspec) values (?, ?, ?)",
-			[@name, @branch, @cspec.to_s])
+			[@name, @branch.name, @cspec.to_s])
 	end
 
 	def create_control_view
-		@ctl_view = ProjectControlView.create(project_name: @name, branch: @branch)
+		@ctl_view = ProjectControlView.create(self)
 	end
 
-	@@ne_template = <<-END
+	@@project_ne_t = <<-END
 (project <%= @name %>
 	(baseline 
 		<%= cspec.to_s %>)
@@ -109,8 +109,9 @@ END
 
 	def create_config_files
 		@lots = @lspec.lots.keys
-		project_ne = Bento.mold(@@ne_template, binding)
+		project_ne = Bento.mold(@@project_ne_t, binding)
 		project_ne_path = config_file('project.ne')
+		byebug
 		File.write(project_ne_path, project_ne)
 		@ctl_view.add_files(project_ne_path)
 
@@ -137,7 +138,7 @@ END
 
 	def ctl_view
 		return @ctl_view if @ctl_view
-		@ctl_view = Confetti.ProjectControlView(name, :ready)
+		@ctl_view = Confetti.ProjectControlView(self, :ready)
 	end
 
 	def config_path

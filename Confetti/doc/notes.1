@@ -1,0 +1,44 @@
+project name context
+integration view
+activity view
+view looking on check
+
+
+
+project name context:
+
+	looks on project_view:project_br/LATEST or project_view:project_br/{latest check}
+	project by name ->  ( global_db -> ) project-view
+
+
+integration view: looks on int_br/LATEST
+	project < stream
+
+	view -> /nbu.meta/confetti/lots.ne
+
+
+
+
+
+
+
+
+activity view: looks on act_br/LATEST
+	activity < stream
+	
+	explain:
+		view -?-> activity -> /nbu.meta/confetti/lots.ne
+		or:
+		view -> /nbu.meta/confetti/lots.ne
+		
+	PS: how do we know a view is an activity view? project integration view?
+		- the user tells us by invoking an activity command
+		- what about tt check?
+		- maybe project.ne file should be named stream.ne?
+
+
+
+view on check: looks on selection by label (nbu.meta/confetti/...)
+	NO: project by context (looking at /nbu.meta/confetti/project.ne)
+
+	view -> /nbu.meta/confetti/lots.ne

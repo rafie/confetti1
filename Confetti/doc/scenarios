@@ -40,10 +40,15 @@ scenarios:
 == activity
 
 - create an activity from project head
+	- create activity rafie_mcu-work-1 from mcu-8.3
+	- create activity db record
+	- create stream
 
 - create an activity from a project version
+	- create activity rafie_mcu-work-1 from mcu-8.3.0.100.0
+		- how should we rebase this?
 
-production:
+== production
 
 - classico structure
 - classico ruby factory

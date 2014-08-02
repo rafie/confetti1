@@ -11,7 +11,31 @@
 			"file": "Confetti/lib/Project.rb",
 			"settings":
 			{
-				"buffer_size": 4745,
+				"buffer_size": 6225,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Confetti/lib/LSpec.rb",
+			"settings":
+			{
+				"buffer_size": 1276,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Confetti/lib/Lot.rb",
+			"settings":
+			{
+				"buffer_size": 2856,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "Confetti/lib/View.rb",
+			"settings":
+			{
+				"buffer_size": 4916,
 				"line_ending": "Windows"
 			}
 		},
@@ -19,15 +43,23 @@
 			"file": "Confetti/test/project1.rb",
 			"settings":
 			{
-				"buffer_size": 1873,
+				"buffer_size": 3381,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "Confetti/lib/CSpec.rb",
+			"file": "Confetti/lib/Test.rb",
 			"settings":
 			{
-				"buffer_size": 1349,
+				"buffer_size": 1827,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "/H/prj/github/classico1/Classico/Bento/lib/Test.rb",
+			"settings":
+			{
+				"buffer_size": 1089,
 				"line_ending": "Windows"
 			}
 		},
@@ -35,39 +67,7 @@
 			"file": "/H/prj/github/classico1/Classico/Bento/lib/ClearCASE/View.rb",
 			"settings":
 			{
-				"buffer_size": 4815,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/h/prj/github/classico1/Classico/Bento/lib/ClearCASE/VOB.rb",
-			"settings":
-			{
-				"buffer_size": 9184,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/h/prj/github/classico1/Classico/Bento/test/vob2.rb",
-			"settings":
-			{
-				"buffer_size": 512,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/h/prj/github/classico1/Classico/Bento/test/vob1.rb",
-			"settings":
-			{
-				"buffer_size": 159,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/h/prj/github/classico1/Classico/Bento/test/r3.rb",
-			"settings":
-			{
-				"buffer_size": 513,
+				"buffer_size": 5778,
 				"line_ending": "Windows"
 			}
 		}
@@ -96,10 +96,32 @@
 	},
 	"file_history":
 	[
-		"/H/prj/github/confetti1/Confetti/lib/Confetti.rb",
-		"/H/prj/github/confetti1/Confetti/test/lot1.rb",
-		"/H/prj/github/classico1/Classico/Bento.rb",
 		"/H/prj/github/classico1/Classico/Bento/lib/DB.rb",
+		"/H/prj/github/nexp/nexp.rb",
+		"/H/prj/github/confetti1/Confetti/lib/Common.rb",
+		"/H/prj/github/confetti1/Confetti/lib/Stream.rb",
+		"/H/prj/github/confetti1/Confetti/lib/View.rb",
+		"/H/prj/github/confetti1/Confetti/lib/Test.rb",
+		"/H/prj/github/confetti1/Confetti/lib/Confetti.rb",
+		"/H/prj/github/confetti1/Confetti/lib/CSpec.rb",
+		"/H/prj/github/classico1/Classico/Bento/lib/ClearCASE/Branch.rb",
+		"/H/prj/github/confetti1/Confetti/lib/Project.rb",
+		"/H/prj/github/classico1/Classico/Bento/lib/ClearCASE/Element.rb",
+		"/H/prj/github/classico1/Classico/Bento/lib/ClearCASE/View.rb",
+		"/H/prj/github/confetti1/Confetti.rb",
+		"/H/prj/github/confetti1/Confetti/lib/Lot.rb",
+		"/H/prj/github/confetti1/Confetti/lib/LSpec.rb",
+		"/H/prj/github/confetti1/Confetti/test/project1.rb",
+		"/h/prj/github/classico1/Classico/Bento/lib/ClearCASE/VOB.rb",
+		"/H/prj/github/classico1/Classico/Bento/lib/ClearCASE/Label.rb",
+		"/H/prj/github/classico1/Classico/Bento/lib/Class.rb",
+		"/C/Users/rafie/AppData/Roaming/Sublime Text 2/Packages/User/Preferences.sublime-settings",
+		"/H/prj/github/classico1/Classico/Bento.rb",
+		"/H/prj/github/confetti1/Confetti/lib/Branch.rb",
+		"/h/prj/github/classico1/Classico/Bento/test/vob2.rb",
+		"/h/prj/github/classico1/Classico/Bento/test/vob1.rb",
+		"/h/prj/github/classico1/Classico/Bento/test/r3.rb",
+		"/H/prj/github/confetti1/Confetti/test/lot1.rb",
 		"/h/prj/github/confetti1/Confetti/lib/Lot.rb",
 		"/h/prj/github/confetti1/Confetti/lib/View.rb",
 		"/h/prj/github/confetti1/Confetti/test/cspec1.rb",
@@ -107,29 +129,21 @@
 		"/h/prj/github/nexp/nexp.rb",
 		"/h/prj/github/confetti1/Confetti/lib/Test.rb",
 		"/h/prj/github/confetti1/Confetti/test/db1.rb",
-		"/H/prj/github/confetti1/Confetti/lib/Common.rb",
-		"/H/prj/github/confetti1/Confetti/lib/Lot.rb",
 		"/H/prj/github/confetti1/Confetti/test/cspec1.rb",
-		"/H/prj/github/nexp/nexp.rb",
 		"/h/prj/github/classico1/Classico/Bento/spec/ClearCASE_spec.rb",
-		"/C/Users/rafie/AppData/Roaming/Sublime Text 2/Packages/User/Preferences.sublime-settings",
 		"/C/Users/rafie/AppData/Roaming/Sublime Text 2/Packages/Default/Preferences.sublime-settings",
 		"/H/prj/github/confetti1/Confetti/test/p1.cspec",
 		"/H/prj/github/confetti1/Confetti/db/global.data.sql",
 		"/H/prj/github/confetti1/Confetti/db/global.schema.sql",
 		"/H/prj/github/nexp/test/test2.rb",
 		"/H/prj/github/nexp/test/test1.rb",
-		"/H/prj/github/classico1/Classico/Bento/lib/ClearCASE/View.rb",
 		"/H/prj/github/classico1/Classico/Bento/lib/ClearCASE/Common.rb",
 		"/H/prj/github/classico1/Classico/Bento/test/vob1.rb",
-		"/H/prj/github/classico1/Classico/Bento/lib/Class.rb",
-		"/H/prj/github/classico1/Classico/Bento/lib/ClearCASE/Label.rb",
 		"/H/prj/github/classico1/Classico/Bento/lib/ClearCASE/VOB.rb",
 		"/H/prj/github/classico1/Classico/Bento/test/r1.rb",
 		"/H/prj/github/classico1/Classico/Bento/lib/ClearCASE.rb",
 		"/H/prj/github/confetti1/confetti.sublime-project",
 		"/H/prj/github/confetti1/confetti.sublime-workspace",
-		"/H/prj/github/confetti1/Confetti.rb",
 		"/R/?",
 		"/M/rafie_home/freemasonBuild/gnu-make/3.81-rv/Makefile.am",
 		"/M/rafie_home/freemasonBuild/gnu-make/3.81-rv/function.c",
@@ -152,6 +166,37 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"bye",
+			"before_class",
+			"@@current_test",
+			"bug",
+			"byebug",
+			"current",
+			"name",
+			"#{@name}",
+			"M:\\",
+			"#{@name}",
+			"@name",
+			"local_db_file",
+			"project.ne",
+			"branch_name",
+			"@branch",
+			"def each",
+			"cspec",
+			"noko",
+			"db",
+			"local_db_file",
+			"view_name",
+			"root_vob",
+			".create",
+			"root_vob",
+			"jazz_name",
+			"fix_name",
+			"@root_vob",
+			"rand_",
+			"pack(",
+			".create",
+			".new",
 			"jazz_name",
 			"DEFAULT_WIN_REGION",
 			"free?",
@@ -214,7 +259,7 @@
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -222,15 +267,15 @@
 					"file": "Confetti/lib/Project.rb",
 					"settings":
 					{
-						"buffer_size": 4745,
+						"buffer_size": 6225,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1093,
-								1093
+								2605,
+								2605
 							]
 						],
 						"settings":
@@ -239,34 +284,112 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 312.0,
+						"translation.y": 1090.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "Confetti/test/project1.rb",
+					"file": "Confetti/lib/LSpec.rb",
 					"settings":
 					{
-						"buffer_size": 1873,
+						"buffer_size": 1276,
 						"regions":
 						{
-							"breakpoint":
-							{
-								"flags": 16,
-								"icon": "circle",
-								"regions":
-								[
-								],
-								"scope": "string"
-							}
 						},
 						"selection":
 						[
 							[
-								828,
-								828
+								504,
+								504
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Ruby/Ruby.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Confetti/lib/Lot.rb",
+					"settings":
+					{
+						"buffer_size": 2856,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								377,
+								377
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Ruby/Ruby.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "Confetti/lib/View.rb",
+					"settings":
+					{
+						"buffer_size": 4916,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								233,
+								233
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Ruby/Ruby.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 4,
+					"file": "Confetti/test/project1.rb",
+					"settings":
+					{
+						"buffer_size": 3381,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1022,
+								1022
 							]
 						],
 						"settings":
@@ -281,117 +404,19 @@
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "Confetti/lib/CSpec.rb",
-					"settings":
-					{
-						"buffer_size": 1349,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								734,
-								734
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Ruby/Ruby.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 312.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "/H/prj/github/classico1/Classico/Bento/lib/ClearCASE/View.rb",
-					"settings":
-					{
-						"buffer_size": 4815,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								564,
-								564
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Ruby/Ruby.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 351.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "/h/prj/github/classico1/Classico/Bento/lib/ClearCASE/VOB.rb",
-					"settings":
-					{
-						"buffer_size": 9184,
-						"regions":
-						{
-							"bookmarks":
-							{
-								"flags": 144,
-								"icon": "bookmark",
-								"regions":
-								[
-									[
-										4712,
-										4712
-									],
-									[
-										7937,
-										7937
-									]
-								],
-								"scope": "bookmarks"
-							}
-						},
-						"selection":
-						[
-							[
-								5236,
-								5236
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Ruby/Ruby.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 1792.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
 					"buffer": 5,
-					"file": "/h/prj/github/classico1/Classico/Bento/test/vob2.rb",
+					"file": "Confetti/lib/Test.rb",
 					"settings":
 					{
-						"buffer_size": 512,
+						"buffer_size": 1827,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								495,
-								495
+								303,
+								303
 							]
 						],
 						"settings":
@@ -407,23 +432,24 @@
 				},
 				{
 					"buffer": 6,
-					"file": "/h/prj/github/classico1/Classico/Bento/test/vob1.rb",
+					"file": "/H/prj/github/classico1/Classico/Bento/lib/Test.rb",
 					"settings":
 					{
-						"buffer_size": 159,
+						"buffer_size": 1089,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								727,
+								727
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Ruby/Ruby.tmLanguage"
+							"syntax": "Packages/Ruby/Ruby.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -433,26 +459,40 @@
 				},
 				{
 					"buffer": 7,
-					"file": "/h/prj/github/classico1/Classico/Bento/test/r3.rb",
+					"file": "/H/prj/github/classico1/Classico/Bento/lib/ClearCASE/View.rb",
 					"settings":
 					{
-						"buffer_size": 513,
+						"buffer_size": 5778,
 						"regions":
 						{
+							"bookmarks":
+							{
+								"flags": 144,
+								"icon": "bookmark",
+								"regions":
+								[
+									[
+										3381,
+										3381
+									]
+								],
+								"scope": "bookmarks"
+							}
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								4156,
+								4156
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Ruby/Ruby.tmLanguage"
+							"syntax": "Packages/Ruby/Ruby.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1462.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -477,11 +517,18 @@
 				0,
 				1,
 				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
 			]
 		],
 		"cols":
 		[
 			0.0,
+			0.5,
 			1.0
 		],
 		"rows":
