@@ -30,20 +30,18 @@ class Test2 < Confetti::Test
 #	def keep?; true; end
 
 	def before
-		byebug
 		@@project = Confetti::Project.create('test1', 
 			cspec: File.read('project1-test2.cspec'),
 			lspec: File.read('project1-test2.lspec'))
-		a = 1
 	end
 
 	def after_cleanup
-		Confetti::Project('test1').ctl_view.remove!
+		Confetti::Project('test1').ctl_view.remove! if !keep?
 	end
 
 	def test_name
 		assert_equal 'test1', @@project.name
-		assert_equal 'test1_int_br', @@project.branch
+		assert_equal 'test1_int_br', @@project.branch.name
 	end
 
 	def test_record_exist_in_db

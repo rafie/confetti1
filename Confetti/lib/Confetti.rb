@@ -75,23 +75,14 @@ class Config
 		path + "/confetti"
 	end
 
-	def Config.view_path(view_name = nil)
+	def Config.view_path(view = nil)
 		if !TEST_MODE || TEST_WITH_CLEARCASE
-			if !view_name
-				view = ClearCASE.CurrentView
-			else
-				view = ClearCASE.View(view_name)
-			end
-			path = view.path
-
+			view = Confetti.CurrentView() if !view
 		else
-			path = Test.root + "/"
-			path += !view_name ? "view" : "views/#{view_name}"
+			view = Confetti.TestView('') if !view
 		end
 
-		path += "/nbu.meta/confetti"
-		# FileUtils.mkdir_p(path) if !File.directory?(path)
-		path
+		view.path + "/nbu.meta/confetti"
 	end
 end # Config
 
