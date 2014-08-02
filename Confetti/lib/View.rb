@@ -1,6 +1,5 @@
 require_relative 'Common'
 require_relative 'Branch'
-require_relative 'view'
 
 module Confetti
 
@@ -12,7 +11,7 @@ class TestView
 	attr_reader :name
 
 	def is(name, *opt)
-		@name = name
+		@name = name.to_s.empty? ? ".current" : name.to_s
 	end
 
 	def create(name, *opt)
@@ -23,7 +22,7 @@ class TestView
 	#-------------------------------------------------------------------------------------------
 
 	def path
-		Config.view_path(@name)
+		Test.root + "/views/" + @name
 	end
 
 	def root
@@ -34,7 +33,7 @@ class TestView
 		# do nothing
 	end
 
-	def add_file(path)
+	def add_files(glob)
 		# no nothing
 	end
 
@@ -115,12 +114,8 @@ class View
 
 	#-------------------------------------------------------------------------------------------
 
-	def add_file(path)
-		if !TEST_MODE || TEST_WITH_CLEARCASE
-			@view.add_file(path)
-		else
-			@view.add_file(path)
-		end
+	def add_files(glob)
+		@view.add_files(path)
 	end
 
 	#-------------------------------------------------------------------------------------------

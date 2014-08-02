@@ -6,6 +6,7 @@ require 'Confetti/lib/Confetti.rb'
 module Confetti
 
 TEST_MODE = true
+KEEP_FS = true
 
 #----------------------------------------------------------------------------------------------
 
@@ -31,14 +32,15 @@ class Test < Bento::Test
 
 			before
 		rescue => x
+			self.failures << Minitest::UnexpectedError.new(x)
 		end
 	end
 
 	def _after
 		super(false)
-		after rescue ''
-		cleanup rescue ''
-		after_cleanup rescue ''
+		live_to_tell { after }
+		live_to_tell { cleanup }
+		live_to_tell { after_cleanup }
 	end
 
 	def setup
@@ -53,11 +55,11 @@ class Test < Bento::Test
 	def cleanup
 		if !keep?
 			if create_fs?
-				Confetti::DB.cleanup rescue ''
-				FileUtils.rm_r(@@root) rescue ''
+				live_to_tell { Confetti::DB.cleanup }
+				live_to_tell { FileUtils.rm_r(@@root) }
 			end
 			if create_vob?
-				@@root_vob.remove! rescue ''
+				live_to_tell { @@root_vob.remove! }
 			end
 		end
 		# @@root_vob = nil
@@ -69,7 +71,7 @@ class Test < Bento::Test
 	#------------------------------------------------------------------------------------------	
 
 	def keep?
-		false
+		KEEP_FS
 	end
 
 	def create_fs?

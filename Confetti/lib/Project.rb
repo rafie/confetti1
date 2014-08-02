@@ -110,8 +110,10 @@ END
 	def create_config_files
 		@lots = @lspec.lots.keys
 		project_ne = Bento.mold(@@project_ne_t, binding)
+
 		project_ne_path = config_file('project.ne')
-		byebug
+		FileUtils.mkdir_p(File.dirname(project_ne_path))
+
 		File.write(project_ne_path, project_ne)
 		@ctl_view.add_files(project_ne_path)
 
@@ -142,7 +144,7 @@ END
 	end
 
 	def config_path
-		Config.view_path(ctl_view.name)
+		Config.view_path(ctl_view)
 	end
 
 	def config_file(file)
@@ -277,7 +279,6 @@ class Projects
 
 	def db
 		Confetti::DB.global
-#		Nexp::Nexp.from_file(Confetti::Config.view_path + "/projects.ne", :single)
 	end
 
 end # Projects
