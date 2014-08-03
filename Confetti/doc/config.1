@@ -1,0 +1,121 @@
+we start with an explicit cspec:
+
+(project mcu-8.3
+	(baseline 
+		(cspec
+			:tag nbu.mcu-8.3_5
+			:stem nbu.mcu-8.3 # need :stem to materialize checks
+			(checks 16 17 18)))
+
+	:icheck 20
+	:itag 5
+	:stem nbu.mcu-8.3 # this is optional, as project name can be used
+	(checks 19 20)
+	
+	(lots
+		nbu.prod.mcu
+		nbu.mcu
+		nbu.web
+		nbu.media
+		nbu.dsp
+		nbu.infra
+		nbu.bsp
+		nbu.contrib
+		nbu.build
+		nbu.tests))
+---
+
+(project mcu-8.3
+	(baseline 
+		(cspec
+			:tag nbu.mcu-8.3_5
+			:stem nbu.mcu-8.3
+			(checks 16 17 18)))
+
+	:icheck 18
+	:itag 5
+	:stem nbu.mcu-8.3 # this is optional, as project name can be used
+	(checks)
+	
+	(lots
+		nbu.prod.mcu
+		nbu.mcu
+		nbu.web
+		nbu.media
+		nbu.dsp
+		nbu.infra
+		nbu.bsp
+		nbu.contrib
+		nbu.build
+		nbu.tests))
+
+---
+
+(project mcu-8.3
+	(baseline 
+		(cspec
+			:tag nbu.mcu-8.3_5
+			:stem nbu.mcu-8.3
+			(checks 16 17 18)))
+
+	:icheck 20
+	:itag 5
+	:stem nbu.mcu-8.3 # this is optional, as project name can be used
+	(checks 19 20)
+	
+	(lots
+		nbu.prod.mcu
+		nbu.mcu
+		nbu.web
+		nbu.media
+		nbu.dsp
+		nbu.infra
+		nbu.bsp
+		nbu.contrib
+		nbu.build
+		nbu.tests))
+
+---
+
+and transform to a minimal one after applying label on project lots:
+ 
+
+project mcu-8.3
+	(baseline 
+		(cspec
+			:tag nbu.mcu-8.3_6)) # lots are implicit, by project configuration
+
+	:icheck 20
+	:itag 6
+	:stem nbu.mcu-8.3 # this is optional, as project name can be used
+	(checks)
+	
+	(lots
+		nbu.prod.mcu
+		nbu.mcu
+		nbu.web
+		nbu.media
+		nbu.dsp
+		nbu.infra
+		nbu.bsp
+		nbu.contrib
+		nbu.build
+		nbu.tests))
+
+---
+
+when taking cspec from this configuration, we get:
+
+(cspec
+	:tag nbu.mcu-8.3_6
+	(lots
+		nbu.prod.mcu
+		nbu.mcu
+		nbu.web
+		nbu.media
+		nbu.dsp
+		nbu.infra
+		nbu.bsp
+		nbu.contrib
+		nbu.build
+		nbu.tests))

@@ -35,7 +35,7 @@ module Confetti
 class CSpec
 	include Bento::Class
 
-	@@configspec_t = ERB.new <<-END
+	@@configspec_t = <<-END
 END
 
 	def is(text, *opt)

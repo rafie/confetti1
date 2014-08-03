@@ -51,6 +51,7 @@
 
 	:icheck 0
 	:itag 0
+	(checks)
 	
 	(lots
 		nbu.prod.mcu

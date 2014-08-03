@@ -120,7 +120,7 @@ end
 # 	end
 # 
 # 	def Lots.nexp
-# 		Nexp::Nexp.from_file(Config.view_path + '/lots.ne', :single)
+# 		Nexp::Nexp.from_file(Config.path_in_view + '/lots.ne', :single)
 # 	end
 # end # Lots
 # 

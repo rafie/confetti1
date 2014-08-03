@@ -6,7 +6,7 @@ require 'byebug'
 
 #----------------------------------------------------------------------------------------------
 
-class Test1 < Confetti::Test
+class AllProjects < Confetti::Test
 
 	def create_vob?; false; end
 
@@ -16,7 +16,6 @@ class Test1 < Confetti::Test
 	end
 
 	def test_all_projects
-		byebug
 		names = @@projects.map { |project| project.name }
 		assert_equal @@all_projects_names, names.sort
 	end
@@ -35,6 +34,10 @@ class CreateFromSpecFiles < Confetti::Test
 			lspec: File.read('project1-test2.lspec'))
 	end
 
+#	def after
+#		@@project = nil
+#	end
+
 	def after_cleanup
 		Confetti::Project('test1').ctl_view.remove!
 	end
@@ -52,10 +55,10 @@ class CreateFromSpecFiles < Confetti::Test
 		assert_equal true, Dir.exists?(@@project.ctl_view.root)
 	end
 
-	def test_project_ne
+	def test_project_config
 		project = @@project
 		assert_equal project.name, project.nexp[:project].car.to_s
-		assert_equal ~project.cspec.nexp, ~project.nexp[:baseline]
+#		assert_equal ~project.cspec.nexp, ~project.nexp[:baseline]
 		assert_equal 0, project.nexp[:itag].to_i
 		assert_equal 0, project.nexp[:icheck].to_i
 		assert_equal %w(nbu.mcu nbu.web nbu.media nbu.dsp nbu.infra nbu.bsp nbu.contrib nbu.build nbu.tests).sort,
@@ -63,7 +66,7 @@ class CreateFromSpecFiles < Confetti::Test
 	end
 
 	def test_lspec
-		assert_equal ~Confetti::LSpec.from_file('project1-test2.lspec').nexp, ~@@project.lotspec.nexp
+		assert_equal ~Confetti::LSpec.from_file('project1-test2.lspec').nexp, ~@@project.lspec.nexp
 	end
 
 end
@@ -96,18 +99,19 @@ class CreateFromProject < Confetti::Test
 		assert_equal true, Dir.exists?(@@project.ctl_view.root)
 	end
 
-	def test_project_ne
+	def test_project_config
 		project = @@project
-		assert_equal project.name, project.nexp[:project].car.to_s
+		byebug
+		assert_equal project.name, project.config_nexp[:project].car.to_s
 		assert_equal ~project.cspec.nexp, ~project.nexp[:baseline]
 		assert_equal 0, project.nexp[:itag].to_i
 		assert_equal 0, project.nexp[:icheck].to_i
-		assert_equal %w(nbu.mcu nbu.web nbu.media nbu.dsp nbu.infra nbu.bsp nbu.contrib nbu.build nbu.tests).sort,
+		assert_equal %w(nbu.prod.mcu nbu.mcu nbu.web nbu.media nbu.dsp nbu.infra nbu.bsp nbu.contrib nbu.build nbu.tests).sort,
 			(~project.nexp[:lots]).sort
 	end
 
 	def test_lspec
-		assert_equal ~Confetti::LSpec.from_file('project1-test2.lspec').nexp, ~@@project.lotspec.nexp
+		assert_equal ~Confetti.Project('mcu-8.3').lspec.nexp, ~@@project.lspec.nexp
 	end
 
 end
@@ -142,7 +146,7 @@ class Test3 < Confetti::Test
 	(checks 16 17 18))
 END
 
-@@project_ne = <<END
+@@project_config = <<END
 END
 
 	def after_cleanup
@@ -158,7 +162,7 @@ END
 		assert_equal name, project.name
 		assert_equal name + '_int_br', project.branch
 		assert_equal t(@@cspec.strip), t(project.cspec.to_s)
-		# assert_equal @@project_ne, File.read(project.local_db_file)
+		# assert_equal @@project_config, File.read(project.local_db_file)
 	end
 
 	def test_create1

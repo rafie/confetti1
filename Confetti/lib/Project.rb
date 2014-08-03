@@ -14,8 +14,10 @@ module Confetti
 # 	(baseline
 #		cspec)
 # 
+# 	:stem stem
 # 	:icheck N
 # 	:itag N
+#   :upstream stream
 # 	
 # 	(lots
 # 		lot-names ...)
@@ -23,6 +25,111 @@ module Confetti
 # 	(products
 # 		(product product-name :lot product-lot))
 # )
+
+# :stem specifies prefix of checks
+# :icheck specifies last check number applied (starts with 0)
+# :itag specifies last tag applied (starts with 0)
+# :upstream specifies the upstream (for rebase/deliver operations)
+
+class ProjectConfig
+	include Bento::Class
+
+	def from_files(path)
+		cspec_text = cspec.is_a? File ? cspec.read : cspec.to_s
+		lspec_text = lspec.is_a? File ? lspec.read : lspec.to_s
+	end
+
+	def from_path(cspec, lspec)
+	end
+
+	def create(name, baseline_cspec: nil, lspec: nil, upstream: nil)
+	end
+
+	#-------------------------------------------------------------------------------------------
+
+	def nexp
+
+	end
+
+	def lspec_nexp
+	end
+
+	#-------------------------------------------------------------------------------------------
+
+	def project_name
+		~nexp.cadr
+	end
+
+	def project_name=(name)
+	end
+
+	def stem
+		nexp[:stem]
+	end
+
+	def icheck
+		nexp[:icheck]
+	end
+
+	def inc_icheck
+		nexp[:icheck] = nexp[:icheck].to_i + 1
+	end
+
+	def itag
+		nexp[:itag]
+	end
+
+	def inc_itag
+		nexp[:itag] = nexp[:itag].to_i + 1
+	end
+
+	def upstream
+		nexp[:upstream]
+	end
+
+	def lots
+	end
+
+	def baseline
+		Confetti.CSpec(nexp[:baseline].to_s)
+	end
+
+	def baseline=
+	end
+
+	def products
+		raise "unimplemented"
+	end
+
+	#-------------------------------------------------------------------------------------------
+
+	def cspec
+	end
+
+	#-------------------------------------------------------------------------------------------
+
+	def write(path)
+	end
+
+	#-------------------------------------------------------------------------------------------
+
+	def self.is(*args)
+		x = self.new; x.send(:is, *args); x
+	end
+
+	def self.create(*args)
+		x = self.send(:new); x.send(:create, *args); x
+	end
+
+	private :is, :create
+	private_class_method :new
+end # Project
+
+def self.ProjectConfig(*args)
+	x = Project.send(:new); x.send(:is, *args); x
+end
+
+#----------------------------------------------------------------------------------------------
 
 class Project < Stream
 	include Bento::Class
@@ -38,14 +145,13 @@ class Project < Stream
 	# :verify - verify project existsance
 
 	def is(name, *opt, db_row: nil)
-		byebug
 		init_flags([:verify], opt)
 
 		@name = name
 		@row = db_row if !!db_row
 
 		@branch = Confetti.Branch(row[:branch])
-		@cspec = Confetti.CSpec(row[:cspec]) if !row[:cspec].empty?
+		@cspec = Confetti.CSpec(row[:cspec]) if !row[:cspec].empty? # what for?
 
 		@ctl_view = Confetti.ProjectControlView(self)
 
@@ -110,7 +216,7 @@ class Project < Stream
 		@ctl_view = ProjectControlView.create(self)
 	end
 
-	@@project_ne_t = <<-END
+	@@project_config_t = <<-END
 (project <%= @name %>
 	(baseline 
 		<%= cspec.to_s %>)
@@ -122,17 +228,17 @@ END
 
 	def create_config_files
 		@lots = @lspec.lots.keys
-		project_ne = Bento.mold(@@project_ne_t, binding)
+		config = Bento.mold(@@project_config_t, binding)
 
-		project_ne_path = config_file('project.ne')
-		FileUtils.mkdir_p(File.dirname(project_ne_path))
+		FileUtils.mkdir_p(config_path)
 
-		File.write(project_ne_path, project_ne)
-		@ctl_view.add_files(project_ne_path)
+		path = main_config_file
+		File.write(path, config)
+		@ctl_view.add_files(path)
 
-		lspec_path = config_file('lots.ne')
-		File.write(lspec_path, @lspec)
-		@ctl_view.add_files(lspec_path)
+		path = lots_config_file
+		File.write(path, @lspec)
+		@ctl_view.add_files(path)
 	end
 
 	def assert_ready
@@ -148,30 +254,34 @@ END
 		@name + "_int_br"
 	end
 
-	def lspec_file
-		config_path + "/" + file
-	end
-
 	def ctl_view
 		return @ctl_view if @ctl_view
 		@ctl_view = Confetti.ProjectControlView(self, :ready)
 	end
 
 	def config_path
-		Config.view_path(ctl_view)
+		Config.path_in_view(ctl_view)
 	end
 
 	def config_file(file)
 		config_path + "/" + file
 	end
 
-	def nexp
+	def main_config_file
+		config_file("project.ne")
+	end
+
+	def lots_config_file
+		config_file("lots.ne")
+	end
+
+	def config_nexp
 		return @project_ne if @project_ne
-		@project_ne = Nexp::Nexp.from_file(config_file('project.ne'), :single)
+		@project_ne = Nexp::Nexp.from_file(main_config_file, :single)
 	end
 
 	def lspec
-		Confetti::LSpec.from_file(config_file('lots.ne'))
+		Confetti::LSpec.from_file(lots_config_file)
 	end
 
 	def row
@@ -195,7 +305,7 @@ END
 	end
 
 	def lots
-		Lots.new(~nexp[:lots])
+		Lots.new(~config_nexp[:lots])
 	end
 
 	def check!
@@ -224,10 +334,10 @@ END
 	end
 
 	def self.create_from_project(*args)
-		x = self.send(:new); x.send(:create, *args); x
+		x = self.send(:new); x.send(:create_from_project, *args); x
 	end
 
-#	private :nexp, :row, :assert_ready
+#	private :config_nexp, :row, :assert_ready
 
 	private :is, :create, :create_from_project
 	private_class_method :new

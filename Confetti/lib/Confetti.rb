@@ -75,7 +75,7 @@ class Config
 		path + "/confetti"
 	end
 
-	def Config.view_path(view = nil)
+	def Config.path_in_view(view = nil)
 		if !TEST_MODE || TEST_WITH_CLEARCASE
 			view = Confetti.CurrentView() if !view
 		else
