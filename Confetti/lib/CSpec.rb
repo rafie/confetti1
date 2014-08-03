@@ -91,8 +91,8 @@ END
 		x = self.new; x.send(:is, *args); x
 	end
 
-	def self.create(*args)
-		x = self.send(:new); x.send(:create, *args); x
+	def self.from_file(*args)
+		x = self.send(:new); x.send(:from_file, *args); x
 	end
 	
 	private :is, :from_file

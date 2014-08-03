@@ -6,7 +6,7 @@ require 'Confetti/lib/Confetti.rb'
 module Confetti
 
 TEST_MODE = true
-KEEP_FS = true
+KEEP_FS = false
 
 #----------------------------------------------------------------------------------------------
 

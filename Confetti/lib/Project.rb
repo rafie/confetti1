@@ -38,13 +38,14 @@ class Project < Stream
 	# :verify - verify project existsance
 
 	def is(name, *opt, db_row: nil)
+		byebug
 		init_flags([:verify], opt)
 
 		@name = name
 		@row = db_row if !!db_row
 
 		@branch = Confetti.Branch(row[:branch])
-		@cspec = Confetti.CSpec(row[:cspec])
+		@cspec = Confetti.CSpec(row[:cspec]) if !row[:cspec].empty?
 
 		@ctl_view = Confetti.ProjectControlView(self)
 
@@ -52,7 +53,7 @@ class Project < Stream
 	end
 
 	def create(name, *opt, branch: nil, cspec: nil, lspec: nil)
-		raise "invalid project name" if name.to_s.strip == ''
+		raise "invalid project name" if name.to_s.strip.empty?
 
 		@name = name
 		raise "Project #{name} exists." if exist?
@@ -61,7 +62,7 @@ class Project < Stream
 		@cspec = Confetti.CSpec(cspec) if cspec
 		@lspec = Confetti.LSpec(lspec) if lspec
 
-		create_db_record
+		create_db_record # should use transaction here
 		create_control_view
 		create_config_files
 
@@ -72,12 +73,24 @@ class Project < Stream
 	end
 
 	def create_from_project(name, *opt, branch: nil, from_project: nil)
-		raise "unimplemented"
+		raise "invalid project name" if name.to_s.strip.empty?
+		raise "invalid source project specification" if !from_project
+
+		@name = name
+		raise "Project #{name} exists." if exist?
+
+		@branch = Confetti.Branch(!branch ? std_branch_name : branch)
+		@cspec = from_project.cspec.dup if from_project.cspec
+		@lspec = from_project.lspec.dup if from_project.lspec
+
+		create_db_record # should use transaction here
+		create_control_view
+		create_config_files
 
 		assert_ready
 
-		rescue Exception => x
-			raise "failed to create project #{name}: " + x.to_s
+#		rescue Exception => x
+#			raise "failed to create project #{name}: " + x.to_s
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -136,6 +149,7 @@ END
 	end
 
 	def lspec_file
+		config_path + "/" + file
 	end
 
 	def ctl_view
@@ -156,7 +170,7 @@ END
 		@project_ne = Nexp::Nexp.from_file(config_file('project.ne'), :single)
 	end
 
-	def lotspec
+	def lspec
 		Confetti::LSpec.from_file(config_file('lots.ne'))
 	end
 

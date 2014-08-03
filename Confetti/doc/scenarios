@@ -16,15 +16,19 @@ scenarios:
 
 - create project
 	- from initial cspec and lspec files
-		- create mcu-8.3 project
+		- create mcu-8.3.1 project
+			- tt create-project mcu-8.3 --cspec file --lspec file
+			- Confetti::Project.create('mcu-8.3', cspec: 'cspec', lspec: 'lspec')
 
 	- from another project head
 		- create mcu-8.3.1 project from mcu-8.3 [low pri]
+			- tt create-project mcu-8.3.1 --from mcu-8.3
+			- Confetti::Project.create('mcu-8.3', project: Confetti.Project('mcu-8.3.1'))
 
-	- from another project version
+	- from another project version: tt create-project mcu-8.3.1 --from mcu-8.3 --version 8.3.0.100.0
 		- create mcu-8.3.1 project from mcu-8.3.0.100.0
 
-- apply check on a project
+- apply check on a project: tt check
 	- use integration view
 	- find elements on branch
 	- find directory closure of elements on branch
@@ -34,8 +38,12 @@ scenarios:
 
 - create project version from initial cspec
 	- project db may hold a default lspec, while version table can hold custom lspec to override it
+	- commands:
+		- tt new-version --project mcu-8.3 --version 8.3.0.1.0 --cspec file
+		- Confetti::Project('mcu-8.3').new_version('8.3.0.1.0', cspec: 'cspec')
 
-- create a project version
+- create a project version: tt new-version --project mcu-8.3
+	- Confetti::Project('mcu-8.3').new_version
 
 == activity
 
@@ -43,10 +51,17 @@ scenarios:
 	- create activity rafie_mcu-work-1 from mcu-8.3
 	- create activity db record
 	- create stream
+	- commands:
+		- tt create-activity mcu-work-1 --project mcu-8.3
+		- Confetti.Activity.create_from_project('mcu-work-1', project: Confetti.Project('mcu-8.3'))
+		
 
 - create an activity from a project version
 	- create activity rafie_mcu-work-1 from mcu-8.3.0.100.0
 		- how should we rebase this?
+	- commands:
+		- tt create-activity mcu-work-1 --project mcu-8.3 --version 8.3.0.100.0
+		- Confetti.Activity.create_from_version('mcu-work-1', project: Confetti.ProjectVersion('mcu-8.3', '8.3.0.100.0'))
 
 == production
 
