@@ -3,6 +3,7 @@ require_relative 'Confetti'
 require_relative 'Stream'
 require_relative 'CSpec'
 require_relative 'LSpec'
+require_relative 'ProjectConfig'
 require_relative 'View'
 require_relative 'Lot'
 
@@ -10,132 +11,10 @@ module Confetti
 
 #----------------------------------------------------------------------------------------------
 
-# (project project-name
-# 	(baseline
-#		cspec)
-# 
-# 	:stem stem
-# 	:icheck N
-# 	:itag N
-#   :upstream stream
-# 	
-# 	(lots
-# 		lot-names ...)
-# 	
-# 	(products
-# 		(product product-name :lot product-lot))
-# )
-
-# :stem specifies prefix of checks
-# :icheck specifies last check number applied (starts with 0)
-# :itag specifies last tag applied (starts with 0)
-# :upstream specifies the upstream (for rebase/deliver operations)
-
-class ProjectConfig
-	include Bento::Class
-
-	def from_files(path)
-		cspec_text = cspec.is_a? File ? cspec.read : cspec.to_s
-		lspec_text = lspec.is_a? File ? lspec.read : lspec.to_s
-	end
-
-	def from_path(cspec, lspec)
-	end
-
-	def create(name, baseline_cspec: nil, lspec: nil, upstream: nil)
-	end
-
-	#-------------------------------------------------------------------------------------------
-
-	def nexp
-
-	end
-
-	def lspec_nexp
-	end
-
-	#-------------------------------------------------------------------------------------------
-
-	def project_name
-		~nexp.cadr
-	end
-
-	def project_name=(name)
-	end
-
-	def stem
-		nexp[:stem]
-	end
-
-	def icheck
-		nexp[:icheck]
-	end
-
-	def inc_icheck
-		nexp[:icheck] = nexp[:icheck].to_i + 1
-	end
-
-	def itag
-		nexp[:itag]
-	end
-
-	def inc_itag
-		nexp[:itag] = nexp[:itag].to_i + 1
-	end
-
-	def upstream
-		nexp[:upstream]
-	end
-
-	def lots
-	end
-
-	def baseline
-		Confetti.CSpec(nexp[:baseline].to_s)
-	end
-
-	def baseline=
-	end
-
-	def products
-		raise "unimplemented"
-	end
-
-	#-------------------------------------------------------------------------------------------
-
-	def cspec
-	end
-
-	#-------------------------------------------------------------------------------------------
-
-	def write(path)
-	end
-
-	#-------------------------------------------------------------------------------------------
-
-	def self.is(*args)
-		x = self.new; x.send(:is, *args); x
-	end
-
-	def self.create(*args)
-		x = self.send(:new); x.send(:create, *args); x
-	end
-
-	private :is, :create
-	private_class_method :new
-end # Project
-
-def self.ProjectConfig(*args)
-	x = Project.send(:new); x.send(:is, *args); x
-end
-
-#----------------------------------------------------------------------------------------------
-
 class Project < Stream
 	include Bento::Class
 
-	attr_reader :name, :branch
-	attr_accessor :cspec
+	attr_reader :name, :branch, :config
 
 	#------------------------------------------------------------------------------------------
 	# constructors
@@ -151,52 +30,58 @@ class Project < Stream
 		@row = db_row if !!db_row
 
 		@branch = Confetti.Branch(row[:branch])
-		@cspec = Confetti.CSpec(row[:cspec]) if !row[:cspec].empty? # what for?
+
+		# what for? can this be removed?
+		@cspec = Confetti.CSpec(row[:cspec]) if !row[:cspec].empty?
 
 		@ctl_view = Confetti.ProjectControlView(self)
 
-		assert_ready
+		assert_good
 	end
 
-	def create(name, *opt, branch: nil, cspec: nil, lspec: nil)
+	def create(name, *opt, branch: nil, baseline_cspec: nil, lspec: nil)
 		raise "invalid project name" if name.to_s.strip.empty?
 
 		@name = name
 		raise "Project #{name} exists." if exist?
 
 		@branch = Confetti.Branch(!branch ? std_branch_name : branch)
-		@cspec = Confetti.CSpec(cspec) if cspec
-		@lspec = Confetti.LSpec(lspec) if lspec
+		@config = ProjectConfig.create(@name, branch: branch, baseline_cspec: baseline_cspec, lspec: lspec)
 
-		create_db_record # should use transaction here
 		create_control_view
 		create_config_files
+		create_db_record # should use transaction here
 
-		assert_ready
+		assert_good
 
 #		rescue Exception => x
+			# should rollback ctl_view and db work
 #			raise "failed to create project #{name}: " + x.to_s
 	end
 
 	def create_from_project(name, *opt, branch: nil, from_project: nil)
 		raise "invalid project name" if name.to_s.strip.empty?
-		raise "invalid source project specification" if !from_project
-
 		@name = name
+
 		raise "Project #{name} exists." if exist?
 
-		@branch = Confetti.Branch(!branch ? std_branch_name : branch)
-		@cspec = from_project.cspec.dup if from_project.cspec
-		@lspec = from_project.lspec.dup if from_project.lspec
+		raise "invalid source project specification" if !from_project
 
-		create_db_record # should use transaction here
+		@branch = Confetti.Branch(!branch ? std_branch_name : branch)
+		@config = ProjectConfig.create_from_config(@name, branch: branch, config: from_project.config)
+
 		create_control_view
 		create_config_files
+		create_db_record # should use transaction here
 
-		assert_ready
+		assert_good
 
-#		rescue Exception => x
-#			raise "failed to create project #{name}: " + x.to_s
+		rescue Exception => x
+			rollback
+			raise "failed to create project #{name}: " + x.to_s
+	end
+
+	def rollback
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -216,34 +101,20 @@ class Project < Stream
 		@ctl_view = ProjectControlView.create(self)
 	end
 
-	@@project_config_t = <<-END
-(project <%= @name %>
-	(baseline 
-		<%= cspec.to_s %>)
-	:itag 0
-	:icheck 0
-	(lots 
-		<%for lot in @lots %> <%= lot %> <% end %>))
-END
-
 	def create_config_files
-		@lots = @lspec.lots.keys
-		config = Bento.mold(@@project_config_t, binding)
-
 		FileUtils.mkdir_p(config_path)
-
-		path = main_config_file
-		File.write(path, config)
-		@ctl_view.add_files(path)
-
-		path = lots_config_file
-		File.write(path, @lspec)
-		@ctl_view.add_files(path)
+		@config.write(config_path)
+		@config.add_to_view(@ctl_view)
 	end
 
-	def assert_ready
-#		byebug
-#		raise "not ready" if !@name || !@row || !@branch || !@ctl_view || !@cspec
+	def assert_good
+		return if 
+			   @name
+			&& @row
+			&& @branch
+			&& @ctl_view
+			&& @config
+		raise "Project no good"
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -251,7 +122,7 @@ END
 	#------------------------------------------------------------------------------------------
 
 	def std_branch_name
-		@name + "_int_br"
+		@name + "_int"
 	end
 
 	def ctl_view
@@ -263,39 +134,10 @@ END
 		Config.path_in_view(ctl_view)
 	end
 
-	def config_file(file)
-		config_path + "/" + file
-	end
-
-	def main_config_file
-		config_file("project.ne")
-	end
-
-	def lots_config_file
-		config_file("lots.ne")
-	end
-
-	def config_nexp
-		return @project_ne if @project_ne
-		@project_ne = Nexp::Nexp.from_file(main_config_file, :single)
-	end
-
-	def lspec
-		Confetti::LSpec.from_file(lots_config_file)
-	end
-
 	def row
 		@row = Confetti::DB.global.single("select * from projects where name=?", [@name]) if !@row
 		@row
 	end
-
-#	def cspec
-#		@cspec.to_s
-#	end
-
-#	def cspec=(text)
-#		@cspec = Confetti.CSpec(text)
-#	end
 
 	#------------------------------------------------------------------------------------------
 	# operations
@@ -338,6 +180,7 @@ END
 	end
 
 #	private :config_nexp, :row, :assert_ready
+	private :rollback
 
 	private :is, :create, :create_from_project
 	private_class_method :new

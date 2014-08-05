@@ -7,7 +7,7 @@ module Confetti
 
 class Branch
 
-	attr_reader :name
+	attr_reader :name, :tag
 
 	def is(name, *opt)
 		raise "invalid branch name" if name.to_s.strip.empty?

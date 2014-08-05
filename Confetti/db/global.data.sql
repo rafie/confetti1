@@ -4,11 +4,11 @@ BEGIN TRANSACTION;
 -----------------------------------------------------------------------------------------------
 
 INSERT INTO "projects" (name, branch, root_vob) VALUES('main',     'main',            '');
-INSERT INTO "projects" (name, branch, root_vob) VALUES('ucgw-7.7', 'ucgw_7.7_int_br', '');
-INSERT INTO "projects" (name, branch, root_vob) VALUES('ucgw-8.0', 'ucgw_8.0_int_br', '');
-INSERT INTO "projects" (name, branch, root_vob) VALUES('mcu-7.7',  'mcu_7.7_int_br',  '');
-INSERT INTO "projects" (name, branch, root_vob) VALUES('mcu-8.0',  'mcu_8.0_int_br',  '');
-INSERT INTO "projects" (name, branch, root_vob) VALUES('test',     'test_int_br',     '.test');
+INSERT INTO "projects" (name, branch, root_vob) VALUES('ucgw-7.7', 'ucgw_7.7_int', '');
+INSERT INTO "projects" (name, branch, root_vob) VALUES('ucgw-8.0', 'ucgw_8.0_int', '');
+INSERT INTO "projects" (name, branch, root_vob) VALUES('mcu-7.7',  'mcu_7.7_int',  '');
+INSERT INTO "projects" (name, branch, root_vob) VALUES('mcu-8.0',  'mcu_8.0_int',  '');
+INSERT INTO "projects" (name, branch, root_vob) VALUES('test',     'test_int',     '.test');
 
 -----------------------------------------------------------------------------------------------
 /*

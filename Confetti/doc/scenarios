@@ -22,17 +22,22 @@ scenarios:
 
 	- from another project head
 		- create mcu-8.3.1 project from mcu-8.3 [low pri]
-			- tt create-project mcu-8.3.1 --from mcu-8.3
-			- Confetti::Project.create('mcu-8.3', project: Confetti.Project('mcu-8.3.1'))
+			- commands:
+				- tt create-project mcu-8.3.1 --from mcu-8.3
+				- Confetti::Project.create('mcu-8.3', project: Confetti.Project('mcu-8.3.1'))
 
-	- from another project version: tt create-project mcu-8.3.1 --from mcu-8.3 --version 8.3.0.100.0
+	- from another project version
 		- create mcu-8.3.1 project from mcu-8.3.0.100.0
+			- commands:
+				- tt create-project mcu-8.3.1 --from mcu-8.3 --version 8.3.0.100.0
 
-- apply check on a project: tt check
+- apply check on a project
 	- use integration view
 	- find elements on branch
 	- find directory closure of elements on branch
 	- apply check label
+	- commands:
+		- tt check
 
 == project version
 
@@ -42,8 +47,10 @@ scenarios:
 		- tt new-version --project mcu-8.3 --version 8.3.0.1.0 --cspec file
 		- Confetti::Project('mcu-8.3').new_version('8.3.0.1.0', cspec: 'cspec')
 
-- create a project version: tt new-version --project mcu-8.3
-	- Confetti::Project('mcu-8.3').new_version
+- create a project version
+	- commands:
+		- tt new-version --project mcu-8.3
+		- Confetti::Project('mcu-8.3').new_version
 
 == activity
 
