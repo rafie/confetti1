@@ -11,6 +11,7 @@ require 'Nexp'
 
 module Confetti
 
+# this should be determined by per-repo association
 CONFETTI_CLEARCASE = true
 CONFETTI_GIT = false
 

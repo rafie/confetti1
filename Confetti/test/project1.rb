@@ -30,8 +30,8 @@ class CreateFromSpecFiles < Confetti::Test
 
 	def before
 		@@project = Confetti::Project.create('test1', 
-			cspec: File.read('project1-test2.cspec'),
-			lspec: File.read('project1-test2.lspec'))
+			baseline_cspec: Confetti::CSpec.from_file('project1-test2.cspec'),
+			lspec: Confetti::LSpec.from_file('project1-test2.lspec'))
 	end
 
 #	def after
@@ -166,12 +166,12 @@ END
 	end
 
 	def test_create1
-		project = Confetti::Project.create('test1', cspec: @@cspec)
+		project = Confetti::Project.create('test1', baseline_cspec: @@cspec)
 		_test_project(project, 'test1')
 	end
 
 	def test_create2
-		Confetti::Project.create('test2', cspec: @@cspec)
+		Confetti::Project.create('test2', baseline_cspec: @@cspec)
 		_test_project(Confetti.Project('test2'), 'test2')
 	end
 end

@@ -32,9 +32,11 @@ class Project < Stream
 		@branch = Confetti.Branch(row[:branch])
 
 		# what for? can this be removed?
-		@cspec = Confetti.CSpec(row[:cspec]) if !row[:cspec].empty?
+		# @cspec = Confetti.CSpec(row[:cspec]) if !row[:cspec].empty?
 
 		@ctl_view = Confetti.ProjectControlView(self)
+
+		@config = Confetti::ProjectConfig.from_path(config_path, )
 
 		assert_good
 	end
@@ -108,12 +110,13 @@ class Project < Stream
 	end
 
 	def assert_good
-		return if 
-			   @name
-			&& @row
-			&& @branch
-			&& @ctl_view
+		return if \
+			   @name \
+			&& @row \
+			&& @branch \
+			&& @ctl_view \
 			&& @config
+		byebug
 		raise "Project no good"
 	end
 

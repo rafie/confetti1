@@ -34,8 +34,9 @@ class ProjectConfig
 	include Bento::Class
 
 	def from_files(main, lspec)
-		@main_file = main.is_a? File ? main : File.new(main.to_s)
-		@lspec_file = lspec.is_a? File ? lspec : File.new(lspec.to_s)
+		@main_file = main.is_a?(File) ? main : File.new(main.to_s)
+		@lspec_file = lspec.is_a?(File) ? lspec : File.new(lspec.to_s)
+		@name = project_name # extract name from main config file
 		assert_good
 	end
 
@@ -49,10 +50,10 @@ class ProjectConfig
 
 		# check_type baseline_cspec, Confetti.CSpec
 		# check_type! also does not allow nils
-		raise "invalid cspec" if !baseline_cspec || !lspec.is_a? Confetti.CSpec
+		raise "invalid cspec" if !baseline_cspec || ! baseline_cspec.is_a?(Confetti::CSpec)
 		baseline_cspec = baseline_cspec if baseline_cspec
 
-		raise "invalid lspec" if !lspec || !lspec.is_a? Confetti.LSpec
+		raise "invalid lspec" if !lspec || ! lspec.is_a?(Confetti::LSpec)
 		@lspec = lspec if lspec
 
 		# @upstream = Confetti.Stream(upstream) if upstream
@@ -67,9 +68,9 @@ class ProjectConfig
 	end
 
 	def assert_good
-		return if 
-			   @name 
-			&& (@nexp || @main_file) 
+		return if \
+			   @name \
+			&& (@nexp || @main_file) \
 			&& (@lspec || @lspec_file)
 		raise "ProjectConfig no good" 
 	end
@@ -185,19 +186,30 @@ END
 
 	#-------------------------------------------------------------------------------------------
 
-	def self.is(*args)
-		x = self.new; x.send(:is, *args); x
+#	def self.is(*args)
+#		x = self.new; x.send(:is, *args); x
+#	end
+
+	def self.from_files(*args)
+		x = self.send(:new); x.send(:from_files, *args); x
+	end
+
+	def self.from_path(*args)
+		x = self.send(:new); x.send(:from_path, *args); x
 	end
 
 	def self.create(*args)
 		x = self.send(:new); x.send(:create, *args); x
 	end
 
-	private :is, :create
+	private :from_files, :from_path, :create
 	private_class_method :new
 end # Project
 
-def self.ProjectConfig(*args)
-	x = Project.send(:new); x.send(:is, *args); x
-end
+#def self.ProjectConfig(*args)
+#	x = Project.send(:new); x.send(:is, *args); x
+#end
 
+#----------------------------------------------------------------------------------------------
+
+end # module Confetti
