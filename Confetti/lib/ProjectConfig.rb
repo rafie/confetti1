@@ -90,7 +90,7 @@ END
 
 		def initialize(project_config, baseline_cspec)
 			@self = project_config
-			@name = @self.name
+			@name = @self.project_name
 			@lots = @self.lspec.lot.keys
 			@baseline_cspec = baseline_cspec
 		end

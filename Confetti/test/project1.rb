@@ -66,6 +66,7 @@ class CreateFromSpecFiles < Confetti::Test
 	end
 
 	def test_lspec
+		byebug
 		assert_equal ~Confetti::LSpec.from_file('project1-test2.lspec').nexp, ~@@project.lspec.nexp
 	end
 
