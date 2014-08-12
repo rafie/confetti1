@@ -34,14 +34,16 @@ class ProjectConfig
 	include Bento::Class
 
 	def from_files(main, lspec)
-		@main_file = main.is_a?(File) ? main : File.new(main.to_s)
-		@lspec_file = lspec.is_a?(File) ? lspec : File.new(lspec.to_s)
+		@main_file = main.is_a?(File) ? main.path : main.to_s
+		@lspec_file = lspec.is_a?(File) ? lspec.path : lspec.to_s
 		@name = project_name # extract name from main config file
 		assert_good
 	end
 
 	def from_path(path)
-		from_files(File.new(path + "/project.ne"), File.new(path + "/lots.ne"))
+		@main_file = self.main_file(path)
+		@lspec_file = self.lspec_file(path)
+		from_files(@main_file, @lspec_file)
 	end
 
 	def create(name, branch: nil, baseline_cspec: nil, lspec: nil, upstream: nil)
@@ -51,19 +53,19 @@ class ProjectConfig
 		# check_type baseline_cspec, Confetti.CSpec
 		# check_type! also does not allow nils
 		raise "invalid cspec" if !baseline_cspec || ! baseline_cspec.is_a?(Confetti::CSpec)
-		baseline_cspec = baseline_cspec if baseline_cspec
 
 		raise "invalid lspec" if !lspec || ! lspec.is_a?(Confetti::LSpec)
 		@lspec = lspec if lspec
 
 		# @upstream = Confetti.Stream(upstream) if upstream
 
-		@nexp = Nexp::Nexp.from_string(MainConfigTemplate.new(self, baseline_cspec), :single)
+		@nexp = Nexp::Nexp.from_string(MainConfigTemplate.new(name, self, baseline_cspec).to_s, :single)
 
 		assert_good
 	end
 
 	def create_from_config(name, branch: nil, config: nil)
+		raise "unimplemented"
 		assert_good
 	end
 
@@ -81,30 +83,32 @@ class ProjectConfig
 		@@config_t = <<-END
 (project <%= @name %>
 	(baseline 
-		<%= baseline_cspec.to_s %>)
+		<%= @baseline_cspec.to_s %>)
 	:itag 0
 	:icheck 0
 	(lots 
 		<%for lot in @lots %> <%= lot %> <% end %>))
 END
 
-		def initialize(project_config, baseline_cspec)
+		def initialize(name, project_config, baseline_cspec)
 			@self = project_config
-			@name = @self.project_name
-			@lots = @self.lspec.lot.keys
+			@name = name
+			@lots = @self.lspec.lots.keys
 			@baseline_cspec = baseline_cspec
 		end
 
-		def text
-			Bento.mold(@@config_t, bindings)
+		def to_s
+			Bento.mold(@@config_t, binding)
 		end
 	end
 
 	#-------------------------------------------------------------------------------------------
 
 	def nexp
-		return @main_nexp if @main_nexp
-		@main_nexp = Nexp::Nexp.from_file(@main_file, :single)
+		return @nexp if @nexp
+		@nexp = Nexp::Nexp.from_file(@main_file, :single)
+		raise "invalid configuration file: #{@main_file}" if ~@nexp[0] != "project"
+		@nexp
 	end
 
 	def lspec
@@ -123,11 +127,12 @@ END
 	end
 
 	def stem
-		nexp[:stem]
+		s = nexp[:stem]
+		s.nil? ? project_name : s
 	end
 
 	def icheck
-		nexp[:icheck]
+		nexp[:icheck].to_i
 	end
 
 	def inc_icheck
@@ -135,7 +140,7 @@ END
 	end
 
 	def itag
-		nexp[:itag]
+		nexp[:itag].to_i
 	end
 
 	def inc_itag
@@ -147,6 +152,7 @@ END
 	end
 
 	def lots
+		(~nexp[:lots]).sort
 	end
 
 	def baseline
@@ -162,26 +168,47 @@ END
 
 	#-------------------------------------------------------------------------------------------
 
-	def cspec
+	def state
+		byebug
+		puts "project_name: " + project_name
+		puts "lots: " + lots.to_s
+		puts "stem: " + stem
+		puts "upstream: " + upstream
+		puts "itag: " + itag.to_s
+		puts "icheck: " + icheck.to_s
+		puts "nexp: ... (ask)"
+		puts "lspec: ... (ask)"
+		puts "baseline: ... (ask)"
 	end
 
 	#-------------------------------------------------------------------------------------------
 
 	def files
-		[@main_config_file, @lspec_file]
+		[@main_file, @lspec_file]
 	end
 
 	def write(path)
-		File.write(path, config)
-		File.write(path, @lspec.to_s)
+		@main_file = ProjectConfig.main_config_file(path)
+		@lspec_file = ProjectConfig.lspec_file(path)
+
+		File.write(@main_file, nexp.text)
+		File.write(@lspec_file, @lspec.to_s)
 	end
 
 	def add_to_view(view)
-		path = main_config_file
-		view.add_files(path)
+		config_path = Config.path_in_view(view)
+		FileUtils.mkdir_p(config_path)
+		write(config_path)
+		view.add_files(@main_file)
+		view.add_files(@lspec_file)
+	end
 
-		path = lots_config_file
-		view.add_files(path)
+	def self.main_config_file(path)
+		path + "/project.ne"
+	end
+
+	def self.lspec_file(path)
+		path + "/lots.ne"
 	end
 
 	#-------------------------------------------------------------------------------------------

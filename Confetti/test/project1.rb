@@ -29,9 +29,9 @@ class CreateFromSpecFiles < Confetti::Test
 	def create_vob?; true; end
 
 	def before
-		@@project = Confetti::Project.create('test1', 
-			baseline_cspec: Confetti::CSpec.from_file('project1-test2.cspec'),
-			lspec: Confetti::LSpec.from_file('project1-test2.lspec'))
+		@@project = Confetti::Project.create("test1", 
+			baseline_cspec: Confetti::CSpec.from_file("project1-test2.cspec"),
+			lspec: Confetti::LSpec.from_file("project1-test2.lspec"))
 	end
 
 #	def after
@@ -43,8 +43,8 @@ class CreateFromSpecFiles < Confetti::Test
 	end
 
 	def test_name
-		assert_equal 'test1', @@project.name
-		assert_equal 'test1_int_br', @@project.branch.name
+		assert_equal "test1", @@project.name
+		assert_equal "test1_int", @@project.branch.name
 	end
 
 	def test_record_exist_in_db
@@ -57,17 +57,16 @@ class CreateFromSpecFiles < Confetti::Test
 
 	def test_project_config
 		project = @@project
-		assert_equal project.name, project.nexp[:project].car.to_s
+		assert_equal project.name, project.config.project_name
 #		assert_equal ~project.cspec.nexp, ~project.nexp[:baseline]
-		assert_equal 0, project.nexp[:itag].to_i
-		assert_equal 0, project.nexp[:icheck].to_i
+		assert_equal 0, project.config.itag
+		assert_equal 0, project.config.icheck
 		assert_equal %w(nbu.mcu nbu.web nbu.media nbu.dsp nbu.infra nbu.bsp nbu.contrib nbu.build nbu.tests).sort,
-			(~project.nexp[:lots]).sort
+			project.config.lots.sort
 	end
 
 	def test_lspec
-		byebug
-		assert_equal ~Confetti::LSpec.from_file('project1-test2.lspec').nexp, ~@@project.lspec.nexp
+		assert_equal ~Confetti::LSpec.from_file("project1-test2.lspec").nexp, ~@@project.config.lspec.nexp
 	end
 
 end
@@ -79,17 +78,17 @@ class CreateFromProject < Confetti::Test
 	def create_vob?; true; end
 
 	def before
-		@@project = Confetti::Project.create_from_project('test1', from_project: Confetti.Project('mcu-8.3'))
-		# also possible: @@project = Confetti::Project.create('test1', from_project: 'mcu-8.3')
+		@@project = Confetti::Project.create_from_project("test1", from_project: Confetti.Project("mcu-8.3"))
+		# also possible: @@project = Confetti::Project.create("test1", from_project: "mcu-8.3")
 	end
 
 	def after_cleanup
-		Confetti::Project('test1').ctl_view.remove!
+		Confetti::Project("test1").ctl_view.remove!
 	end
 
 	def test_name
-		assert_equal 'test1', @@project.name
-		assert_equal 'test1_int_br', @@project.branch.name
+		assert_equal "test1", @@project.name
+		assert_equal "test1_int", @@project.branch.name
 	end
 
 	def test_record_exist_in_db
@@ -112,7 +111,7 @@ class CreateFromProject < Confetti::Test
 	end
 
 	def test_lspec
-		assert_equal ~Confetti.Project('mcu-8.3').lspec.nexp, ~@@project.lspec.nexp
+		assert_equal ~Confetti.Project("mcu-8.3").lspec.nexp, ~@@project.lspec.nexp
 	end
 
 end
@@ -161,19 +160,19 @@ END
 
 	def _test_project(project, name)
 		assert_equal name, project.name
-		assert_equal name + '_int_br', project.branch
+		assert_equal name + "_int", project.branch
 		assert_equal t(@@cspec.strip), t(project.cspec.to_s)
 		# assert_equal @@project_config, File.read(project.local_db_file)
 	end
 
 	def test_create1
-		project = Confetti::Project.create('test1', baseline_cspec: @@cspec)
-		_test_project(project, 'test1')
+		project = Confetti::Project.create("test1", baseline_cspec: @@cspec)
+		_test_project(project, "test1")
 	end
 
 	def test_create2
-		Confetti::Project.create('test2', baseline_cspec: @@cspec)
-		_test_project(Confetti.Project('test2'), 'test2')
+		Confetti::Project.create("test2", baseline_cspec: @@cspec)
+		_test_project(Confetti.Project("test2"), "test2")
 	end
 end
 

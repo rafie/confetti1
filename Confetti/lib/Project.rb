@@ -112,7 +112,7 @@ class Project < Stream
 	def assert_good
 		return if \
 			   @name \
-			&& @row \
+			&& row \
 			&& @branch \
 			&& @ctl_view \
 			&& @config

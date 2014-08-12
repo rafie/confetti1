@@ -19,11 +19,12 @@ class LSpec
 	include Bento::Class
 
 	def is(text, *opt)
-		@ne = Nexp::Nexp.from_string(text, :single)
+		@nexp = Nexp::Nexp.from_string(text, :single)
 	end
 
 	def from_file(fname, *opt)
-		@ne = Nexp::Nexp.from_file(fname, :single)
+		@nexp = Nexp::Nexp.from_file(fname, :single)
+		raise "invalid lspec file: #{fname}" if ~@nexp[0] != "lots"
 	end
 
 	#-------------------------------------------------------------------------------------------
@@ -33,7 +34,7 @@ class LSpec
 	end
 
 	def nexp
-		@ne
+		@nexp
 	end
 
 	def lots
