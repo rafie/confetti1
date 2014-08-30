@@ -19,11 +19,11 @@ class LSpec
 	include Bento::Class
 
 	def is(text, *opt)
-		@ne = Nexp::Nexp.from_string(text, :single)
+		@ne = Bento::Nexp.from_s(text, :single)
 	end
 
 	def from_file(fname, *opt)
-		@ne = Nexp::Nexp.from_file(fname, :single)
+		@ne = Bento::Nexp.from_file(fname, :single)
 	end
 
 	#-------------------------------------------------------------------------------------------

@@ -58,7 +58,7 @@ class ProjectConfig
 
 		# @upstream = Confetti.Stream(upstream) if upstream
 
-		@nexp = Nexp::Nexp.from_string(MainConfigTemplate.new(self, baseline_cspec), :single)
+		@nexp = Bento::Nexp.from_s(MainConfigTemplate.new(self, baseline_cspec), :single)
 
 		assert_good
 	end
@@ -104,7 +104,7 @@ END
 
 	def nexp
 		return @main_nexp if @main_nexp
-		@main_nexp = Nexp::Nexp.from_file(@main_file, :single)
+		@main_nexp = Bento::Nexp.from_file(@main_file, :single)
 	end
 
 	def lspec
