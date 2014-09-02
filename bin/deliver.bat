@@ -1,7 +1,8 @@
 @echo off
 
 setlocal
-pushd %ROOT%
+set here=%~dp0
+pushd %here%\..\..
 
 set comment=%1
 if "%commend%"=="" set comment=...

@@ -1,7 +1,8 @@
 @echo off
 
 setlocal
-pushd %ROOT%
+set here=%~dp0
+pushd %here%\..\..
 
 pushd classico1-bento
 call git fetch origin master
