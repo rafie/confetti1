@@ -59,7 +59,7 @@ class ProjectConfig
 
 		# @upstream = Confetti.Stream(upstream) if upstream
 
-		@nexp = Nexp::Nexp.from_string(MainConfigTemplate.new(name, self, baseline_cspec).to_s, :single)
+		@nexp = NExp.from_s(MainConfigTemplate.new(name, self, baseline_cspec).to_s, :single)
 
 		assert_good
 	end
@@ -106,7 +106,7 @@ END
 
 	def nexp
 		return @nexp if @nexp
-		@nexp = Nexp::Nexp.from_file(@main_file, :single)
+		@nexp = Nexp(@main_file, :single)
 		raise "invalid configuration file: #{@main_file}" if ~@nexp[0] != "project"
 		@nexp
 	end
