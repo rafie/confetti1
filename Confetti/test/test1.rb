@@ -1,7 +1,7 @@
 
 require 'minitest/autorun'
-require 'Confetti/lib/Test.rb'
-require 'Confetti/lib/View.rb'
+require 'Test.rb'
+require 'View.rb'
 require 'byebug'
 
 #----------------------------------------------------------------------------------------------

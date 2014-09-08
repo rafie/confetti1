@@ -41,8 +41,8 @@ class ProjectConfig
 	end
 
 	def from_path(path)
-		@main_file = self.main_file(path)
-		@lspec_file = self.lspec_file(path)
+		@main_file = ProjectConfig.main_config_file(path)
+		@lspec_file = ProjectConfig.lspec_file(path)
 		from_files(@main_file, @lspec_file)
 	end
 
@@ -227,6 +227,10 @@ END
 
 	def self.create(*args)
 		x = self.send(:new); x.send(:create, *args); x
+	end
+
+	def self.create_from_config(*args)
+		x = self.send(:new); x.send(:create_from_config, *args); x
 	end
 
 	private :from_files, :from_path, :create

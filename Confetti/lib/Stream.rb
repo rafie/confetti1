@@ -21,11 +21,11 @@ module Confetti
 
 class StreamSpec
 	def is(text, *opt)
-		@ne = Bento::Nexp.from_s(text, :single)
+		@ne = NExp.from_s(text, :single)
 	end
 
 	def from_file(fname, *opt)
-		@ne = Bento::Nexp.from_file(fname, :single)
+		@ne = Nexp(fname, :single)
 	end
 
 	#-------------------------------------------------------------------------------------------

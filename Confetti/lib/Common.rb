@@ -7,7 +7,7 @@ require 'pathname'
 require 'sqlite3'
 
 require 'Bento'
-require 'Nexp'
+# require 'Nexp'
 
 module Confetti
 

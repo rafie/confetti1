@@ -1,7 +1,7 @@
 
 require 'minitest/autorun'
-require '../lib/Project.rb'
-require '../lib/Test.rb'
+require 'Project.rb'
+require 'Test.rb'
 require 'byebug'
 
 #----------------------------------------------------------------------------------------------
