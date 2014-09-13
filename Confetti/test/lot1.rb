@@ -1,9 +1,11 @@
 
 require 'minitest/autorun'
 require 'Bento'
-require '../lib/Test.rb'
-require '../lib/LSpec.rb'
-require '../lib/Lot.rb'
+require 'Test.rb'
+require 'LSpec.rb'
+require 'Lot.rb'
+
+#----------------------------------------------------------------------------------------------
 
 class Lot1 < Confetti::Test
 
@@ -32,3 +34,5 @@ class Lot1 < Confetti::Test
 		assert_equal %w(nbu.dsp nbu.infra nbu.bsp nbu.contrib nbu.build nbu.tests).sort, media.lots.names.sort
 	end
 end
+
+#----------------------------------------------------------------------------------------------

@@ -1,9 +1,12 @@
 
 require 'minitest/autorun'
-require '../lib/Project.rb'
-require '../lib/ProjectVersion.rb'
-require '../lib/View.rb'
-require '../lib/Test.rb'
+require 'Bento'
+
+require 'Project.rb'
+require 'ProjectVersion.rb'
+require 'View.rb'
+require 'Test.rb'
+
 require 'byebug'
 
 #----------------------------------------------------------------------------------------------

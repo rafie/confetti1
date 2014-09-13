@@ -3,18 +3,18 @@ BEGIN TRANSACTION;
 
 -----------------------------------------------------------------------------------------------
 
-INSERT INTO "projects" (name, branch, root_vob) VALUES('main',     'main',            '');
-INSERT INTO "projects" (name, branch, root_vob) VALUES('ucgw-7.7', 'ucgw_7.7_int', '');
-INSERT INTO "projects" (name, branch, root_vob) VALUES('ucgw-8.0', 'ucgw_8.0_int', '');
-INSERT INTO "projects" (name, branch, root_vob) VALUES('mcu-7.7',  'mcu_7.7_int',  '');
-INSERT INTO "projects" (name, branch, root_vob) VALUES('mcu-8.0',  'mcu_8.0_int',  '');
-INSERT INTO "projects" (name, branch, root_vob) VALUES('test',     'test_int',     '.test');
+INSERT INTO "projects" (id, name, branch, cspec) VALUES(1, 'ucgw-7.7', 'ucgw-7.7_int', '');
+INSERT INTO "projects" (id, name, branch, cspec) VALUES(2, 'mcu-8.0',  'mcu-8.0_int',  '');
+INSERT INTO "projects" (id, name, branch, cspec) VALUES(3, 'mcu-8.3',  'mcu-8.3_int',  '');
 
 -----------------------------------------------------------------------------------------------
-/*
-INSERT INTO "activities" VALUES('rafie_prod-1','rafie_prod-1','rafie_prod-1_br','','mcu-8.0','rafie',1);
-INSERT INTO "activities" VALUES('myact1','myact1','myact1_br','','main','',0);
-*/
+
+-----------------------------------------------------------------------------------------------
+
+INSERT INTO "activities" (name, view, branch, project_id, user, cspec, icheck) VALUES('rafie_prod-1', 'rafie_prod-1', 'rafie_prod-1_br', 2, 'rafie', '', 0);
+INSERT INTO "activities" (name, view, branch, project_id, user, cspec, icheck) VALUES('myact1',       'myact1',       'myact1_br',       3, '',      '', 0);
+
 -----------------------------------------------------------------------------------------------
 
 COMMIT;
+	

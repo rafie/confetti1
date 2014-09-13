@@ -2,7 +2,7 @@
 require 'minitest/autorun'
 
 require 'Confetti/lib/Test.rb'
-require 'Confetti/lib/CSpec.rb'
+require 'CSpec.rb'
 
 #----------------------------------------------------------------------------------------------
 
