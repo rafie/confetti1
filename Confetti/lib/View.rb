@@ -73,7 +73,7 @@ class View
 		elsif TEST_WITH_CLEARCASE
 			raise "no active test" if !Test.current
 			view_opt = filter_flags([:raw], opt)
-			@view = ClearCASE.View(name, root_vob: Test.root_vob)
+			@view = ClearCASE.View(name, *view_opt, root_vob: Test.root_vob)
 			@name = @view.name
 		else
 			@view = Confetti.TestView(name)
@@ -94,7 +94,7 @@ class View
 			@view = ClearCASE::View.create(name, root_vob: Test.root_vob)
 
 		else
-			@view  = Confetti::TestView.create(name)
+			@view = Confetti::TestView.create(name)
 		end
 	end
 

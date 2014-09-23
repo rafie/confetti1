@@ -12,24 +12,19 @@ class Activity
 
 	#------------------------------------------------------------------------------------------
 
-	id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,  
-	name text NOT NULL UNIQUE, 
-	view text UNIQUE NOT NULL, 
-	branch text UNIQUE NOT NULL, 
-	/* root text,*/
-	project_id integer NOT NULL,
-	user text NOT NULL, 
-	cspec text NOT NULL,
-	icheck integer);
+#	name
+#	view
+#	branch
+#	project_id
+#	user
+#	cspec
+#	icheck
 
 	def _from_row(row)
-		@view = row[:view]
+		@view = Confetti.View(row[:view])
 		@branch = Confetti.Branch(row[:branch])
 		@user = User.new(row[:user])
 		@project = Project(row[:project])
-		# @root = row[:root]
-		
-		@view = View(row[:view])
 	end
 
 	def is(name, *opt)
@@ -38,44 +33,34 @@ class Activity
 		@name = name
 		raise "invalid name" if !@name
 		
-		row = db.single("select name, view, branch, root, user, project from activities where name='#{@name}'")
+		row = db.single("select name, view, branch, user, project, project_id from activities, projects where name='#{@name}'")
 		fail "Unknown activity: #{@name}" if row == nil
 		_from_row(row)
 	end
 
-	def create(name, *opt, project: nil, )
+	def create(name, *opt, project: nil)
 		init_flags([:raw], opt)
-		init([:name], [:user, :branch, :view, :project, :root], [:raw, :jazz], opt)
+
 		raise "invalid name" if !@name
+		raise "create activity #{@name} failed: already exists" if exists?
+
+		raise "invalid project" if !project
 
 		@user = System.user if !@raw
 		@name = "#{@user}_#{@name}" if !@raw
-		@name += "_" + Bento.rand_name if @jazz
-		@branch = "#{@name}_br"  if !@branch
-		@view = "#{@name}" if !@view
-		@project = "main" if !@project
-		@root = '' if !@root
+		@branch = Confetti::Branch.create(@name)
+		@view = Confetti::View.create(@name, *filter_flags([:raw], opt))
+		@project = project
 		@last_check = 0
-
-		raise "create activity #{@name} failed: already exists" if exists?
-
-		br_args = {name: @branch}
-		br_args[:root_vob] = @root if @root
-		ClearCASE::Branch.create(br_args)
 
 		view_args = {name: @view}
 		view_args[:root_vob] = @root if @root
 		ClearCASE::View.create(view_args)
 
-		db.execute("insert into activities (name, view, branch, root, user, project, last_check) " +
-			"values ('#{@name}', '#{@view}', '#{@branch}', '#{@root}', '#{@user}', '#{@project}', #{@last_check})")
+		@id = db.insert(:activities, %w(name view branch project_id user cspec last_check),
+			@name, @view, @branch, @project.id, @user, '', @last_check)
 	end
 	
-
-	def Activity.create(*opt)
-		Activity.new(opt, :create)
-	end
-
 	#------------------------------------------------------------------------------------------
 
 	def exists?
@@ -152,7 +137,17 @@ class Activity
 
 	#-------------------------------------------------------------------------------------------
 
-	private :is, :from_file
+	def self.is(*args)
+		x = self.new; x.send(:is, *args); x
+	end
+
+	def self.create(*args)
+		x = self.send(:new); x.send(:create, *args); x
+	end
+
+	#-------------------------------------------------------------------------------------------
+
+	private :is, :create
 	private :_from_row
 	private_class_method :new
 

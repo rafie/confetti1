@@ -11,8 +11,8 @@ INSERT INTO "projects" (id, name, branch, cspec) VALUES(3, 'mcu-8.3',  'mcu-8.3_
 
 -----------------------------------------------------------------------------------------------
 
-INSERT INTO "activities" (name, view, branch, project_id, user, cspec, icheck) VALUES('rafie_prod-1', 'rafie_prod-1', 'rafie_prod-1_br', 2, 'rafie', '', 0);
-INSERT INTO "activities" (name, view, branch, project_id, user, cspec, icheck) VALUES('myact1',       'myact1',       'myact1_br',       3, '',      '', 0);
+INSERT INTO "activities" (name, view, branch, project_id, user, cspec, icheck) VALUES('user_prod-1', 'user_prod-1', 'user_prod-1', 2, 'user', '', 0);
+INSERT INTO "activities" (name, view, branch, project_id, user, cspec, icheck) VALUES('myact1',       'myact1',       'myact1',       3, '',      '', 0);
 
 -----------------------------------------------------------------------------------------------
 

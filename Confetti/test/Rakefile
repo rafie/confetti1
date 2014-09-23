@@ -29,3 +29,9 @@ Rake::TestTask.new("test:project") do |t|
 		)]
 end
 
+Rake::TestTask.new("test:act") do |t|
+	t.libs = test_libs
+	t.test_files = FileList[%w(
+		activity1.rb
+		)]
+end

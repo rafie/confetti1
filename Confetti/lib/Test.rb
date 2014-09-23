@@ -6,7 +6,7 @@ require 'Confetti/lib/Confetti.rb'
 module Confetti
 
 TEST_MODE = true
-KEEP_FS = false
+KEEP_FS = ENV["KEEP"].to_i == 1
 
 #----------------------------------------------------------------------------------------------
 
@@ -23,7 +23,11 @@ class Test < Bento::Test
 					@@root = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S%L")
 				end
 				FileUtils.mkdir_p(@@root)
-				Bento.unzip(fs_zip, @@root)
+				if File.directory?(fs_source)
+					FileUtils.cp_r(fs_source, @@root)
+				elsif File.file?(fs_source)
+					Bento.unzip(fs_source, @@root)
+				end
 			end
 
 			if create_vob? && TEST_WITH_CLEARCASE
@@ -82,8 +86,8 @@ class Test < Bento::Test
 		false
 	end
 
-	def fs_zip
-		'test.fs.zip'
+	def fs_source
+		'fs/'
 	end
 
 	def vob_zip

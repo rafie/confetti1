@@ -36,7 +36,7 @@ class Project < Stream
 
 		@ctl_view = Confetti.ProjectControlView(self)
 
-		@config = Confetti::ProjectConfig.from_path(config_path, )
+		@config = Confetti::ProjectConfig.from_path(config_path)
 
 		assert_good
 	end
@@ -95,6 +95,7 @@ class Project < Stream
 	end
 
 	def create_db_record
+#		Confetti::DB.global.insert('projects', %w(name branch cspec), [@name, @branch.name, @cspec.to_s])
 		Confetti::DB.global.execute("insert into projects (name, branch, cspec) values (?, ?, ?)",
 			[@name, @branch.name, @cspec.to_s])
 	end
