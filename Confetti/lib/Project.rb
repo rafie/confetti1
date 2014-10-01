@@ -14,14 +14,16 @@ module Confetti
 class Project < Stream
 	include Bento::Class
 
-	attr_reader :name, :branch, :config
+	attr_reader :id, :name, :branch, :config
 
 	#------------------------------------------------------------------------------------------
 	# constructors
 	#------------------------------------------------------------------------------------------
+	
+	# constructors :is, :create
 
 	# opt:
-	# :verify - verify project existsance
+	# :verify - verify project existence
 
 	def is(name, *opt, db_row: nil)
 		init_flags([:verify], opt)
@@ -91,13 +93,14 @@ class Project < Stream
 	#------------------------------------------------------------------------------------------
 
 	def exist?
-		!!Confetti::DB.global.single("select * from projects where name=?", [@name])
+		!!db.single("select * from projects where name=?", [@name])
 	end
 
 	def create_db_record
-#		Confetti::DB.global.insert('projects', %w(name branch cspec), [@name, @branch.name, @cspec.to_s])
-		Confetti::DB.global.execute("insert into projects (name, branch, cspec) values (?, ?, ?)",
-			[@name, @branch.name, @cspec.to_s])
+#		db.insert('projects', %w(name branch cspec), [@name, @branch.name, @cspec.to_s])
+#		db.execute("insert into projects (name, branch, cspec) values (?, ?, ?)",
+#			[@name, @branch.name, @cspec.to_s])
+		@id = db.insert(:projects, %w(name branch cspec), @name, @branch.name, @cspec.to_s)
 	end
 
 	def create_control_view
@@ -139,10 +142,14 @@ class Project < Stream
 	end
 
 	def row
-		@row = Confetti::DB.global.single("select * from projects where name=?", @name) if !@row
+		@row = db.single("select * from projects where name=?", @name) if !@row
 		@row
 	end
 
+	def db
+		Confetti::DB.global
+	end
+	
 	#------------------------------------------------------------------------------------------
 	# operations
 	#------------------------------------------------------------------------------------------

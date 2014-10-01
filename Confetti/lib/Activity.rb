@@ -22,7 +22,7 @@ class Activity
 #	cspec
 #	icheck
 
-	def _from_row(row)
+	def from_row(row)
 		@id = row[:id]
 		@view = Confetti.View(row[:view])
 		@branch = Confetti.Branch(row[:branch])
@@ -38,7 +38,7 @@ class Activity
 		
 		row = db.single("select id, name, view, branch, user, project, project_id from activities join projects on id = project_id where name=?", @name)
 		fail "Unknown activity: #{@name}" if row == nil
-		_from_row(row)
+		from_row(row)
 	end
 
 	def create(name, *opt, project: nil)
@@ -58,11 +58,6 @@ class Activity
 		@project = project
 		@last_check = 0
 
-		view_args = {name: @view}
-		view_args[:root_vob] = @root if @root
-
-		ClearCASE::View.create(view_args)
-
 		@id = db.insert(:activities, %w(name view branch project_id user cspec last_check),
 			@name, @view, @branch, @project.id, @user, '', @last_check)
 	end
@@ -70,9 +65,9 @@ class Activity
 	#------------------------------------------------------------------------------------------
 
 	def exists?
-		db.one("select count(*) from activities where name=?", name)[0] == 1
+		db.val("select count(*) from activities where name=?", name) == 1
 	end	
-	
+
 	#------------------------------------------------------------------------------------------
 
 	def checkouts
@@ -154,7 +149,7 @@ class Activity
 	#-------------------------------------------------------------------------------------------
 
 	private :is, :create
-	private :_from_row
+	private :from_row
 	private_class_method :new
 
 end # Activity

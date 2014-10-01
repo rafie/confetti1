@@ -11,11 +11,22 @@ class TestView
 	attr_reader :name
 
 	def is(name, *opt)
-		@name = name.to_s.empty? ? ".current" : name.to_s
+		init_flags([:raw], opt)
+
+		if name.to_s.empty?
+			@name =  ".current"
+		else
+			@name = name.to_s
+			@name = System.user.downcase + "_" + @name if !@raw
+		end
 	end
 
 	def create(name, *opt)
-		@name = name
+		init_flags([:raw], opt)
+		
+		@name = name.to_s
+		@name = System.user.downcase + "_" + @name if !@raw
+		
 		FileUtils.mkdir_p(path)
 	end
 
@@ -64,6 +75,7 @@ class View
 
 	def is(name, *opt)
 		init_flags([:raw], opt)
+		opt1 = filter_flags([:raw], opt)
 
 		@name = name
 
@@ -72,30 +84,32 @@ class View
 
 		elsif TEST_WITH_CLEARCASE
 			raise "no active test" if !Test.current
-			view_opt = filter_flags([:raw], opt)
-			@view = ClearCASE.View(name, *view_opt, root_vob: Test.root_vob)
-			@name = @view.name
+			@view = ClearCASE.View(name, *opt1, root_vob: Test.root_vob)
+
 		else
-			@view = Confetti.TestView(name)
+			opt1 = filter_flags([:raw], opt)
+			@view = Confetti.TestView(name, *opt1)
 		end
+		
+		@name = @view.name
 	end
 
 	def create(name, *opt)
 		init_flags([:raw], opt)
-
-		@name = name
+		opt1 = filter_flags([:raw], opt)
 
 		if !TEST_MODE
-			view_opt = filter_flags([:raw], opt)
-			@view = ClearCASE::View.create(name, *view_opt)
+			@view = ClearCASE::View.create(name, *opt1)
 
 		elsif TEST_WITH_CLEARCASE
 			raise "no active test" if !Test.current
-			@view = ClearCASE::View.create(name, root_vob: Test.root_vob)
+			@view = ClearCASE::View.create(name, *opt1, root_vob: Test.root_vob)
 
 		else
-			@view = Confetti::TestView.create(name)
+			@view = Confetti::TestView.create(name, *opt1)
 		end
+
+		@name = @view.name
 	end
 
 	#-------------------------------------------------------------------------------------------
