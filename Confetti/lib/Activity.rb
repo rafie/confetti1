@@ -1,7 +1,7 @@
 
-require 'Bento'
+require_relative 'Confetti'
 
-require 'Confetti/lib/Project'
+require_relative 'Project'
 
 module Confetti
 
@@ -27,7 +27,8 @@ class Activity
 		@view = Confetti.View(row[:view])
 		@branch = Confetti.Branch(row[:branch])
 		@user = User.new(row[:user])
-		@project = Project(row[:project])
+		@project = Project.from_id(row[:project_id])
+		@icheck = row[:icheck]
 	end
 
 	def is(name, *opt)
@@ -36,13 +37,12 @@ class Activity
 		@name = name
 		raise "invalid name" if !@name
 		
-		row = db.single("select id, name, view, branch, user, project, project_id from activities join projects on id = project_id where name=?", @name)
+		row = db.one("select id, name, view, branch, user, project, project_id from activities join projects on id = project_id where name=?", @name)
 		fail "Unknown activity: #{@name}" if row == nil
 		from_row(row)
 	end
 
 	def create(name, *opt, project: nil)
-		byebug
 		init_flags([:raw], opt)
 
 		@name = name
@@ -56,10 +56,10 @@ class Activity
 		@branch = Confetti::Branch.create(@name, :raw)
 		@view = Confetti::View.create(@name, :raw)
 		@project = project
-		@last_check = 0
+		@icheck = 0
 
-		@id = db.insert(:activities, %w(name view branch project_id user cspec last_check),
-			@name, @view, @branch, @project.id, @user, '', @last_check)
+		@id = db.insert(:activities, %w(name view branch project_id user cspec icheck),
+			@name, @view.name, @branch.name, @project.id, @user, '', @icheck)
 	end
 	
 	#------------------------------------------------------------------------------------------
@@ -80,17 +80,17 @@ class Activity
 
 	#------------------------------------------------------------------------------------------
 
-	def last_check
-		db.get_first_value("select last_check from activities where name='#{@name}'")
+	def icheck
+		db.get_first_value("select icheck from activities where name='#{@name}'")
 	end
 
 	def inc_check
-		db.execute("update activities set last_check = last_check + 1 where name='#{@name}'")
-		last_check
+		db.execute("update activities set icheck = icheck + 1 where name='#{@name}'")
+		icheck
 	end
 
-	def last_check_name
-		Activity.check_name(@name, last_check)
+	def icheck_name
+		Activity.check_name(@name, icheck)
 	end
 
 	def new_check_name

@@ -1,6 +1,12 @@
 
 require 'rake/testtask'
 
+ENV["CONFETTI_TEST_KEEP"] = ENV["KEEP"]
+ENV["CONFETTI_TEST_CCASE"] = ENV["CCASE"]
+
+puts "CONFETTI_TEST_KEEP=" + ENV["CONFETTI_TEST_KEEP"].to_s
+puts "CONFETTI_TEST_CCASE=" + ENV["CONFETTI_TEST_CCASE"].to_s
+
 test_libs = ["../lib", "../../../classico1-bento"]
 
 Rake::TestTask.new do |t|
@@ -13,6 +19,27 @@ Rake::TestTask.new do |t|
 		project1.rb
 		)]
 #	t.verbose = true
+end
+
+Rake::TestTask.new("test:test") do |t|
+	t.libs = test_libs
+	t.test_files = FileList[%w(
+		test1.rb
+		)]
+end
+
+Rake::TestTask.new("test:db") do |t|
+	t.libs = test_libs
+	t.test_files = FileList[%w(
+		db1.rb
+		)]
+end
+
+Rake::TestTask.new("test:cspec") do |t|
+	t.libs = test_libs
+	t.test_files = FileList[%w(
+		cspec1.rb
+		)]
 end
 
 Rake::TestTask.new("test:lot") do |t|

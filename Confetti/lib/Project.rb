@@ -20,16 +20,23 @@ class Project < Stream
 	# constructors
 	#------------------------------------------------------------------------------------------
 	
-	# constructors :is, :create
+	# constructors :is, :from_id, :from_row, :create, :create_from_project
+	## later: :create_from_version
 
 	# opt:
 	# :verify - verify project existence
 
-	def is(name, *opt, db_row: nil)
+	def is(name, *opt)
 		init_flags([:verify], opt)
 
-		@name = name
-		@row = db_row if !!db_row
+		from_row(db.one("select * from projects where name=?", name))
+	end
+
+	def from_row(db_row)
+		@row = db_row
+
+		@id = row[:id]
+		@name = row[:name]
 
 		@branch = Confetti.Branch(row[:branch])
 
@@ -43,10 +50,15 @@ class Project < Stream
 		assert_good
 	end
 
+	def from_id(id)
+		@id = id
+		from_row(db.one("select * from projects where id=?", id))
+	end
+
 	def create(name, *opt, branch: nil, baseline_cspec: nil, lspec: nil)
 		raise "invalid project name" if name.to_s.strip.empty?
 
-		@name = name
+		@name = name.to_s
 		raise "Project #{name} exists." if exist?
 
 		@branch = Confetti.Branch(!branch ? std_branch_name : branch)
@@ -115,7 +127,8 @@ class Project < Stream
 
 	def assert_good
 		return if \
-			   @name \
+			   @id \
+			&& @name \
 			&& row \
 			&& @branch \
 			&& @ctl_view \
@@ -127,6 +140,11 @@ class Project < Stream
 	#------------------------------------------------------------------------------------------
 	# configuration
 	#------------------------------------------------------------------------------------------
+
+	def id
+		@id = db.val("select id from projects where name=?", @name) if !@id
+		@id
+	end
 
 	def std_branch_name
 		@name + "_int"
@@ -180,6 +198,14 @@ class Project < Stream
 
 	def self.is(*args)
 		x = self.new; x.send(:is, *args); x
+	end
+
+	def self.from_row(*args)
+		x = self.new; x.send(:from_row, *args); x
+	end
+
+	def self.from_id(*args)
+		x = self.new; x.send(:from_id, *args); x
 	end
 
 	def self.create(*args)
@@ -252,7 +278,7 @@ class Projects
 	end
 
 	def each
-		@rows.each { |row| yield Confetti.Project(row[:name], db_row: row) }
+		@rows.each { |row| yield Project.from_row(row) }
 	end
 
 	def db

@@ -30,8 +30,6 @@ class Branch
 	end
 
 	def create(name, *opt, stream: nil)
-		byebug
-	
 		init_flags([:raw], opt)
 		opt1 = filter_flags([:raw], opt)
 
@@ -43,7 +41,7 @@ class Branch
 
 		elsif TEST_WITH_CLEARCASE
 			raise "no active test" if !Test.current
-			@branch = ClearCASE.Branch(name, *opt1, root_vob: Test.root_vob)
+			@branch = ClearCASE::Branch.create(name, *opt1, root_vob: Test.root_vob)
 			@name = @branch.name
 		else
 			fix_name(name)

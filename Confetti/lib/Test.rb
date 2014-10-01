@@ -1,7 +1,6 @@
 
-require 'byebug'
 require 'Bento/lib/Test'
-require 'Confetti/lib/Confetti.rb'
+require_relative 'Confetti'
 
 module Confetti
 

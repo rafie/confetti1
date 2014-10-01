@@ -14,19 +14,18 @@ class Primitives < Confetti::Test
 	def create_fs?; true; end
 
 	def before
-		byebug
 		@@act = Confetti::Activity.create("myact1", project: Confetti::Project('mcu-8.0'))
 	end
 	
 	def test_new_act
-		assert_equal "myact1", @@act.name
-		assert_equal "myact1", @@act.branch.to_s
-		assert_equal "myact1", @@act.view.to_s
+		user = System.user.downcase + "_"
+		assert_equal user + "myact1", @@act.name
+		assert_equal user + "myact1", @@act.branch.name
+		assert_equal user + "myact1", @@act.view.name
 	end	
 	
-	def test_existing_act
-#		assert_equal 
-	end	
+#	def test_existing_act
+#	end	
 end
 
 #----------------------------------------------------------------------------------------------

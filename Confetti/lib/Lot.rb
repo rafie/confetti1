@@ -1,6 +1,4 @@
 
-require '../lib/Test.rb'
-
 require_relative 'Confetti'
 
 module Confetti

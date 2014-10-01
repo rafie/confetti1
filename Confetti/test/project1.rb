@@ -51,6 +51,8 @@ end
 
 #----------------------------------------------------------------------------------------------
 
+if false
+
 class CreateFromProject < Confetti::Test
 
 	def create_vob?; true; end
@@ -93,6 +95,8 @@ class CreateFromProject < Confetti::Test
 	end
 
 end
+
+end # 0
 
 #----------------------------------------------------------------------------------------------
 
