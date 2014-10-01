@@ -139,7 +139,7 @@ class Project < Stream
 	end
 
 	def row
-		@row = Confetti::DB.global.single("select * from projects where name=?", [@name]) if !@row
+		@row = Confetti::DB.global.single("select * from projects where name=?", @name) if !@row
 		@row
 	end
 

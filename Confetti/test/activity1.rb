@@ -4,6 +4,7 @@ require 'Bento'
 
 require 'Confetti/lib/Test.rb'
 require 'Activity'
+require 'Project'
 
 #----------------------------------------------------------------------------------------------
 
@@ -13,7 +14,8 @@ class Primitives < Confetti::Test
 	def create_fs?; true; end
 
 	def before
-		@@act = Confetti::Activity.create("myact1")
+		byebug
+		@@act = Confetti::Activity.create("myact1", project: Confetti::Project('mcu-8.0'))
 	end
 	
 	def test_new_act

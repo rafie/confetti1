@@ -15,7 +15,8 @@ module Confetti
 CONFETTI_CLEARCASE = true
 CONFETTI_GIT = false
 
-# TEST_MODE = false # (instead, in Test.rb)
-TEST_WITH_CLEARCASE = false
+# now in Test.rb:
+# TEST_MODE = false 
+# TEST_WITH_CLEARCASE = false
 
 end # module Confetti

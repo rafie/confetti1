@@ -1,6 +1,8 @@
 
 require 'Bento'
 
+require 'Confetti/lib/Project'
+
 module Confetti
 
 #----------------------------------------------------------------------------------------------
@@ -21,6 +23,7 @@ class Activity
 #	icheck
 
 	def _from_row(row)
+		@id = row[:id]
 		@view = Confetti.View(row[:view])
 		@branch = Confetti.Branch(row[:branch])
 		@user = User.new(row[:user])
@@ -33,28 +36,31 @@ class Activity
 		@name = name
 		raise "invalid name" if !@name
 		
-		row = db.single("select name, view, branch, user, project, project_id from activities, projects where name='#{@name}'")
+		row = db.single("select id, name, view, branch, user, project, project_id from activities join projects on id = project_id where name=?", @name)
 		fail "Unknown activity: #{@name}" if row == nil
 		_from_row(row)
 	end
 
 	def create(name, *opt, project: nil)
+		byebug
 		init_flags([:raw], opt)
 
+		@name = name
 		raise "invalid name" if !@name
 		raise "create activity #{@name} failed: already exists" if exists?
 
 		raise "invalid project" if !project
 
-		@user = System.user if !@raw
+		@user = System.user.downcase if !@raw
 		@name = "#{@user}_#{@name}" if !@raw
-		@branch = Confetti::Branch.create(@name)
-		@view = Confetti::View.create(@name, *filter_flags([:raw], opt))
+		@branch = Confetti::Branch.create(@name, :raw)
+		@view = Confetti::View.create(@name, :raw)
 		@project = project
 		@last_check = 0
 
 		view_args = {name: @view}
 		view_args[:root_vob] = @root if @root
+
 		ClearCASE::View.create(view_args)
 
 		@id = db.insert(:activities, %w(name view branch project_id user cspec last_check),
@@ -64,7 +70,7 @@ class Activity
 	#------------------------------------------------------------------------------------------
 
 	def exists?
-		db.get_first_value("select count(*) from activities where name='#{name}'") == 1
+		db.one("select count(*) from activities where name=?", name)[0] == 1
 	end	
 	
 	#------------------------------------------------------------------------------------------
