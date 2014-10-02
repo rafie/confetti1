@@ -7,16 +7,17 @@ require 'pathname'
 require 'sqlite3'
 
 require 'Bento'
-# require 'Nexp'
 
 module Confetti
+
+unless const_defined?(:CONFETTI_COMMON__) # this handles const redefs due to code reloading
+CONFETTI_COMMON__=1
 
 # this should be determined by per-repo association
 CONFETTI_CLEARCASE = true
 CONFETTI_GIT = false
 
-# now in Test.rb:
-# TEST_MODE = false 
-# TEST_WITH_CLEARCASE = false
+end # unless
 
 end # module Confetti
+

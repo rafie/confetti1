@@ -38,6 +38,9 @@ class CSpec
 	@@configspec_t = <<-END
 END
 
+	# constructors :is, :from_file
+	# members :@ne
+
 	def is(text, *opt)
 		@ne = NExp.from_s(text, :single)
 	end
@@ -57,6 +60,7 @@ END
 	end
 
 	def configspec
+		raise "unimplemented"
 	end
 
 	def tag(lot = '')

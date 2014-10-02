@@ -1,8 +1,8 @@
 
 require 'minitest/autorun'
-require 'Bento'
 
-require 'Confetti/lib/Test.rb'
+# require 'Common'
+require 'Confetti/lib/Test'
 require 'Activity'
 require 'Project'
 
@@ -21,7 +21,8 @@ class Primitives < Confetti::Test
 		user = System.user.downcase + "_"
 		assert_equal user + "myact1", @@act.name
 		assert_equal user + "myact1", @@act.branch.name
-		assert_equal user + "myact1", @@act.view.name
+		byebug
+		assert_equal Confetti::TEST_WITH_CLEARCASE ? user + "myact1" : "myact1", @@act.view.name
 	end	
 	
 #	def test_existing_act

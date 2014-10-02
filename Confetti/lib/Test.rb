@@ -1,6 +1,6 @@
 
+require_relative 'Common'
 require 'Bento/lib/Test'
-require_relative 'Confetti'
 
 module Confetti
 

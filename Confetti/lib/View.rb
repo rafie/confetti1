@@ -71,6 +71,9 @@ end
 class View
 	include Bento::Class
 
+	# constructors :is, :create
+	# members :raw, :name, :view
+
 	attr_reader :name
 
 	def is(name, *opt)
@@ -184,8 +187,13 @@ end
 
 #----------------------------------------------------------------------------------------------
 
+# this may end up being a git-only view holding project metadata
+
 class ProjectControlView < View
 	include Bento::Class
+
+	# constructors :is, :create
+	# members :project_name, :branch
 
 	attr_reader :project_name
 

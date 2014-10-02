@@ -22,10 +22,11 @@ class Project < Stream
 	
 	# constructors :is, :from_id, :from_row, :create, :create_from_project
 	## later: :create_from_version
+	
+	# members: :row, :id, :name, :branch, :ctl_view, :config
 
 	# opt:
 	# :verify - verify project existence
-
 	def is(name, *opt)
 		init_flags([:verify], opt)
 
@@ -70,9 +71,9 @@ class Project < Stream
 
 		assert_good
 
-#		rescue Exception => x
+		# 	rescue Exception => x
 			# should rollback ctl_view and db work
-#			raise "failed to create project #{name}: " + x.to_s
+		#		raise "failed to create project #{name}: " + x.to_s
 	end
 
 	def create_from_project(name, *opt, branch: nil, from_project: nil)
@@ -97,21 +98,15 @@ class Project < Stream
 			raise "failed to create project #{name}: " + x.to_s
 	end
 
-	def rollback
-	end
-
 	#------------------------------------------------------------------------------------------
 	# construction
 	#------------------------------------------------------------------------------------------
 
 	def exist?
-		!!db.single("select * from projects where name=?", [@name])
+		!!db.single("select * from projects where name=?", @name)
 	end
 
 	def create_db_record
-#		db.insert('projects', %w(name branch cspec), [@name, @branch.name, @cspec.to_s])
-#		db.execute("insert into projects (name, branch, cspec) values (?, ?, ?)",
-#			[@name, @branch.name, @cspec.to_s])
 		@id = db.insert(:projects, %w(name branch cspec), @name, @branch.name, @cspec.to_s)
 	end
 
@@ -123,6 +118,9 @@ class Project < Stream
 		FileUtils.mkdir_p(config_path)
 		@config.write(config_path)
 		@config.add_to_view(@ctl_view)
+	end
+
+	def rollback
 	end
 
 	def assert_good
@@ -159,6 +157,10 @@ class Project < Stream
 		Config.path_in_view(ctl_view)
 	end
 
+	def cpsec
+		config.baseline
+	end
+	
 	def row
 		@row = db.single("select * from projects where name=?", @name) if !@row
 		@row
