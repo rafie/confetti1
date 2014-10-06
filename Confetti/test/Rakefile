@@ -7,7 +7,7 @@ ENV["CONFETTI_TEST_CCASE"] = ENV["CCASE"]
 puts "CONFETTI_TEST_KEEP=" + ENV["CONFETTI_TEST_KEEP"].to_s
 puts "CONFETTI_TEST_CCASE=" + ENV["CONFETTI_TEST_CCASE"].to_s
 
-test_libs = ["../lib", "../../../classico1-bento"]
+test_libs = ["../lib", "../../../classico1-bento/Classico"]
 
 Rake::TestTask.new do |t|
 	t.libs = test_libs

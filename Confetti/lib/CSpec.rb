@@ -38,8 +38,8 @@ class CSpec
 	@@configspec_t = <<-END
 END
 
-	# constructors :is, :from_file
-	# members :@ne
+	constructors :is, :from_file
+	members :ne
 
 	def is(text, *opt)
 		@ne = NExp.from_s(text, :single)
@@ -63,6 +63,7 @@ END
 		raise "unimplemented"
 	end
 
+	# TODO: allow vob tags
 	def tag(lot = '')
 		if lot == ''
 			t = ~nexp[:tag]
@@ -81,6 +82,10 @@ END
 		~nexp[:stem]
 	end
 
+	def vobs
+		Hash[ nexp[:vobs].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
+	end
+	
 	def lots
 		Hash[ nexp[:lots].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
 	end
@@ -91,21 +96,21 @@ END
 
 	#-------------------------------------------------------------------------------------------
 
-	def self.is(*args)
-		x = self.new; x.send(:is, *args); x
-	end
+#	def self.is(*args)
+#		x = self.new; x.send(:is, *args); x
+#	end
 
-	def self.from_file(*args)
-		x = self.send(:new); x.send(:from_file, *args); x
-	end
+#	def self.from_file(*args)
+#		x = self.send(:new); x.send(:from_file, *args); x
+#	end
 	
-	private :is, :from_file
-	private_class_method :new
+#	private :is, :from_file
+#	private_class_method :new
 end # CSpec
 
-def self.CSpec(*args)
-	x = CSpec.send(:new); x.send(:is, *args); x
-end
+#def self.CSpec(*args)
+#	x = CSpec.send(:new); x.send(:is, *args); x
+#end
 
 #----------------------------------------------------------------------------------------------
 

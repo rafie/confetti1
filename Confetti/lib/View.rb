@@ -71,8 +71,8 @@ end
 class View
 	include Bento::Class
 
-	# constructors :is, :create
-	# members :raw, :name, :view
+	constructors :is, :create
+	members :raw, :name, :view
 
 	attr_reader :name
 
@@ -131,27 +131,33 @@ class View
 
 	#-------------------------------------------------------------------------------------------
 
+	def checkin(glob)
+	end
+	
+	def checkout(glob)
+	end
+
 	def add_files(glob)
-		@view.add_files(path)
+		@view.add_files(glob)
 	end
 
 	#-------------------------------------------------------------------------------------------
 
-	def self.is(*args)
-		x = self.new; x.send(:is, *args); x
-	end
+#	def self.is(*args)
+#		x = self.new; x.send(:is, *args); x
+#	end
 
-	def self.create(*args)
-		x = self.send(:new); x.send(:create, *args); x
-	end
+#	def self.create(*args)
+#		x = self.send(:new); x.send(:create, *args); x
+#	end
 	
-	protected :is, :create
-	private_class_method :new
+#	protected :is, :create
+#	private_class_method :new
 end
 
-def self.View(*args)
-	x = View.send(:new); x.send(:is, *args); x
-end
+#def self.View(*args)
+#	x = View.send(:new); x.send(:is, *args); x
+#end
 
 #----------------------------------------------------------------------------------------------
 

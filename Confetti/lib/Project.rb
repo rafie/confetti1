@@ -203,11 +203,11 @@ class Project < Stream
 	end
 
 	def self.from_row(*args)
-		x = self.new; x.send(:from_row, *args); x
+		x = self.send(:new); x.send(:from_row, *args); x
 	end
 
 	def self.from_id(*args)
-		x = self.new; x.send(:from_id, *args); x
+		x = self.send(:new); x.send(:from_id, *args); x
 	end
 
 	def self.create(*args)
@@ -221,7 +221,7 @@ class Project < Stream
 #	private :config_nexp, :row, :assert_ready
 	private :rollback
 
-	private :is, :create, :create_from_project
+	private :is, :from_id, :from_row, :create, :create_from_project
 	private_class_method :new
 end # Project
 

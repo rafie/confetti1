@@ -27,6 +27,7 @@ class Activity
 		@view = Confetti.View(row[:view])
 		@branch = Confetti.Branch(row[:branch])
 		@user = User.new(row[:user])
+		byebug
 		@project = Project.from_id(row[:project_id])
 		@icheck = row[:icheck]
 	end
@@ -37,7 +38,7 @@ class Activity
 		@name = name
 		raise "invalid name" if !@name
 		
-		row = db.one("select id, name, view, branch, user, project, project_id from activities join projects on id = project_id where name=?", @name)
+		row = db.one("select a.id, a.name, view, a.branch, user, p.name as project, project_id from activities as a join projects as p on p.id = a.project_id where a.name=?", @name)
 		fail "Unknown activity: #{@name}" if row == nil
 		from_row(row)
 	end

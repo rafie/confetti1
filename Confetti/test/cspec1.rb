@@ -108,3 +108,29 @@ END
 end
 
 #----------------------------------------------------------------------------------------------
+
+class CSpec2  < Confetti::Test
+
+	def create_fs?; false; end
+	def create_vob?; false; end
+
+	@@nexp = <<END
+(cspec
+	:stem nbu.mcu-8.3
+	(vobs
+		(mcu            nbu.mcu-8.3.1.3.5)
+		(adapters       nbu.mcu-8.3.1.3.5)
+		(mvp            nbu.media_8.3.1.3.2)
+		(dspInfra       nbu.dsp_8.3.1.3.5.0)
+		(boardInfra     nbu.infra_mcu-8.0_3.0)
+		(freemasonBuild nbu.build_1.4.19)))
+END
+
+	def test_vobs
+	end
+	
+	def test_configspec
+	end
+end
+
+#----------------------------------------------------------------------------------------------
