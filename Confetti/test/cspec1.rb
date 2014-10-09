@@ -1,8 +1,8 @@
 
 require 'minitest/autorun'
 
-require 'Confetti/lib/Test.rb'
-require 'CSpec.rb'
+require 'Confetti/lib/Test'
+require 'CSpec'
 
 #----------------------------------------------------------------------------------------------
 
@@ -102,7 +102,6 @@ END
 	end
 
 	def test_configspec
-		skip "unimplemented"
 		assert_equal @@configspec, @@cspec.configspec
 	end
 end

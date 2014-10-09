@@ -60,18 +60,19 @@ END
 	end
 
 	def configspec
-		raise "unimplemented"
+		checks1 = checks.map {|c| stem + "_check_" + c.to_s }
+		ClearCASE.Configspec(vobs: vobs, tag: tag, checks: checks1)
 	end
 
 	# TODO: allow vob tags
 	def tag(lot = '')
 		if lot == ''
-			t = ~nexp[:tag]
+			t = nexp[:tag]
 		else
 			t = lots[lot]
-			t = ~nexp[:tag] if t == ''
+			t = nexp[:tag] if t == ''
 		end
-		t
+		t.nil? ? nil : ~t.to_s
 	end
 
 	def tag=(t)
@@ -80,6 +81,10 @@ END
 
 	def stem
 		~nexp[:stem]
+	end
+
+	def stem=(s)
+		nexp[:stem] = s
 	end
 
 	def vobs

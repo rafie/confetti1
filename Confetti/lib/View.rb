@@ -44,6 +44,14 @@ class TestView
 		# do nothing
 	end
 
+	def checkin(glob)
+		# no nothing
+	end
+
+	def checkout(glob)
+		# no nothing
+	end
+
 	def add_files(glob)
 		# no nothing
 	end
@@ -72,7 +80,7 @@ class View
 	include Bento::Class
 
 	constructors :is, :create
-	members :raw, :name, :view
+	members :id, :raw, :name, :view
 
 	attr_reader :name
 
@@ -80,7 +88,12 @@ class View
 		init_flags([:raw], opt)
 		opt1 = filter_flags([:raw], opt)
 
-		@name = name
+		raise "invalid name" if !name
+		@name = name.to_s
+
+		row = db.one("select id, name, user, cspec from views where name=?", @name)
+		fail "Unknown view: #{@name}" if row == nil
+		from_row(row)
 
 		if !TEST_MODE
 			@view = ClearCASE.View(name)
@@ -93,13 +106,15 @@ class View
 			opt1 = filter_flags([:raw], opt)
 			@view = Confetti.TestView(name, *opt1)
 		end
-		
+
 		@name = @view.name
 	end
 
-	def create(name, *opt)
+	def create(name, *opt, cspec: nil)
 		init_flags([:raw], opt)
 		opt1 = filter_flags([:raw], opt)
+		
+		raise "invalid cspec" if !cspec
 
 		if !TEST_MODE
 			@view = ClearCASE::View.create(name, *opt1)
@@ -113,6 +128,15 @@ class View
 		end
 
 		@name = @view.name
+
+		@id = db.insert(:views, %w(name user cspec), @name, @user, @cspec)
+	end
+
+	def from_row(row)
+		@id = row[:id]
+		@user = User.new(row[:user])
+		@name = row[:name] if !@name
+		@cspec = Confetti.CSpec(row[:cspec])
 	end
 
 	#-------------------------------------------------------------------------------------------
@@ -132,9 +156,11 @@ class View
 	#-------------------------------------------------------------------------------------------
 
 	def checkin(glob)
+		@view.checkin(glob)
 	end
-	
+
 	def checkout(glob)
+		@view.checkout(glob)
 	end
 
 	def add_files(glob)
@@ -143,21 +169,11 @@ class View
 
 	#-------------------------------------------------------------------------------------------
 
-#	def self.is(*args)
-#		x = self.new; x.send(:is, *args); x
-#	end
+	def db
+		Confetti::DB.global
+	end
 
-#	def self.create(*args)
-#		x = self.send(:new); x.send(:create, *args); x
-#	end
-	
-#	protected :is, :create
-#	private_class_method :new
 end
-
-#def self.View(*args)
-#	x = View.send(:new); x.send(:is, *args); x
-#end
 
 #----------------------------------------------------------------------------------------------
 
@@ -198,8 +214,8 @@ end
 class ProjectControlView < View
 	include Bento::Class
 
-	# constructors :is, :create
-	# members :project_name, :branch
+	constructors :is, :create
+	members :project_name, :branch
 
 	attr_reader :project_name
 

@@ -19,6 +19,14 @@ CREATE TABLE "project_versions" (
 
 -----------------------------------------------------------------------------------------------
 
+CREATE TABLE views (
+	id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,  
+	name text NOT NULL UNIQUE, 
+	user text NOT NULL, 
+	cspec text NOT NULL);
+
+-----------------------------------------------------------------------------------------------
+
 CREATE TABLE activities (
 	id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,  
 	name text NOT NULL UNIQUE, 

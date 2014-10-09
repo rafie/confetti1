@@ -10,33 +10,18 @@ module Confetti
 class Activity
 	include Bento::Class
 
+	constructors :is, :create
+	members :id, :name, :view, :branch, :project, :user, :cspec, :icheck
+	
 	attr_reader :name, :user, :branch, :view
 
 	#------------------------------------------------------------------------------------------
 
-#	name
-#	view
-#	branch
-#	project_id
-#	user
-#	cspec
-#	icheck
-
-	def from_row(row)
-		@id = row[:id]
-		@view = Confetti.View(row[:view])
-		@branch = Confetti.Branch(row[:branch])
-		@user = User.new(row[:user])
-		byebug
-		@project = Project.from_id(row[:project_id])
-		@icheck = row[:icheck]
-	end
-
 	def is(name, *opt)
 		init_flags([:raw], opt)
 
-		@name = name
-		raise "invalid name" if !@name
+		raise "invalid name" if !name
+		@name = name.to_s
 		
 		row = db.one("select a.id, a.name, view, a.branch, user, p.name as project, project_id from activities as a join projects as p on p.id = a.project_id where a.name=?", @name)
 		fail "Unknown activity: #{@name}" if row == nil
@@ -55,14 +40,29 @@ class Activity
 		@user = System.user.downcase if !@raw
 		@name = "#{@user}_#{@name}" if !@raw
 		@branch = Confetti::Branch.create(@name, :raw)
-		@view = Confetti::View.create(@name, :raw)
 		@project = project
 		@icheck = 0
+
+		@cspec = project.cspec
+		@cspec.tag = @name
+		@view = Confetti::View.create(@name, :raw, cspec: @cspec)
 
 		@id = db.insert(:activities, %w(name view branch project_id user cspec icheck),
 			@name, @view.name, @branch.name, @project.id, @user, '', @icheck)
 	end
 	
+	def from_row(row)
+		@id = row[:id]
+		@view = Confetti.View(row[:view])
+		@branch = Confetti.Branch(row[:branch])
+		@user = User.new(row[:user])
+		@project = Project.from_id(row[:project_id])
+		@cspec = Confetti.CSpec(row[:cspec])
+		@icheck = row[:icheck]
+	end
+
+	private :from_row
+
 	#------------------------------------------------------------------------------------------
 
 	def exists?
@@ -130,34 +130,12 @@ class Activity
 	end	
 
 	#------------------------------------------------------------------------------------------
-	private
-	#------------------------------------------------------------------------------------------
 	
 	def db
 		Confetti::DB.global
 	end
 
-	#-------------------------------------------------------------------------------------------
-
-	def self.is(*args)
-		x = self.new; x.send(:is, *args); x
-	end
-
-	def self.create(*args)
-		x = self.send(:new); x.send(:create, *args); x
-	end
-
-	#-------------------------------------------------------------------------------------------
-
-	private :is, :create
-	private :from_row
-	private_class_method :new
-
 end # Activity
-
-def self.Activity(*args)
-	x = Activity.send(:new); x.send(:is, *args); x
-end
 
 #----------------------------------------------------------------------------------------------
 
