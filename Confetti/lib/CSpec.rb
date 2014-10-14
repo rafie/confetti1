@@ -1,5 +1,6 @@
 
 require_relative 'Common'
+require_relative 'Lot'
 
 module Confetti
 
@@ -59,20 +60,35 @@ END
 		@ne
 	end
 
-	def configspec
+	def configspec(lspec: nil)
 		checks1 = checks.map {|c| stem + "_check_" + c.to_s }
-		ClearCASE.Configspec(vobs: vobs, tag: tag, checks: checks1)
+		lots1 = lots
+		vobs1 = vobs
+		tag1 = tag
+		if lspec != nil
+			lots1.keys.each do |lot|
+				lot1 = Confetti.Lot(lot, lspec: lspec)
+				lot_vobs = lot1.vobs
+				lot_vobs.each do |vob|
+					vob1 = vob.to_s
+					vob_tag = lots1[lot]
+					vob_tag = tag1 if vob_tag.empty?
+					vobs1[vob] = vob_tag
+				end
+			end
+		end
+		ClearCASE.Configspec(vobs: vobs1, tag: tag, checks: checks1)
 	end
 
 	# TODO: allow vob tags
-	def tag(lot = '')
+	def tag(lot: '')
 		if lot == ''
-			t = nexp[:tag]
+			t = ~nexp[:tag]
 		else
 			t = lots[lot]
-			t = nexp[:tag] if t == ''
+			t = ~nexp[:tag] if t == ''
 		end
-		t.nil? ? nil : ~t.to_s
+		t.empty? ? nil : t
 	end
 
 	def tag=(t)
@@ -88,10 +104,18 @@ END
 	end
 
 	def vobs
+		Confetti.VOBs.new(nexp.nodes(:vobs))
+	end
+
+	def vobs_cfg
 		Hash[ nexp[:vobs].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
 	end
 	
 	def lots
+		nexp.nodes(:lots)
+	end
+
+	def lots_cfg
 		Hash[ nexp[:lots].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
 	end
 
@@ -99,23 +123,7 @@ END
 		nexp[:checks].map { |x| x.to_i }
 	end
 
-	#-------------------------------------------------------------------------------------------
-
-#	def self.is(*args)
-#		x = self.new; x.send(:is, *args); x
-#	end
-
-#	def self.from_file(*args)
-#		x = self.send(:new); x.send(:from_file, *args); x
-#	end
-	
-#	private :is, :from_file
-#	private_class_method :new
 end # CSpec
-
-#def self.CSpec(*args)
-#	x = CSpec.send(:new); x.send(:is, *args); x
-#end
 
 #----------------------------------------------------------------------------------------------
 

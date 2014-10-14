@@ -13,6 +13,10 @@ module Confetti
 # Q: should lot have project/stream association?
 
 class Lot
+	include Bento::Class
+
+	constructors :is
+	members :name, :lspec, :lot_cspec
 
 	attr_reader :name
 
@@ -57,18 +61,8 @@ class Lot
 
 	#-------------------------------------------------------------------------------------------
 
-	def self.is(*args)
-		x = self.new; x.send(:is, *args); x
-	end
-
 	private :nexp
-	private :is
-	private_class_method :new
 end # Lot
-
-def self.Lot(*args)
-	x = Lot.send(:new); x.send(:is, *args); x
-end
 
 #----------------------------------------------------------------------------------------------
 
