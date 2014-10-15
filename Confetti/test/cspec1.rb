@@ -124,21 +124,33 @@ END
 		byebug
 	end
 
+	# not tested: tag= stem=, configspec()
+
+	# tag, tag(lot)
+	# stem
+	# checks
 	def test_basics
 		cspec = @@cspec
 		assert_equal 'nbu.mcu-8.3.1.3.5', cspec.tag
 		assert_equal 'nbu.mcu-8.3', cspec.stem
-		assert_equal %w(nbu.bsp nbu.build nbu.contrib nbu.dsp nbu.infra nbu.mcu nbu.media nbu.tests nbu.web), cspec.lots.keys.sort
+		lot_names = %w(nbu.bsp nbu.build nbu.contrib nbu.dsp nbu.infra nbu.mcu nbu.media nbu.tests nbu.web)
+		assert_equal lot_names, cspec.lots.names.sort
 		assert_equal [16, 17, 18], cspec.checks
 		assert_equal 'nbu.bsp_1.0.0.7.9', cspec.tag(lot: 'nbu.bsp')
 	end
 
-	def test_mods
+	# tag=
+	def test_tag_set
 		skip "Node.[]= is broken"
 		@@cspec.tag = 'nbu.mcu-8.3.1.4.0'
 		assert_equal 'nbu.mcu-8.3.1.4.0', @@cspec.tag
 	end
 
+	# stem=
+	def test_stem_set
+	end
+
+	# configspec(lspec)
 	def test_configspec
 		assert_equal compact(@@configspec), compact(@@cspec.configspec(lspec: @@lspec).to_s)
 	end
@@ -181,11 +193,11 @@ element * /main/0
 END
 
 	def test_vobs
-		assert_equal %w(adapters boardInfra dspInfra freemasonBuild mcu mvp), cspec.vobs.keys.sort
+#		assert_equal %w(adapters boardInfra dspInfra freemasonBuild mcu mvp), cspec.vobs.keys.sort
 	end
 	
 	def test_configspec
-		assert_equal compact(@@configspec), compact(@@cspec_nexp.configspec.to_s)
+#		assert_equal compact(@@configspec), compact(@@cspec_nexp.configspec.to_s)
 	end
 end
 

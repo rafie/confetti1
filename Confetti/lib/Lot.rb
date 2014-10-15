@@ -73,7 +73,7 @@ class Lots
 
 	def initialize(names, lspec: nil)
 		raise "invalid lspec" if !lspec
-		names = lspec.lots.keys if !names
+		names = lspec.lots.names if !names
 		@names = names
 		@lspec = lspec
 	end
