@@ -20,10 +20,10 @@ class Project < Stream
 	# constructors
 	#------------------------------------------------------------------------------------------
 	
-	# constructors :is, :from_id, :from_row, :create, :create_from_project
+	constructors :is, :from_id, :from_row, :create, :create_from_project
 	## later: :create_from_version
 	
-	# members: :row, :id, :name, :branch, :ctl_view, :config
+	members: :row, :id, :name, :branch, :ctl_view, :config
 
 	# opt:
 	# :verify - verify project existence
@@ -160,6 +160,8 @@ class Project < Stream
 	def cpsec
 		config.baseline
 	end
+
+	alias_method :baseline, :cspec
 	
 	def row
 		@row = db.single("select * from projects where name=?", @name) if !@row
@@ -198,53 +200,22 @@ class Project < Stream
 
 	#-------------------------------------------------------------------------------------------
 
-	def self.is(*args)
-		x = self.new; x.send(:is, *args); x
-	end
-
-	def self.from_row(*args)
-		x = self.send(:new); x.send(:from_row, *args); x
-	end
-
-	def self.from_id(*args)
-		x = self.send(:new); x.send(:from_id, *args); x
-	end
-
-	def self.create(*args)
-		x = self.send(:new); x.send(:create, *args); x
-	end
-
-	def self.create_from_project(*args)
-		x = self.send(:new); x.send(:create_from_project, *args); x
-	end
-
 #	private :config_nexp, :row, :assert_ready
 	private :rollback
 
-	private :is, :from_id, :from_row, :create, :create_from_project
-	private_class_method :new
 end # Project
-
-def self.Project(*args)
-	x = Project.send(:new); x.send(:is, *args); x
-end
 
 #----------------------------------------------------------------------------------------------
 
 class CurrentProject < Project
 
+	constructors :is
+
 	def is
 		raise "unimplemented"
 	end
 
-	private :is
-	private_class_method :new
-
 end # CurrentProject
-
-def self.CurrentProject(*args)
-	x = CurrentProject.send(:new); x.send(:is, *args); x
-end
 
 #----------------------------------------------------------------------------------------------
 

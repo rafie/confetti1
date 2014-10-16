@@ -13,7 +13,7 @@ class Activity
 	constructors :is, :create
 	members :id, :name, :view, :branch, :project, :user, :cspec, :icheck
 	
-	attr_reader :name, :user, :branch, :view
+	attr_reader :name, :user, :branch, :view, :cspec, :project
 
 	#------------------------------------------------------------------------------------------
 
@@ -47,6 +47,7 @@ class Activity
 		@cspec.tag = @name
 		@view = Confetti::View.create(@name, :raw, cspec: @cspec)
 
+		# TODO: add @cspec
 		@id = db.insert(:activities, %w(name view branch project_id user cspec icheck),
 			@name, @view.name, @branch.name, @project.id, @user, '', @icheck)
 	end
@@ -65,9 +66,9 @@ class Activity
 
 	#------------------------------------------------------------------------------------------
 
-	def exists?
-		db.val("select count(*) from activities where name=?", name) == 1
-	end	
+	def self.exists?(name)
+		Confetti::DB.global.val("select count(*) from activities where name=?", name) == 1
+	end
 
 	#------------------------------------------------------------------------------------------
 
@@ -98,7 +99,7 @@ class Activity
 		Activity.check_name(@name, inc_check)
 	end
 
-	def Activity.check_name(name, check)
+	def self.check_name(name, check)
 		"#{name}_check_#{check}"
 	end
 

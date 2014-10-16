@@ -8,6 +8,9 @@ module Confetti
 class TestView
 	include Bento::Class
 
+	constructors :is, :create
+	members :name, :raw
+
 	attr_reader :name
 
 	def is(name, *opt)
@@ -55,23 +58,6 @@ class TestView
 	def add_files(glob)
 		# no nothing
 	end
-
-	#-------------------------------------------------------------------------------------------
-
-	def self.is(*args)
-		x = self.new; x.send(:is, *args); x
-	end
-
-	def self.create(*args)
-		x = self.send(:new); x.send(:create, *args); x
-	end
-
-	protected :is, :create
-	private_class_method :new
-end
-
-def self.TestView(*args)
-	x = TestView.send(:new); x.send(:is, *args); x
 end
 
 #----------------------------------------------------------------------------------------------
@@ -172,12 +158,14 @@ class View
 	def db
 		Confetti::DB.global
 	end
-
 end
 
 #----------------------------------------------------------------------------------------------
 
 class CurrentView < View
+
+	constructors :is
+	members :view
 
 	def is(*opt)
 		if !TEST_MODE
@@ -191,21 +179,7 @@ class CurrentView < View
 			@view = Confetti.TestView(name)
 		end
 	end
-
-	#-------------------------------------------------------------------------------------------
-
-	def self.is(*args)
-		x = self.new; x.send(:is, *args); x
-	end
-
-	protected :is, :create
-	private_class_method :new
-
 end # CurrentView
-
-def self.CurrentView(*args)
-	x = CurrentView.send(:new); x.send(:is, *args); x
-end
 
 #----------------------------------------------------------------------------------------------
 
@@ -275,25 +249,6 @@ END
 	def branch_name
 		@branch.name
 	end
-
-	#-------------------------------------------------------------------------------------------
-
-	def self.is(*args)
-		x = self.new; x.send(:is, *args); x
-	end
-
-	def self.create(*args)
-		x = self.send(:new); x.send(:create, *args); x
-	end
-	
-	private :view_name
-
-	protected :is, :create
-	private_class_method :new
-end
-
-def self.ProjectControlView(*args)
-	x = ProjectControlView.send(:new); x.send(:is, *args); x
 end
 
 #----------------------------------------------------------------------------------------------

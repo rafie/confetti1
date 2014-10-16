@@ -20,6 +20,11 @@ module Confetti
 # )
 
 class StreamSpec
+	include Bento::Class
+	
+	constructors :is, :from_file
+	members :ne
+
 	def is(text, *opt)
 		@ne = NExp.from_s(text, :single)
 	end
@@ -38,37 +43,22 @@ class StreamSpec
 		@ne
 	end
 
-	#-------------------------------------------------------------------------------------------
-
-	private :is, :from_file
-	private_class_method :new
 end # class StreamSpec
-
-def self.StreamSpec(*args)
-	x = StreamSpec.send(:new); x.send(:is, *args); x
-end
 
 #----------------------------------------------------------------------------------------------
 
 class Stream
+	include Bento::Class
+	
+	constructors :is
+	members :ne
 
 	def is(name, *opt)
 	end
 
 	#-------------------------------------------------------------------------------------------
 
-	def self.is(*args)
-		x = self.new; x.send(:is, *args); x
-	end
-
-	private :is
-	private_class_method :new
-
 end # class Stream
-
-def self.Stream(*args)
-	x = Stream.send(:new); x.send(:is, *args); x
-end
 
 #----------------------------------------------------------------------------------------------
 

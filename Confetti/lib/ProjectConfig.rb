@@ -33,8 +33,8 @@ module Confetti
 class ProjectConfig
 	include Bento::Class
 	
-	# constructors :from_file, :from_path, :create. :create_from_config
-	# members :main_file, :lspec_file, :name, :nexp
+	constructors :from_file, :from_path, :create. :create_from_config
+	members :main_file, :lspec_file, :name, :nexp
 
 	def from_files(main, lspec)
 		@main_file = main.is_a?(File) ? main.path : main.to_s
@@ -114,6 +114,9 @@ END
 		@nexp
 	end
 
+	def cspec
+	end
+
 	def lspec
 		return @lspec if @lspec
 		@lspec = Confetti::LSpec.from_file(@lspec_file)
@@ -162,8 +165,8 @@ END
 		Confetti.CSpec(nexp[:baseline].to_s)
 	end
 
-	def baseline=
-		raise "unimplemented"
+	def baseline=(cspec)
+		nexp[:baseline] = cspec.text
 	end
 
 	def products
@@ -217,33 +220,7 @@ END
 
 	#-------------------------------------------------------------------------------------------
 
-#	def self.is(*args)
-#		x = self.new; x.send(:is, *args); x
-#	end
-
-	def self.from_files(*args)
-		x = self.send(:new); x.send(:from_files, *args); x
-	end
-
-	def self.from_path(*args)
-		x = self.send(:new); x.send(:from_path, *args); x
-	end
-
-	def self.create(*args)
-		x = self.send(:new); x.send(:create, *args); x
-	end
-
-	def self.create_from_config(*args)
-		x = self.send(:new); x.send(:create_from_config, *args); x
-	end
-
-	private :from_files, :from_path, :create
-	private_class_method :new
 end # Project
-
-#def self.ProjectConfig(*args)
-#	x = Project.send(:new); x.send(:is, *args); x
-#end
 
 #----------------------------------------------------------------------------------------------
 

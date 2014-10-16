@@ -8,6 +8,33 @@ require 'Project'
 
 #----------------------------------------------------------------------------------------------
 
+#	constructors:
+#		is(name, *opt)
+#		create(name, *opt, project: nil)
+#
+#	attributes:
+#	+	name
+#	+	user
+#	+	branch
+#	+	view
+#		cspec
+#		project
+#
+#	methods:
+#		self.exists?
+#		
+#		checkouts
+#		active_elements
+#		
+#		icheck
+#		inc_check
+#		icheck_name
+#		new_check_name
+#		check!(lot = nil, *flags) flags: keepco
+#		self.check_name(name, check)
+
+#----------------------------------------------------------------------------------------------
+
 class Primitives < Confetti::Test
 
 	def create_vob?; true; end
