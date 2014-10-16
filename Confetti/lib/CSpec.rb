@@ -40,15 +40,25 @@ class CSpec
 END
 
 	constructors :is, :from_file
-	members :ne
+	members :ne, [:lspec, :opt]
 
-	def is(text, *opt)
+	attr_accessor :lspec
+
+	def is(text, *opt, lspec: nil)
 		@ne = NExp.from_s(text, :single)
+		ctor(*opt, lspec)
 	end
 
-	def from_file(fname, *opt)
+	def from_file(fname, *opt, lspec: nil)
 		@ne = Nexp(fname, :single)
+		ctor(*opt, lspec)
 	end
+
+	def ctor(*opt, lspec)
+		@lspec = lspec if lspec
+	end
+
+	private :ctor
 
 	#-------------------------------------------------------------------------------------------
 
@@ -61,23 +71,26 @@ END
 	end
 
 	def configspec(lspec: nil)
-		checks1 = checks.map {|c| stem + "_check_" + c.to_s }
-		lots1 = lots
-		vobs1 = vobs
-		tag1 = tag
+		tag = self.tag
+
+		vobs_cfg = self.vobs_cfg
+		lots_cfg = self.lots_cfg
+
+		lspec = @lspec if lspec == nil
 		if lspec != nil
-			lots1.keys.each do |lot|
-				lot1 = Confetti.Lot(lot, lspec: lspec)
-				lot_vobs = lot1.vobs
+			lots_cfg.keys.each do |lot_name|
+				lot = Confetti.Lot(lot_name, lspec: @lspec)
+				lot_vobs = lot.vobs
 				lot_vobs.each do |vob|
-					vob1 = vob.to_s
-					vob_tag = lots1[lot]
-					vob_tag = tag1 if vob_tag.empty?
-					vobs1[vob] = vob_tag
+					vob_tag = lots_cfg[lot_name]
+					vob_tag = tag if vob_tag.empty?
+					vobs_cfg[vob.name] = vob_tag
 				end
 			end
 		end
-		ClearCASE.Configspec(vobs: vobs1, tag: tag, checks: checks1)
+
+		checks_tags = checks.map {|c| stem + "_check_" + c.to_s}
+		ClearCASE.Configspec(vobs_cfg: vobs_cfg, tag: tag, checks: checks_tags)
 	end
 
 	# TODO: allow vob tags
@@ -85,7 +98,7 @@ END
 		if lot == ''
 			t = ~nexp[:tag]
 		else
-			t = lots[lot]
+			t = lots_cfg[lot]
 			t = ~nexp[:tag] if t == ''
 		end
 		t.empty? ? nil : t
@@ -104,7 +117,7 @@ END
 	end
 
 	def vobs
-		Confetti.VOBs.new(nexp.nodes(:vobs))
+		ClearCASE::VOBs.new(nexp.nodes(:vobs).map {|x| ~x.car })
 	end
 
 	def vobs_cfg
@@ -112,7 +125,7 @@ END
 	end
 	
 	def lots
-		nexp.nodes(:lots)
+		Confetti::Lots.new(nexp.nodes(:lots).map {|x| ~x.car }, lspec: @lspec)
 	end
 
 	def lots_cfg

@@ -7,7 +7,7 @@ require 'LSpec'
 
 #----------------------------------------------------------------------------------------------
 
-class CSpecWithLots < Confetti::Test
+class WithLots < Confetti::Test
 
 	def create_fs?; false; end
 	def create_vob?; false; end
@@ -119,12 +119,9 @@ element * /main/0
 END
 
 	def before
-		@@cspec = Confetti.CSpec(@@cspec_nexp)
 		@@lspec = Confetti.LSpec(@@lspec_nexp)
-		byebug
+		@@cspec = Confetti.CSpec(@@cspec_nexp, lspec: @@lspec)
 	end
-
-	# not tested: tag= stem=, configspec()
 
 	# tag, tag(lot)
 	# stem
@@ -139,20 +136,16 @@ END
 		assert_equal 'nbu.bsp_1.0.0.7.9', cspec.tag(lot: 'nbu.bsp')
 	end
 
-	# tag=
-	def test_tag_set
-		skip "Node.[]= is broken"
-		@@cspec.tag = 'nbu.mcu-8.3.1.4.0'
-		assert_equal 'nbu.mcu-8.3.1.4.0', @@cspec.tag
-	end
-
-	# stem=
-	def test_stem_set
-	end
-
 	# configspec(lspec)
 	def test_configspec
 		assert_equal compact(@@configspec), compact(@@cspec.configspec(lspec: @@lspec).to_s)
+	end
+
+	# configspec()
+	def test_configspec1
+		cspec = @@cspec.clone
+		cspec.lspec = @@lspec
+		assert_equal compact(@@configspec), compact(cspec.configspec.to_s)
 	end
 
 	def compact(s)
@@ -162,7 +155,7 @@ end
 
 #----------------------------------------------------------------------------------------------
 
-class CSpecWithVOBs  < Confetti::Test
+class VOBsOnly < Confetti::Test
 
 	def create_fs?; false; end
 	def create_vob?; false; end
@@ -192,12 +185,52 @@ element /freemasonBuild/... nbu.build_1.4.19
 element * /main/0
 END
 
+	def before
+		@@cspec = Confetti.CSpec(@@cspec_nexp)
+	end
+
 	def test_vobs
-#		assert_equal %w(adapters boardInfra dspInfra freemasonBuild mcu mvp), cspec.vobs.keys.sort
+		assert_equal %w(adapters boardInfra dspInfra freemasonBuild mcu mvp), @@cspec.vobs.names.sort
 	end
 	
 	def test_configspec
-#		assert_equal compact(@@configspec), compact(@@cspec_nexp.configspec.to_s)
+		assert_equal compact(@@configspec), compact(@@cspec.configspec.to_s)
+	end
+
+	def compact(s)
+		Bento::Text.compact(s)
+	end
+end
+
+#----------------------------------------------------------------------------------------------
+
+class Mutation < Confetti::Test
+
+	def create_fs?; false; end
+	def create_vob?; false; end
+
+	@@cspec_nexp = <<END
+(cspec
+	:stem nbu.mcu-8.3
+	:tag nbu.mcu-8.3.1.3.5
+	(vobs
+		mcu adapters mvp dspInfra boardInfra freemasonBuild))
+END
+
+	def before
+		@@cspec = Confetti.CSpec(@@cspec_nexp)
+	end
+
+	# tag=
+	def test_tag_set
+		@@cspec.tag = 'nbu.mcu-8.3.1.4.0'
+		assert_equal 'nbu.mcu-8.3.1.4.0', @@cspec.tag
+	end
+
+	# stem=
+	def test_stem_set
+		@@cspec.stem = 'nbu.mcu-8.5'
+		assert_equal 'nbu.mcu-8.5', @@cspec.stem
 	end
 end
 
