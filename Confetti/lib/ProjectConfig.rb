@@ -33,7 +33,7 @@ module Confetti
 class ProjectConfig
 	include Bento::Class
 	
-	constructors :from_file, :from_path, :create. :create_from_config
+	constructors :from_file, :from_path, :create, :create_from_config
 	members :main_file, :lspec_file, :name, :nexp
 
 	def from_files(main, lspec)

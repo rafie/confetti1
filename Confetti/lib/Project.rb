@@ -23,7 +23,7 @@ class Project < Stream
 	constructors :is, :from_id, :from_row, :create, :create_from_project
 	## later: :create_from_version
 	
-	members: :row, :id, :name, :branch, :ctl_view, :config
+	members :row, :id, :name, :branch, :ctl_view, :config
 
 	# opt:
 	# :verify - verify project existence
@@ -157,7 +157,7 @@ class Project < Stream
 		Config.path_in_view(ctl_view)
 	end
 
-	def cpsec
+	def cspec
 		config.baseline
 	end
 
