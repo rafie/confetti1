@@ -5,21 +5,21 @@ require 'Confetti'
 module Confetti
 module Commands
 
-class Mark
-	def Mark.command(c)
-		c.syntax = 'tt mark [options] [activity-name]'
-		c.summary = 'Mark state of an activity'
+class Check
+	def Check.command(c)
+		c.syntax = 'tt check [options] [activity-name]'
+		c.summary = 'Check an activity'
 		c.description = c.summary
 
-		c.example 'Mark state of current activity', 'tt mark'
-		c.example 'Mark state of activity ACT', 'tt mark --name ACT'
-		c.example 'Mark state of current activity, but only lot LOT', 'tt mark --lot LOT'
+		c.example 'Check current activity', 'tt check'
+		c.example 'Check activity ACT', 'tt check --name ACT'
+		c.example 'Check current activity, but only lot LOT', 'tt check --lot LOT'
 
 		c.option '--name NAME', 'Name of activity'
-		c.option '--lot NAME', 'Mark specific lot (repeatable)'
+		c.option '--lot NAME', 'Check lot (repeatable)'
 		c.option '--keepco', 'Re-check-out elements after labeling'
 
-		c.action Mark
+		c.action Check
 	end
 
 	def initialize(args, options)
@@ -32,19 +32,19 @@ class Mark
 				act = Confetti.CurrentActivity
 				act_name = act.anme
 			rescue
-				raise "Cannot determine activity. Please specify activity name"
+				raise "Cannot determine activity. Please specify activity name."
 			end
 		end
 
 		flags << :keepco if options.keepco
 
-		say "Marking activity #{act_name} ..."
+		say "Checking activity #{act_name} ..."
 		
 		act = Confetti.Activity(act_name)
-		mark = act.mark!(nil, flags)
-		
-		say "Activity #{act_name} marked with #{mark}."
-		say "Checkouts are presersed." if keepco
+		check = act.check!(*flags)
+
+		say "Activity #{act_name} checked with #{check}."
+		say "Checkouts are preserved." if keepco
 	end
 end
 

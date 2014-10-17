@@ -7,14 +7,13 @@ CREATE TABLE "projects" (
 	[id] integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE, 
 	[name] text NOT NULL UNIQUE,
 	branch text NOT NULL,
-	root_vob text,
 	cspec text /*NOT NULL*/);
 
 CREATE TABLE "project_versions" (
 	[id] integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,
 	project_id integer NOT NULL,
 	version text NOT NULL,
-	cspec text NOT NULL,
+	cspec text /*NOT NULL*/,
 	UNIQUE(project_id, version));
 
 -----------------------------------------------------------------------------------------------

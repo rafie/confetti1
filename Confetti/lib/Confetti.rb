@@ -39,6 +39,7 @@ class DB
 				db = Bento::DB.create(path: DB.global_path, 
 					schema: '../db/global.schema.sql', 
 					data: Config.db_path + '/global.data.sql')
+				System.command("ruby init.rb", at: Config.db_path)
 			end
 			class_variable_set(:@@global_db, db)
 		else

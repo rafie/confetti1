@@ -5,15 +5,15 @@ require 'Confetti'
 module Confetti
 module Commands
 
-class NewVer
-	def NewVer.command(c)
-		c.syntax = 'tt newver [options]'
+class MkVer
+	def MkVer.command(c)
+		c.syntax = 'tt mkver [options]'
 		c.summary = 'Create a new project version'
 		c.description = ''
 		c.example 'description', 'command example'
 		c.option '--some-switch', 'Some switch that does something'
 
-		c.action NewVer
+		c.action MkVer
 	end
 
 	def initialize(args, options)

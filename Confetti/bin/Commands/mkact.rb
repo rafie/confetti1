@@ -11,10 +11,11 @@ class MkAct
 		c.summary = 'Create a new activity'
 		c.description = 'Create a new activity'
 
-		c.example "Create activity named 'ACT'", 'tt mkact ACT'
-		c.example "Create activity named 'ACT'", 'tt mkact --name ACT'
+		c.example "Create activity ACT for project PRJ", 'tt mkact --project PRJ ACT'
+		c.example "Create activity ACT for project PRJ", 'tt mkact --name ACT --project PRJ'
 
 		c.option '--name NAME', 'Activity name'
+		c.option '--project NAME', 'Project name'
 		c.option '--raw', 'Do not add username prefix'
 
 		c.action MkAct
@@ -27,14 +28,15 @@ class MkAct
 		name = options.name if !name && !!options.name
 		raise "missing activity name" if !name
 
+		project = options.project
+		raise "missing project name" if !project
+
 		flags << :raw if options.raw
 
 		say "Creating activity #{name} ..."
-		
-		act_args = {name: name}
-		act_args[:project] = options.project if options.project
-		act = Confetti::Activity.create(act_args, *flags)
-		
+
+		act = Confetti::Activity.create(name, *flags, project: Confetti.Project(project))
+
 		say "Activity #{name} created."
 	end
 end

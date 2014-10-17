@@ -183,7 +183,8 @@ class Project < Stream
 		Lots.new(~config_nexp[:lots])
 	end
 
-	def check!
+	# opt: :keepco
+	def check!(*opt)
 	end
 
 	def new_version!

@@ -103,11 +103,10 @@ class Activity
 		"#{name}_check_#{check}"
 	end
 
-	# flags: keepco
-
-	def check!(lot = nil, *flags)
-		lot = lot == nil ? nil : lot.is_a?(ClearCASE::Lot) ? lot : Lot.new(lot)
-		keepco = flags.include?(:keepco)
+	# opt: :keepco
+	def check!(*opt, lot: nil)
+		keepco = opt.include?(:keepco)
+		lot = lot.is_a?(String) ? Confetti.Lot(lot) : lot
 
 		checkouts = view.checkouts
 		checkouts = lot.filter_elements(checkouts) if lot
@@ -128,6 +127,7 @@ class Activity
 		ensure
 			checkouts.checkout if checkin_done && keepco
 		end
+		check_name
 	end	
 
 	#------------------------------------------------------------------------------------------
