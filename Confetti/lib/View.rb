@@ -81,7 +81,7 @@ class View
 		fail "Unknown view: #{@name}" if row == nil
 		from_row(row)
 
-		if !TEST_MODE
+		if !Confetti.test_mode?
 			@view = ClearCASE.View(name)
 
 		elsif TEST_WITH_CLEARCASE
@@ -102,7 +102,7 @@ class View
 		
 		raise "invalid cspec" if !cspec
 
-		if !TEST_MODE
+		if !Confetti.test_mode?
 			@view = ClearCASE::View.create(name, *opt1)
 
 		elsif TEST_WITH_CLEARCASE
@@ -168,7 +168,7 @@ class CurrentView < View
 	members :view
 
 	def is(*opt)
-		if !TEST_MODE
+		if !Confetti.test_mode?
 			@view = ClearCASE.CurrentView
 
 		elsif TEST_WITH_CLEARCASE
@@ -212,7 +212,7 @@ END
 
 		opt1 = filter_flags([:ready], opt)
 
-		opt1 << :raw if !(TEST_MODE && TEST_WITH_CLEARCASE)
+		opt1 << :raw if !(Confetti.test_mode? && TEST_WITH_CLEARCASE)
 		super(view_name, *opt1)
 	end
 
@@ -223,10 +223,10 @@ END
 		@branch = project.branch
 
 		opt1 = []
-		opt1 << :raw if !(TEST_MODE && TEST_WITH_CLEARCASE)
+		opt1 << :raw if !(Confetti.test_mode? && TEST_WITH_CLEARCASE)
 		super(view_name, *opt1)
 
-		if !TEST_MODE || TEST_WITH_CLEARCASE
+		if !Confetti.test_mode? || TEST_WITH_CLEARCASE
 			@configspec = Bento.mold(@@configspec_t, binding)
 			@view.configspec = @configspec
 		end
@@ -239,7 +239,7 @@ END
 	end
 
 	def view_name
-		if !TEST_MODE || !TEST_WITH_CLEARCASE
+		if !Confetti.test_mode? || !TEST_WITH_CLEARCASE
 			'.project_' + project_name
 		else
 			'confetti-project_' + project_name

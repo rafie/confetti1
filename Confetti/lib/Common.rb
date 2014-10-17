@@ -17,7 +17,14 @@ CONFETTI_COMMON__=1
 CONFETTI_CLEARCASE = true
 CONFETTI_GIT = false
 
+$confetti_test_mode = ENV["CONFETTI_TEST"].to_i == 1
+
+KEEP_FS = ENV["CONFETTI_TEST_KEEP"].to_i == 1
+TEST_WITH_CLEARCASE = ENV["CONFETTI_TEST_CCASE"].to_i == 1
+TEST_ROOT_VOB = ENV["CONFETTI_ROOT_VOB"]
+
 end # unless
 
-end # module Confetti
+def self.test_mode?; $confetti_test_mode; end
 
+end # module Confetti

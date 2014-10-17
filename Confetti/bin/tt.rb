@@ -10,6 +10,8 @@ program :name, 'tt - Confetti'
 program :version, '1.0.0'
 program :description, 'A configuration management system.'
 default_command :help
+
+global_option('-', '--test', 'Run in test mode') { $confetti_test_mode = true; puts "Running in test mode." }
  
 require 'Bento'
 require 'Confetti'

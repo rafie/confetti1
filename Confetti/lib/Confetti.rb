@@ -33,7 +33,7 @@ class DB
 
 	def DB.global
 		if DB.global_db == nil
-			if !TEST_MODE
+			if !Confetti.test_mode?
 				db = Bento::DB.new(DB.global_path)
 			else
 				db = Bento::DB.create(path: DB.global_path, 
@@ -52,7 +52,7 @@ class DB
 	end
 	
 	def DB.global_path
-		if !TEST_MODE
+		if !Confetti.test_mode?
 			Config.db_path + "/global.db"
 		else
 			Config.db_path + "/global.db"
@@ -61,7 +61,7 @@ class DB
 
 	def DB.cleanup
 #		puts @@global_db.path + " cleanup"
-		if TEST_MODE
+		if Confetti.test_mode?
 			DB.global_db.cleanup if @@global_db
 			@@global_db =  nil
 		end
@@ -73,7 +73,7 @@ end # DB
 
 class Config
 	def Config.db_path
-		if !TEST_MODE
+		if !Confetti.test_mode?
 			view = ClearCASE.CurrentView
 			path = "R:/Build/cfg"
 		else
@@ -83,7 +83,7 @@ class Config
 	end
 
 	def Config.path_in_view(view = nil)
-		if !TEST_MODE || TEST_WITH_CLEARCASE
+		if !Confetti.test_mode? || TEST_WITH_CLEARCASE
 			view = Confetti.CurrentView() if !view
 		else
 			view = Confetti.TestView('') if !view

@@ -16,7 +16,7 @@ class Branch
 
 		raise "invalid branch name" if name.to_s.empty?
 
-		if !TEST_MODE
+		if !Confetti.test_mode?
 			@branch = ClearCASE.Branch(name, *opt1)
 			@name = @branch.name
 
@@ -35,7 +35,7 @@ class Branch
 
 		raise "invalid branch name" if name.to_s.empty?
 
-		if !TEST_MODE
+		if !Confetti.test_mode?
 			@branch = ClearCASE::Branch.create(name, *opt1)
 			@name = @branch.name
 

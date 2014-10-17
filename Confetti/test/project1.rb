@@ -2,7 +2,28 @@
 require 'minitest/autorun'
 require 'Project.rb'
 require 'Test.rb'
-require 'byebug'
+
+#----------------------------------------------------------------------------------------------
+
+#	constructors:
+#		is(name, *opt) # opt: :verify
+#		from_row(db_row)
+#		from_id(id)
+#		create(name, *opt, branch, baseline_cspec, lspec)
+#		create_from_project(name, *opt, branch: nil, from_project: nil)
+#
+#	methods:
+#		id
+#		std_branch_name
+#		ctl_view
+#		config_path
+#		cpsec
+#	
+#		new_activity(name, project, version: nil)
+#		lots
+#		check!
+#		new_version!
+#		tag!
 
 #----------------------------------------------------------------------------------------------
 

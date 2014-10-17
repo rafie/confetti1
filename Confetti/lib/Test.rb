@@ -4,9 +4,7 @@ require 'Bento/lib/Test'
 
 module Confetti
 
-TEST_MODE = true
-KEEP_FS = ENV["CONFETTI_TEST_KEEP"].to_i == 1
-TEST_WITH_CLEARCASE = ENV["CONFETTI_TEST_CCASE"].to_i == 1
+$confetti_test_mode = true
 
 #----------------------------------------------------------------------------------------------
 
@@ -31,7 +29,12 @@ class Test < Bento::Test
 			end
 
 			if create_vob? && TEST_WITH_CLEARCASE
-				@@root_vob = ClearCASE::VOB.create('', file: vob_zip)
+				if TEST_ROOT_VOB
+					@@root_vob = ClearCASE.VOB(TEST_ROOT_VOB)
+				else
+					@@root_vob = ClearCASE::VOB.create('', file: vob_zip)
+					ENV["CONFETTI_ROOT_VOB"] = @@root_vob.name
+				end
 			end
 
 			before
