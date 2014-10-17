@@ -62,3 +62,10 @@ Rake::TestTask.new("test:act") do |t|
 		activity1.rb
 		)]
 end
+
+Rake::TestTask.new("test:tt:mkact") do |t|
+	t.libs = test_libs
+	t.test_files = FileList[%w(
+		tt/mkact.rb
+		)]
+end

@@ -25,7 +25,7 @@ END
 	end
 
 	def test_create1
-		assert_equal 0, tt("mkact --project mcu-8.0 act2").retval
+		assert_equal 0, tt("mkact --project mcu-8.0 act2").status
 		_test("act2")
 	end
 	
