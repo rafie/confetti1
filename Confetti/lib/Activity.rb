@@ -47,9 +47,8 @@ class Activity
 		@cspec.tag = @name
 		@view = Confetti::View.create(@name, :raw, cspec: @cspec)
 
-		# TODO: add @cspec
 		@id = db.insert(:activities, %w(name view branch project_id user cspec icheck),
-			@name, @view.name, @branch.name, @project.id, @user, '', @icheck)
+			@name, @view.name, @branch.name, @project.id, @user, @cspec.text, @icheck)
 	end
 	
 	def from_row(row)
@@ -83,11 +82,11 @@ class Activity
 	#------------------------------------------------------------------------------------------
 
 	def icheck
-		db.get_first_value("select icheck from activities where name='#{@name}'")
+		db.val("select icheck from activities where name=?", @name)
 	end
 
 	def inc_check
-		db.execute("update activities set icheck = icheck + 1 where name='#{@name}'")
+		db.execute("update activities set icheck = icheck + 1 where name=?", @name)
 		icheck
 	end
 
@@ -127,7 +126,9 @@ class Activity
 		ensure
 			checkouts.checkout if checkin_done && keepco
 		end
-		check_name
+		cspec1 = cspec.clone
+		cspec1.add_check(check_name)
+		Confetti.Check.create(check_name, cspec: cspec1)
 	end	
 
 	#------------------------------------------------------------------------------------------

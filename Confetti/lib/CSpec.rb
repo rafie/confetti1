@@ -70,7 +70,7 @@ END
 		@ne
 	end
 
-	def configspec(lspec: nil)
+	def configspec(lspec: nil, branch: nil)
 		tag = self.tag
 
 		vobs_cfg = self.vobs_cfg
@@ -90,7 +90,7 @@ END
 		end
 
 		checks_tags = checks.map {|c| stem + "_check_" + c.to_s}
-		ClearCASE.Configspec(vobs_cfg: vobs_cfg, tag: tag, checks: checks_tags)
+		ClearCASE.Configspec(vobs_cfg: vobs_cfg, tag: tag, checks: checks_tags, branch: branch)
 	end
 
 	# TODO: allow vob tags
@@ -123,7 +123,11 @@ END
 	def vobs_cfg
 		Hash[ nexp[:vobs].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
 	end
-	
+
+	def add_vob(vob, tag)
+		nexp.find(:vobs) << [vob, tag]
+	end
+
 	def lots
 		Confetti::Lots.new(nexp.nodes(:lots).map {|x| ~x.car }, lspec: @lspec)
 	end
@@ -134,6 +138,20 @@ END
 
 	def checks
 		nexp[:checks].map { |x| x.to_i }
+	end
+
+	def add_check(n)
+		nexp.find(:checks) << n
+	end
+
+	# TODO: return a flat cspec, without lot tags, just basic repos
+	def flat
+		raise "unimplemented"
+	end
+
+	# TODO
+	def flat?
+		# are there any lot tags?
 	end
 
 end # CSpec

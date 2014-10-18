@@ -77,9 +77,7 @@ class View
 		raise "invalid name" if !name
 		@name = name.to_s
 
-		row = db.one("select id, name, user, cspec from views where name=?", @name)
-		fail "Unknown view: #{@name}" if row == nil
-		from_row(row)
+		from_row(db.one("select id, name, user, cspec from views where name=?", @name))
 
 		if !Confetti.test_mode?
 			@view = ClearCASE.View(name)
@@ -119,6 +117,7 @@ class View
 	end
 
 	def from_row(row)
+		fail "Unknown view: #{@name}" if row == nil
 		@id = row[:id]
 		@user = User.new(row[:user])
 		@name = row[:name] if !@name
@@ -151,6 +150,9 @@ class View
 
 	def add_files(glob)
 		@view.add_files(glob)
+	end
+
+	def label(name)
 	end
 
 	#-------------------------------------------------------------------------------------------

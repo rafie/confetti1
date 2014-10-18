@@ -24,6 +24,7 @@ class MkAct
 	def initialize(args, options)
 		flags = []
 
+		byebug
 		name = args.shift
 		name = options.name if !name && !!options.name
 		raise "missing activity name" if !name

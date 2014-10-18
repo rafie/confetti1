@@ -38,4 +38,18 @@ CREATE TABLE activities (
 
 -----------------------------------------------------------------------------------------------
 
+CREATE TABLE checks (
+	id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,  
+	name text UNIQUE NOT NULL UNIQUE, 
+	cspec text NOT NULL, 
+	user text);
+
+-----------------------------------------------------------------------------------------------
+
+CREATE TABLE products (
+	id integer PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,  
+	name text UNIQUE NOT NULL UNIQUE);
+
+-----------------------------------------------------------------------------------------------
+
 COMMIT;

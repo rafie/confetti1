@@ -8,6 +8,9 @@ module Confetti
 class Branch
 	include Bento::Class
 
+	constructors :is, :create
+	members :raw, :name, :branch
+
 	attr_reader :name, :tag
 
 	def is(name, *opt)
@@ -63,24 +66,7 @@ class Branch
 	def to_s; name; end
 	def to_str; name; end
 
-	#-------------------------------------------------------------------------------------------
-
-	def self.is(*args)
-		x = self.new; x.send(:is, *args); x
-	end
-
-	def self.create(*args)
-		x = self.send(:new); x.send(:create, *args); x
-	end
-
-	private :is, :create
-	private_class_method :new
-
 end # class Stream
-
-def self.Branch(*args)
-	x = Branch.send(:new); x.send(:is, *args); x
-end
 
 #----------------------------------------------------------------------------------------------
 
