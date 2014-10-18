@@ -36,7 +36,24 @@ module Confetti
 class CSpec
 	include Bento::Class
 
-	@@configspec_t = <<-END
+		@@config_t = <<-END
+(project <%= @name %>
+	(baseline 
+		<%= @baseline_cspec.to_s %>)
+	:itag 0
+	:icheck 0
+	(lots 
+		<%for lot in @lots %> <%= lot %> <% end %>))
+END
+
+	@@configspec_t = <<END
+(cspec
+	(vobs
+<%for vob in @vobs_cfg.keys %>
+		(<%= vob %> <%= @vobs_cfg[vob] %>)
+<% end %>
+	)
+)
 END
 
 	constructors :is, :from_file
@@ -52,6 +69,13 @@ END
 	def from_file(fname, *opt, lspec: nil)
 		@ne = Nexp(fname, :single)
 		ctor(*opt, lspec)
+	end
+
+	def from_configspec(configspec, *opt)
+		vobs_cfg = configspec.vobs_cfg
+		cspec_s = Bento.mold(@@config_t, binding)
+		@ne = NExp.from_s(cspec_s, :single)
+		ctor(*opt, nil)
 	end
 
 	def ctor(*opt, lspec)
