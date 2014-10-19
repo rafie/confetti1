@@ -8,6 +8,59 @@ $confetti_test_mode = true
 
 #----------------------------------------------------------------------------------------------
 
+class TextEnv
+	include Bento::class
+
+	constructors :is, :create
+	members :root, :root_vob, :fs_source, :vob_zip
+
+	addr_reader :root, :root_vob
+
+	def is()
+		raise "unimplemented"
+	end
+
+	# opt: :keep
+	def create(*opt, make_fs: true, make_vob: true, fs_source: 'fs/', vob_zip: 'test.vob.zip')
+		@fs_source = fs_source
+		@vob_zip = vob_zip
+
+		create_fs if make_fs
+		create_vob if make_vob
+	end
+
+	def create_fs
+		@root = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S")
+		while File.directory?(@root)
+			@root = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S%L")
+		end
+		FileUtils.mkdir_p(@root)
+		if File.directory?(@fs_source)
+			FileUtils.cp_r(Dir.glob(@fs_source + "/*"), @root)
+		elsif File.file?(@fs_source)
+			Bento.unzip(@fs_source, @root)
+		end
+	end
+
+	def create_vob
+		if TEST_ROOT_VOB
+			@root_vob = ClearCASE.VOB(TEST_ROOT_VOB)
+		else
+			@root_vob = ClearCASE::VOB.create('', file: @vob_zip)
+			ENV["CONFETTI_ROOT_VOB"] = @root_vob.name
+		end
+	end
+
+	#------------------------------------------------------------------------------------------
+
+	def destroy
+		# remove test FS root dir
+		# remove VOB
+	end
+end
+
+#----------------------------------------------------------------------------------------------
+
 class Test < Bento::Test
 	attr_reader :path, :root_vob
 

@@ -36,7 +36,24 @@ module Confetti
 class CSpec
 	include Bento::Class
 
-	@@configspec_t = <<-END
+		@@config_t = <<-END
+(project <%= @name %>
+	(baseline 
+		<%= @baseline_cspec.to_s %>)
+	:itag 0
+	:icheck 0
+	(lots 
+		<%for lot in @lots %> <%= lot %> <% end %>))
+END
+
+	@@configspec_t = <<END
+(cspec
+	(vobs
+<%for vob in @vobs_cfg.keys %>
+		(<%= vob %> <%= @vobs_cfg[vob] %>)
+<% end %>
+	)
+)
 END
 
 	constructors :is, :from_file
@@ -52,6 +69,13 @@ END
 	def from_file(fname, *opt, lspec: nil)
 		@ne = Nexp(fname, :single)
 		ctor(*opt, lspec)
+	end
+
+	def from_configspec(configspec, *opt)
+		vobs_cfg = configspec.vobs_cfg
+		cspec_s = Bento.mold(@@config_t, binding)
+		@ne = NExp.from_s(cspec_s, :single)
+		ctor(*opt, nil)
 	end
 
 	def ctor(*opt, lspec)
@@ -70,7 +94,7 @@ END
 		@ne
 	end
 
-	def configspec(lspec: nil)
+	def configspec(lspec: nil, branch: nil)
 		tag = self.tag
 
 		vobs_cfg = self.vobs_cfg
@@ -90,7 +114,7 @@ END
 		end
 
 		checks_tags = checks.map {|c| stem + "_check_" + c.to_s}
-		ClearCASE.Configspec(vobs_cfg: vobs_cfg, tag: tag, checks: checks_tags)
+		ClearCASE.Configspec(vobs_cfg: vobs_cfg, tag: tag, checks: checks_tags, branch: branch)
 	end
 
 	# TODO: allow vob tags
@@ -123,7 +147,11 @@ END
 	def vobs_cfg
 		Hash[ nexp[:vobs].map {|x| [~x.car, ~x.cdr == [] ? '' : ~x.cadr] } ]
 	end
-	
+
+	def add_vob(vob, tag)
+		nexp.find(:vobs) << [vob, tag]
+	end
+
 	def lots
 		Confetti::Lots.new(nexp.nodes(:lots).map {|x| ~x.car }, lspec: @lspec)
 	end
@@ -134,6 +162,20 @@ END
 
 	def checks
 		nexp[:checks].map { |x| x.to_i }
+	end
+
+	def add_check(n)
+		nexp.find(:checks) << n
+	end
+
+	# TODO: return a flat cspec, without lot tags, just basic repos
+	def flat
+		raise "unimplemented"
+	end
+
+	# TODO
+	def flat?
+		# are there any lot tags?
 	end
 
 end # CSpec

@@ -214,7 +214,8 @@ class Mutation < Confetti::Test
 	:stem nbu.mcu-8.3
 	:tag nbu.mcu-8.3.1.3.5
 	(vobs
-		mcu adapters mvp dspInfra boardInfra freemasonBuild))
+		mcu adapters mvp dspInfra boardInfra freemasonBuild)
+	(checks 16 17 18))
 END
 
 	def before
@@ -231,6 +232,20 @@ END
 	def test_stem_set
 		@@cspec.stem = 'nbu.mcu-8.5'
 		assert_equal 'nbu.mcu-8.5', @@cspec.stem
+	end
+	
+	# add_check
+	def test_add_check
+		@@cspec.add_check(19)
+		assert_equal [16, 17, 18, 19], @@cspec.checks
+	end
+
+	# add_vob
+	def test_add_vob
+		@@cspec.add_vob("web", "WebMcu_8.3_1_SP1_1_240314.5628")
+		vob_cfg = {"mcu"=>"", "adapters"=>"", "mvp"=>"", "dspInfra"=>"", "boardInfra"=>"", 
+			"freemasonBuild"=>"", "web" => "WebMcu_8.3_1_SP1_1_240314.5628"}
+		assert_equal vob_cfg, @@cspec.vobs_cfg
 	end
 end
 
