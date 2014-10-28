@@ -17,7 +17,7 @@ class ProjectVersion
 		raise "invalid project" if !project
 	end
 
-	def create(version, *opt, project: nil, version: nil, cspec: nil)
+	def create(version, *opt, project: nil, cspec: nil)
 		raise "invalid project" if !project
 	end
 
