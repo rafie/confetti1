@@ -5,6 +5,7 @@ set ROOT=%cd%
 
 set HOME=%USERPROFILE%
 
+: set RUBY_ROOT=%ROOT%\classico1-ruby
 set RUBY_ROOT=d:\tmp\classico1-ruby
 set BENTO_ROOT=%ROOT%\classico1-bento
 set CONFETTI_ROOT=%ROOT%\confetti1
