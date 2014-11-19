@@ -21,3 +21,8 @@ pushd confetti1
 call git commit -a -m"%comment%"
 call git push origin master
 popd
+
+pushd confetti1-import
+call git commit -a -m"%comment%"
+call git push origin master
+popd
