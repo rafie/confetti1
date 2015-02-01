@@ -51,9 +51,9 @@ end
 
 def deployProd(tag)
 System.command("git clone https://github.com/rafie/confetti1" + $prodDropFolder +"\\confetti1")
-System.command("git clone https://github.com/rafie/confetti1-import" + $prodDropFolder +"\\confetti1")
-System.command("git clone https://github.com/rafie/classico1-bento" + $prodDropFolder +"\\confetti1")
-System.command("git clone https://github.com/rafie/classico1-ruby" + $prodDropFolder +"\\confetti1")
+System.command("git clone https://github.com/rafie/confetti1-import" + $prodDropFolder +"\\confetti1-import")
+System.command("git clone https://github.com/rafie/classico1-bento" + $prodDropFolder +"\\classico1-bento")
+System.command("git clone https://github.com/rafie/classico1-ruby" + $prodDropFolder +"\\classico1-ruby")
 System.command("git checkout " + tag)
 end
 
