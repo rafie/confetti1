@@ -1,45 +1,75 @@
 require 'rubygems'
-require 'git'
+
+
+module Confetti
+
+
+class deployment
+
+	include  Bento::System
+
+def initialize(prmProdDropFolder)
+		$prodDropFolder=prmProdDropFolder
+end
 #-----------------------------------------------------------------------------
 #             target local referential
 #-----------------------------------------------------------------------------
-g=Git.open(".")
+#g=Git.open(".")
 #-----------------------------------------------------------------------------
 #             add a db migration script
 #-----------------------------------------------------------------------------
-g.add('confetti\\lib\\dbmigration1.rb')
+#g.add('confetti\\lib\\dbmigration1.rb')
+def addNewFiles(filesList)
+	array = filesList.split(/,/)
+	array.size.times do |i|
+	  System.command ("git add " + array[i])
+	end 
+end
 #-----------------------------------------------------------------------------
 #             commit and push changes
 #-----------------------------------------------------------------------------
-begin
-g.tag("1.0.1")
-g.commit("CMSG")
-rescue
-puts("nothing to commit") 
+def commitAndPush(tag,message)
+	begin
+	System.command("git tag" + tag)
+	System.command("git commit -m " + message)
+	rescue
+	puts("nothing to commit") 
+	end
+	System.command("git push origin :" + tag )
 end
-g.push
 #-----------------------------------------------------------------------------
 #           create a file to isolate production db
 #-----------------------------------------------------------------------------
-File.new("c:\\proddropfolder\\dblock.cft", "w")
-
+def lockDBProd
+File.new($prodDropFolder + "\\dblock.cft", "w")
+end
 
 #-----------------------------------------------------------------------------
 #           create the batch file that imports source 
 #           code from github to production. Execution of batch
 #-----------------------------------------------------------------------------
-out_file = File.new("c:\\proddropfolder\\getconfetti.bat", "w")
-out_file.puts("git clone https://github.com/rafie/confetti1 c:\\proddropfolder\\confetti1")
-out_file.close
-system("pushd c:\\proddropfolder\\")
-system("c:\\proddropfolder\\getconfetti.bat")
+
+def deployProd(tag)
+System.command("git clone https://github.com/rafie/confetti1" + $prodDropFolder +"\\confetti1")
+System.command("git clone https://github.com/rafie/confetti1-import" + $prodDropFolder +"\\confetti1")
+System.command("git clone https://github.com/rafie/classico1-bento" + $prodDropFolder +"\\confetti1")
+System.command("git clone https://github.com/rafie/classico1-ruby" + $prodDropFolder +"\\confetti1")
+System.command("git checkout " + tag)
+end
 
 #-----------------------------------------------------------------------------
 #         execution of the db migration script that has been added
 #-----------------------------------------------------------------------------
-system("ruby", "c:\\proddropfolder\\confetti1\\confetti\\lib\\dbmigration1.rb")
-
+def migrateDB(scriptFileName)
+System.command("ruby", $prodDropFolder + "\\confetti1\\confetti\\lib\\" + scriptFileName)
+end
 #-----------------------------------------------------------------------------
 #         production lock release
 #-----------------------------------------------------------------------------
-File.delete("c:\\proddropfolder\\dblock.cft")
+def unlockDBProd
+File.delete($prodDropFolder + "\\dblock.cft")
+end
+end  #module
+
+
+end #class  
