@@ -4,25 +4,23 @@ require 'rubygems'
 module Confetti
 
 
-class deployment
+class Deployment
 
-	include  Bento::System
+include  Bento::System
+LOCKFILENAME="dblock.cft"
 
-def initialize(prmProdDropFolder)
+def initialize(prmSourceRepoURL="https://github.com/rafie",prmProdDropFolder)
 		$prodDropFolder=prmProdDropFolder
+		$sourceRepoURL=prmSourceRepoURL
 end
-#-----------------------------------------------------------------------------
-#             target local referential
-#-----------------------------------------------------------------------------
-#g=Git.open(".")
+
 #-----------------------------------------------------------------------------
 #             add a db migration script
 #-----------------------------------------------------------------------------
-#g.add('confetti\\lib\\dbmigration1.rb')
 def addNewFiles(filesList)
 	array = filesList.split(/,/)
 	array.size.times do |i|
-	  System.command ("git add " + array[i])
+	  System.command("git add " + array[i])
 	end 
 end
 #-----------------------------------------------------------------------------
@@ -30,45 +28,72 @@ end
 #-----------------------------------------------------------------------------
 def commitAndPush(tag,message)
 	begin
-	System.command("git tag" + tag)
-	System.command("git commit -m " + message)
-	rescue
-	puts("nothing to commit") 
-	end
+		System.command("git tag" + tag)
+		System.command("git commit -m " + message)
+		rescue
+			puts("nothing to commit") 
+		end
 	System.command("git push origin :" + tag )
 end
 #-----------------------------------------------------------------------------
-#           create a file to isolate production db
+#           create a file to isolate production db. If it already
+#           exists then another deployment is currently running.
 #-----------------------------------------------------------------------------
 def lockDBProd
-File.new($prodDropFolder + "\\dblock.cft", "w")
+	unless File.exist?($prodDropFolder + "/" + LOCKFILENAME)
+		File.new($prodDropFolder + "/" + LOCKFILENAME, "w")
+		return 0
+	end
+	return 1
 end
 
 #-----------------------------------------------------------------------------
-#           create the batch file that imports source 
-#           code from github to production. Execution of batch
+#           Creation of directories and pull source 
+#           code from github to production.
 #-----------------------------------------------------------------------------
 
 def deployProd(tag)
-System.command("git clone https://github.com/rafie/confetti1" + $prodDropFolder +"\\confetti1")
-System.command("git clone https://github.com/rafie/confetti1-import" + $prodDropFolder +"\\confetti1-import")
-System.command("git clone https://github.com/rafie/classico1-bento" + $prodDropFolder +"\\classico1-bento")
-System.command("git clone https://github.com/rafie/classico1-ruby" + $prodDropFolder +"\\classico1-ruby")
-System.command("git checkout " + tag)
+	unless Dir.exist?($prodDropFolder +"/confetti1")
+		Dir.mkdir($prodDropFolder +"/confetti1")
+	end
+	Dir.chdir($prodDropFolder +"/confetti1") do
+		System.command("git clone " + $sourceRepoURL + "/confetti1 -b " + tag)
+	end
+	unless Dir.exist?($prodDropFolder +"/confetti1-import")
+		Dir.mkdir($prodDropFolder +"/confetti1-import")
+	end
+	Dir.chdir($prodDropFolder +"/confetti1-import") do
+		System.command("git clone " + $sourceRepoURL + "/confetti1-import -b " + tag)
+	end
+	unless Dir.exist?($prodDropFolder +"/classico1-bento")
+		Dir.mkdir($prodDropFolder +"/classico1-bento")
+	end
+	Dir.chdir($prodDropFolder +"/classico1-bento") do
+		System.command("git clone " + $sourceRepoURL + "/classico1-bento -b " + tag)
+	end
+	unless Dir.exist?($prodDropFolder +"/classico1-ruby")
+		Dir.mkdir($prodDropFolder +"/classico1-ruby")
+	end
+	Dir.chdir($prodDropFolder +"/classico1-ruby") do
+		System.command("git clone " + $sourceRepoURL + "/classico1-ruby -b " + tag)
+	end
+	#System.command("git checkout " + tag)
 end
 
 #-----------------------------------------------------------------------------
 #         execution of the db migration script that has been added
 #-----------------------------------------------------------------------------
 def migrateDB(scriptFileName)
-System.command("ruby", $prodDropFolder + "\\confetti1\\confetti\\lib\\" + scriptFileName)
+	System.command("ruby", $prodDropFolder + "/confetti1/confetti/lib/" + scriptFileName)
 end
 #-----------------------------------------------------------------------------
 #         production lock release
 #-----------------------------------------------------------------------------
 def unlockDBProd
-File.delete($prodDropFolder + "\\dblock.cft")
+	File.delete($prodDropFolder + "/" + LOCKFILENAME)
 end
+
+
 end  #module
 
 
