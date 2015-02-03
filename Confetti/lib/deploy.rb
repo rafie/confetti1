@@ -34,7 +34,7 @@ def commitAndPush(tag,message)
 	Dir.chdir("c:/github/confetti1") do
 		begin
 			System.command("git tag " + tag)
-			System.command("git commit -a -m " + message)
+			System.command('git commit -a -m "' + message + '"')
 			rescue
 				puts("nothing to commit") 
 			end
