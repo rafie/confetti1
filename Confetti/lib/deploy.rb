@@ -10,10 +10,13 @@ class Deployment
 
 LOCKFILENAME="dblock.cft"
 
-def initialize(prmSourceRepoURL="https://github.com/rafie",prmProdDropFolder)
+def initialize(prmSourceRepoURL="https://github.com/rafie",prmProdDropFolder,prmTag,prmRepositories,prmMigrationScript,prmDeploymentBranch)
 		$prodDropFolder=prmProdDropFolder
 		$sourceRepoURL=prmSourceRepoURL
-		
+		$tag=prmTag
+		$repositories=prmRepositories
+		$migrationScript=prmMigrationScript
+		$deploymentBranch=prmDeploymentBranch
 end
 
 #-----------------------------------------------------------------------------
@@ -30,17 +33,24 @@ end
 #-----------------------------------------------------------------------------
 #             commit and push changes
 #-----------------------------------------------------------------------------
-def commitAndPush(tag,message,branch)
-	Dir.chdir("c:/github/confetti1") do
-		begin
-			System.command("git tag " + tag)
-			System.command('git commit -a -m "' + message + '"')
-			rescue
-				puts("nothing to commit") 
-			end
-		System.command("git push origin " + tag )
-		System.command("git push origin " + branch )
-	end
+def commitAndPush
+	$repositories.size.times do |i|
+		Dir.chdir("../..") do
+			begin
+				System.command("git tag " + $tag)
+				System.command('git commit -a -m "auto deploy of tag ' + $tag +  '"')
+				rescue
+					puts("nothing to commit in " + i)  
+				end
+			System.command("git push origin " + $tag )
+			System.command("git push origin " + $deploymentBranch )
+		end
+	end 
+	
+	
+	
+	
+	
 end
 #-----------------------------------------------------------------------------
 #           create a file to isolate production db. If it already
@@ -59,13 +69,12 @@ end
 #           code from github to production.
 #-----------------------------------------------------------------------------
 
-def deployProd(tag)
+def deployProd
 	
 	Dir.chdir($prodDropFolder) do
-		System.command("git clone " + $sourceRepoURL + "/confetti1 -b " + tag)
-		System.command("git clone " + $sourceRepoURL + "/confetti1-import -b " + tag)
-		System.command("git clone " + $sourceRepoURL + "/classico1-bento -b " + tag)
-		System.command("git clone " + $sourceRepoURL + "/classico1-ruby -b " + tag)
+		$repositories.size.times do |i|
+			System.command("git clone " + $sourceRepoURL + i + " -b " + $tag)
+		end
 	end
 	
 	#System.command("git checkout " + tag)
@@ -74,8 +83,8 @@ end
 #-----------------------------------------------------------------------------
 #         execution of the db migration script that has been added
 #-----------------------------------------------------------------------------
-def migrateDB(scriptFileName)
-	System.command("ruby", $prodDropFolder + "/confetti1/confetti/lib/" + scriptFileName)
+def migrateDB
+	System.command("ruby", $prodDropFolder + "/confetti1/confetti/lib/" + $migrationScript)
 end
 #-----------------------------------------------------------------------------
 #         production lock release

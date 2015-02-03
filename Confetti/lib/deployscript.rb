@@ -5,11 +5,14 @@ conf=File.read("../../../confetti1/Confetti/lib/config.json")
 my_hash = JSON.parse(conf)
 fold = my_hash["ProdFolder"]
 repo = my_hash["SourceRepo"]
-dep=Deployment.new(repo,fold)
-#dep.addNewFiles("confetti/lib/config.json,confetti/lib/deployscript.rb")
-dep.commitAndPush("0.0.4","first run","didier")
+tag = my_hash["Tag"]
+repos = my_hash["Repositories"]
+migrationScript = my_hash["MigrationScript"]
+deploymentBranch = my_hash["DeploymentBranch"]
+dep=Deployment.new(repo,fold,tag,repos,migrationScript,deploymentBranch)
+dep.commitAndPush
 dep.lockDBProd
-dep.deployProd("0.0.3")
-dep.migrateDB("dbmigration1.rb")
+dep.deployProd
+dep.migrateDB
 dep.unlockDBProd
 end
