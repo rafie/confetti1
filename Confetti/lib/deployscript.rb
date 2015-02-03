@@ -7,7 +7,7 @@ fold = my_hash["ProdFolder"]
 repo = my_hash["SourceRepo"]
 dep=Deployment.new(repo,fold)
 #dep.addNewFiles("confetti/lib/config.json,confetti/lib/deployscript.rb")
-dep.commitAndPush("0.0.3","first run")
+dep.commitAndPush("0.0.4","first run","didier")
 dep.lockDBProd
 dep.deployProd("0.0.3")
 dep.migrateDB("dbmigration1.rb")

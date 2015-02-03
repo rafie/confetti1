@@ -30,7 +30,7 @@ end
 #-----------------------------------------------------------------------------
 #             commit and push changes
 #-----------------------------------------------------------------------------
-def commitAndPush(tag,message)
+def commitAndPush(tag,message,branch)
 	Dir.chdir("c:/github/confetti1") do
 		begin
 			System.command("git tag " + tag)
@@ -39,6 +39,7 @@ def commitAndPush(tag,message)
 				puts("nothing to commit") 
 			end
 		System.command("git push origin " + tag )
+		System.command("git push origin " + branch )
 	end
 end
 #-----------------------------------------------------------------------------
@@ -59,30 +60,14 @@ end
 #-----------------------------------------------------------------------------
 
 def deployProd(tag)
-	unless Dir.exist?($prodDropFolder +"/confetti1")
-		Dir.mkdir($prodDropFolder +"/confetti1")
-	end
-	Dir.chdir($prodDropFolder +"/confetti1") do
+	
+	Dir.chdir($prodDropFolder) do
 		System.command("git clone " + $sourceRepoURL + "/confetti1 -b " + tag)
-	end
-	unless Dir.exist?($prodDropFolder +"/confetti1-import")
-		Dir.mkdir($prodDropFolder +"/confetti1-import")
-	end
-	Dir.chdir($prodDropFolder +"/confetti1-import") do
 		System.command("git clone " + $sourceRepoURL + "/confetti1-import -b " + tag)
-	end
-	unless Dir.exist?($prodDropFolder +"/classico1-bento")
-		Dir.mkdir($prodDropFolder +"/classico1-bento")
-	end
-	Dir.chdir($prodDropFolder +"/classico1-bento") do
 		System.command("git clone " + $sourceRepoURL + "/classico1-bento -b " + tag)
-	end
-	unless Dir.exist?($prodDropFolder +"/classico1-ruby")
-		Dir.mkdir($prodDropFolder +"/classico1-ruby")
-	end
-	Dir.chdir($prodDropFolder +"/classico1-ruby") do
 		System.command("git clone " + $sourceRepoURL + "/classico1-ruby -b " + tag)
 	end
+	
 	#System.command("git checkout " + tag)
 end
 
