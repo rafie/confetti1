@@ -35,12 +35,12 @@ end
 #-----------------------------------------------------------------------------
 def commitAndPush
 	$repositories.size.times do |i|
-		Dir.chdir("../..") do
+		Dir.chdir("../../../" + $repositories[i]) do
 			begin
 				System.command("git tag " + $tag)
 				System.command('git commit -a -m "auto deploy of tag ' + $tag +  '"')
 				rescue
-					puts("nothing to commit in " + i)  
+					puts("nothing to commit in " + $repositories[i])  
 				end
 			System.command("git push origin " + $tag )
 			System.command("git push origin " + $deploymentBranch )
