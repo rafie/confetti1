@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'Bento'
 
 
 module Confetti
@@ -6,34 +7,39 @@ module Confetti
 
 class Deployment
 
-include  Bento::System
+
 LOCKFILENAME="dblock.cft"
 
 def initialize(prmSourceRepoURL="https://github.com/rafie",prmProdDropFolder)
 		$prodDropFolder=prmProdDropFolder
 		$sourceRepoURL=prmSourceRepoURL
+		
 end
 
 #-----------------------------------------------------------------------------
 #             add a db migration script
 #-----------------------------------------------------------------------------
 def addNewFiles(filesList)
-	array = filesList.split(/,/)
-	array.size.times do |i|
-	  System.command("git add " + array[i])
-	end 
+	Dir.chdir("c:/github/confetti1") do
+		array = filesList.split(/,/)
+		array.size.times do |i|
+		  System.command("git add " + array[i])
+		end 
+	end
 end
 #-----------------------------------------------------------------------------
 #             commit and push changes
 #-----------------------------------------------------------------------------
 def commitAndPush(tag,message)
-	begin
-		System.command("git tag" + tag)
-		System.command("git commit -m " + message)
-		rescue
-			puts("nothing to commit") 
-		end
-	System.command("git push origin :" + tag )
+	Dir.chdir("c:/github/confetti1") do
+		begin
+			System.command("git tag " + tag)
+			System.command("git commit -a -m " + message)
+			rescue
+				puts("nothing to commit") 
+			end
+		System.command("git push origin :" + tag )
+	end
 end
 #-----------------------------------------------------------------------------
 #           create a file to isolate production db. If it already
