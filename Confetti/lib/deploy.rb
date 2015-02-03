@@ -38,7 +38,7 @@ def commitAndPush(tag,message)
 			rescue
 				puts("nothing to commit") 
 			end
-		System.command("git push origin :" + tag )
+		System.command("git push origin " + tag )
 	end
 end
 #-----------------------------------------------------------------------------
