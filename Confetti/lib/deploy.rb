@@ -73,7 +73,7 @@ def deployProd
 	
 	Dir.chdir($prodDropFolder) do
 		$repositories.size.times do |i|
-			System.command("git clone " + $sourceRepoURL + i + " -b " + $tag)
+			System.command("git clone " + $sourceRepoURL + $repositories[i] + " -b " + $tag)
 		end
 	end
 	
