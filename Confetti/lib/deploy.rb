@@ -10,7 +10,7 @@ class Deployment
 
 LOCKFILENAME="dblock.cft"
 
-def initialize(prmSourceRepoURL="https://github.com/rafie",prmProdDropFolder,prmTag,prmRepositories,prmMigrationScript,prmDeploymentBranch)
+def initialize(prmSourceRepoURL,prmProdDropFolder,prmTag,prmRepositories,prmMigrationScript,prmDeploymentBranch)
 		$prodDropFolder=prmProdDropFolder
 		$sourceRepoURL=prmSourceRepoURL
 		$tag=prmTag
