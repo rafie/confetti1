@@ -26,7 +26,7 @@ command :auto do |c|
 	say 'deploying'
 	dep.deployProd
 	say 'migrating DB'
-	#dep.migrateDB
+	dep.migrateDB
 	say 'unlocking production environment'
 	dep.unlockDBProd	
 end
