@@ -58,7 +58,7 @@ end
 #-----------------------------------------------------------------------------
 def lockDBProd
 	unless File.exist?($prodDropFolder + "/" + LOCKFILENAME)
-		File.new($prodDropFolder + "/" + LOCKFILENAME, "w")
+		System.command('echo "lock" > ' + $prodDropFolder + "/" + LOCKFILENAME)
 		return 0
 	end
 	return 1
@@ -95,7 +95,7 @@ end
 #         production lock release
 #-----------------------------------------------------------------------------
 def unlockDBProd
-	File.delete($prodDropFolder + "/" + LOCKFILENAME)
+	System.command('del ' + $prodDropFolder + "/" + LOCKFILENAME)
 end
 
 
