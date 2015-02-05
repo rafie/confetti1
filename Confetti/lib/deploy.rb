@@ -76,7 +76,9 @@ def deployProd
 			unless Dir.exist?($prodDropFolder + "/" + $repositories[i])
 				System.command("git clone " + $sourceRepoURL + "/" + $repositories[i] + " -b " + $tag)
 			else
-				System.command("git rebase " + $tag)
+				Dir.chdir($prodDropFolder + "/" + $repositories[i]) do
+					System.command("git rebase " + $tag)
+				end
 			end
 		end
 	end
