@@ -73,7 +73,11 @@ def deployProd
 	
 	Dir.chdir($prodDropFolder) do
 		$repositories.size.times do |i|
-			System.command("git clone " + $sourceRepoURL + "/" + $repositories[i] + " -b " + $tag)
+			unless Dir.exist?($prodDropFolder + "/" + $repositories[i])
+				System.command("git clone " + $sourceRepoURL + "/" + $repositories[i] + " -b " + $tag)
+			else
+				System.command("git rebase " + $sourceRepoURL + "/" + $repositories[i] + " -b " + $tag)
+			end
 		end
 	end
 	

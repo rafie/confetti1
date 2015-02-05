@@ -17,6 +17,7 @@ command :auto do |c|
 	repos = my_hash["Repositories"]
 	migrationScript = my_hash["MigrationScript"]
 	deploymentBranch = my_hash["DeploymentBranch"]
+	say 'before require'
 	require_relative migrationScript
 	say 'Parameters loaded'
 	dep=Deployment.new(repo,fold,tag,repos,migrationScript,deploymentBranch)

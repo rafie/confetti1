@@ -2,11 +2,12 @@
 require 'rubygems'
 require 'sqlite3'
 require 'active_record'
+
 def creating
 ActiveRecord::Base.logger = Logger.new(STDERR)
 ActiveRecord::Base.establish_connection(
 	:adapter  => 'sqlite3',
-	:database => 'c:/localConfetti.db' 
+	:database => 'localConfetti.db' 
 )
 
 ActiveRecord::Schema.define do
@@ -124,4 +125,4 @@ show_single_item
 show_all_items  
 migrate 
 end
-migration
+
