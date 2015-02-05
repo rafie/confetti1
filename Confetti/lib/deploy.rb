@@ -58,7 +58,7 @@ end
 #-----------------------------------------------------------------------------
 def lockDBProd
 	unless File.exist?($prodDropFolder + "/" + LOCKFILENAME)
-		File.create($prodDropFolder + "/" + LOCKFILENAME,'w')
+		File.new($prodDropFolder + "/" + LOCKFILENAME,'w')
 		return 0
 	end
 	return 1
