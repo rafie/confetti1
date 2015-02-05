@@ -97,7 +97,9 @@ end
 #         production lock release
 #-----------------------------------------------------------------------------
 def unlockDBProd
-	System.command('del ' + $prodDropFolder + "/" + LOCKFILENAME)
+	Dir.chdir($prodDropFolder) do
+		System.command('del ' + LOCKFILENAME)
+	end
 end
 
 
