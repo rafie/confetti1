@@ -17,6 +17,7 @@ command :auto do |c|
 	repos = my_hash["Repositories"]
 	migrationScript = my_hash["MigrationScript"]
 	deploymentBranch = my_hash["DeploymentBranch"]
+	require_relative migrationScript
 	say 'Parameters loaded'
 	dep=Deployment.new(repo,fold,tag,repos,migrationScript,deploymentBranch)
 	say 'commit and push'
@@ -26,7 +27,7 @@ command :auto do |c|
 	say 'deploying'
 	dep.deployProd
 	say 'migrating DB'
-	dep.migrateDB
+	migration
 	say 'unlocking production environment'
 	dep.unlockDBProd	
 end

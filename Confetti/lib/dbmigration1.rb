@@ -2,11 +2,11 @@
 require 'rubygems'
 require 'sqlite3'
 require 'active_record'
-
+def creating
 ActiveRecord::Base.logger = Logger.new(STDERR)
 ActiveRecord::Base.establish_connection(
 	:adapter  => 'sqlite3',
-	:database => 'localConfetti.db' 
+	:database => 'c:/localConfetti.db' 
 )
 
 ActiveRecord::Schema.define do
@@ -56,7 +56,7 @@ end
 end
 
 end
-
+end
 
 class Activity< ActiveRecord::Base
 	belongs_to :view 
@@ -117,8 +117,11 @@ def migrate
 	m=Migrate.new
 	m.migrateDB()
 end
-
+def migration
+creating
 createActivity
 show_single_item  
 show_all_items  
 migrate 
+end
+migration
