@@ -58,7 +58,7 @@ end
 #-----------------------------------------------------------------------------
 def lockDBProd
 	unless File.exist?($prodDropFolder + "/" + LOCKFILENAME)
-		System.command('echo "lock" > ' + $prodDropFolder + "/" + LOCKFILENAME)
+		File.create($prodDropFolder + "/" + LOCKFILENAME,'w')
 		return 0
 	end
 	return 1
