@@ -84,7 +84,8 @@ end
 #         execution of the db migration script that has been added
 #-----------------------------------------------------------------------------
 def migrateDB
-	System.command($prodDropFolder + "/classico1-ruby/Ruby/bin/ruby", $prodDropFolder + "/confetti1/confetti/lib/" + $migrationScript)
+	#System.command($prodDropFolder + "/classico1-ruby/Ruby/bin/ruby", $prodDropFolder + "/confetti1/confetti/lib/" + $migrationScript)
+	system($prodDropFolder + "/classico1-ruby/Ruby/bin/RUBY", "-r",$prodDropFolder + "/confetti1/confetti/lib/" + $migrationScript)
 end
 #-----------------------------------------------------------------------------
 #         production lock release
