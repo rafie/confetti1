@@ -11,6 +11,16 @@ module Confetti
 
 #----------------------------------------------------------------------------------------------
 
+module DB
+
+class Project < ActiveRecord::Base
+	has_many :project_versions, dependent: :destroy
+end
+
+end # module DB
+
+#----------------------------------------------------------------------------------------------
+
 class Project < Stream
 	include Bento::Class
 

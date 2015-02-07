@@ -8,13 +8,13 @@ $confetti_test_mode = true
 
 #----------------------------------------------------------------------------------------------
 
-class TextEnv
-	include Bento::class
+class TestEnv
+	include Bento::Class
 
 	constructors :is, :create
 	members :root, :root_vob, :fs_source, :vob_zip
 
-	addr_reader :root, :root_vob
+	attr_reader :root, :root_vob
 
 	def is()
 		raise "unimplemented"

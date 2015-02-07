@@ -7,6 +7,16 @@ module Confetti
 
 #----------------------------------------------------------------------------------------------
 
+module DB
+
+class Activity < ActiveRecord::Base
+	has_one :view
+end
+
+end # module DB
+
+#----------------------------------------------------------------------------------------------
+
 class Activity
 	include Bento::Class
 
@@ -23,6 +33,7 @@ class Activity
 		raise "invalid name" if !name
 		@name = name.to_s
 		
+		row = DB::Activity.find_by(name: @name)
 		row = db.one("select a.id, a.name, view, a.branch, user, p.name as project, project_id from activities as a join projects as p on p.id = a.project_id where a.name=?", @name)
 		fail "Unknown activity: #{@name}" if row == nil
 		from_row(row)

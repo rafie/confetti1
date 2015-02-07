@@ -5,6 +5,16 @@ module Confetti
 
 #----------------------------------------------------------------------------------------------
 
+module DB
+
+class Product < ActiveRecord::Base
+	has_many :product_versions, dependent: :destroy
+end
+
+end # module DB
+
+#----------------------------------------------------------------------------------------------
+
 class Product
 	include Bento::Class
 

@@ -1,5 +1,6 @@
 
 require_relative 'Common'
+require 'byebug'
 
 module Confetti
 
@@ -23,14 +24,35 @@ end # User
 
 #----------------------------------------------------------------------------------------------
 
+class Config
+	def Config.db_path
+		if !Confetti.test_mode?
+			view = ClearCASE.CurrentView
+			path = "R:/Build/cfg"
+		else
+			path = Test.root + "/net"
+		end
+		path + "/confetti"
+	end
+
+	def Config.path_in_view(view = nil)
+		if !Confetti.test_mode? || TEST_WITH_CLEARCASE
+			view = Confetti.CurrentView() if !view
+		else
+			view = Confetti.TestView('') if !view
+		end
+
+		view.path + "/nbu.meta/confetti"
+	end
+end # Config
+
+
+#----------------------------------------------------------------------------------------------
+
 class DB
 
 	@@global_db = nil
-
-	def DB.global_db
-		@@global_db
-	end
-
+	
 	def DB.global
 		if DB.global_db == nil
 			if !Confetti.test_mode?
@@ -67,32 +89,20 @@ class DB
 		end
 	end
 
+	def DB.connect
+		byebug
+		if @@global_db == nil
+			ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: DB.global_path)
+		end
+	end
+
+	DB.connect
+
+	def DB.global_db
+		@@global_db
+	end
+
 end # DB
-
-#----------------------------------------------------------------------------------------------
-
-class Config
-	def Config.db_path
-		if !Confetti.test_mode?
-			view = ClearCASE.CurrentView
-			path = "R:/Build/cfg"
-		else
-			path = Test.root + "/net"
-		end
-		path + "/confetti"
-	end
-
-	def Config.path_in_view(view = nil)
-		if !Confetti.test_mode? || TEST_WITH_CLEARCASE
-			view = Confetti.CurrentView() if !view
-		else
-			view = Confetti.TestView('') if !view
-		end
-
-		view.path + "/nbu.meta/confetti"
-	end
-end # Config
-
 
 #----------------------------------------------------------------------------------------------
 
