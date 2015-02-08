@@ -22,13 +22,17 @@ command :auto do |c|
 	dep=Deployment.new(repo,fold,tag,repos,migrationScript,deploymentBranch)
 	say 'commit and push'
 	dep.commitAndPush
-	say 'production environment locked'
-	dep.lockDBProd
-	say 'deploying'
-	dep.deployProd
-	say 'migrating DB'
-	migration
-	say 'unlocking production environment'
-	dep.unlockDBProd	
+	say 'locking production environment'
+	vl=dep.lockDBProd
+	if vl=0
+		say 'deploying'
+		dep.deployProd
+		say 'migrating DB'
+		migration
+		say 'unlocking production environment'
+		dep.unlockDBProd
+	else
+		say 'another deployment is currently running, try again later'
+end	
 end
 end
