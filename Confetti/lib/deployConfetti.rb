@@ -24,7 +24,7 @@ command :auto do |c|
 	dep.commitAndPush
 	say 'locking production environment'
 	vl=dep.lockDBProd
-	if vl=0
+	if vl==0
 		say 'deploying'
 		dep.deployProd
 		say 'migrating DB'

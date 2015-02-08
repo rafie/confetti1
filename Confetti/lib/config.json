@@ -1,7 +1,7 @@
 {
 	"ProdFolder":"c:/proddropfolder",
 	"SourceRepo":"https://github.com/rafie",
-	"Tag":"v0.1.5",
+	"Tag":"v0.1.6",
 	"Repositories": [
     "confetti1",
     "confetti1-import",

@@ -84,7 +84,7 @@ def deployProd
 		end
 	end
 	
-	#System.command("git checkout " + tag)
+	#System.command("git checkout " + tag) 
 end
 
 #-----------------------------------------------------------------------------
