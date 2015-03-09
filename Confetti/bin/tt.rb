@@ -24,6 +24,7 @@ require_relative 'Commands/merge'
 require_relative 'Commands/build'
 require_relative 'Commands/mkver'
 require_relative 'Commands/mkproj'
+require_relative 'Commands/mkprod'
 require_relative 'Commands/nomerge'
 require_relative 'Commands/release'
 
@@ -35,6 +36,7 @@ command :build   do |c| Confetti::Commands::Build.command(c) ; end
 command :release do |c| Confetti::Commands::Release.command(c) ; end
 command :mkver   do |c| Confetti::Commands::MkVer.command(c) ; end
 command :mkproj  do |c| Confetti::Commands::MkProj.command(c) ; end
+command :mkprod  do |c| Confetti::Commands::MkProd.command(c) ; end
 # command :nomerge do |c| Confetti::Commands::NoMerge.command(c) ; end
 # command :mkview do |c| Confetti::Commands::Mkview.command(c) ; end
 # command :changes do |c| Confetti::Commands::Changes.command(c) ; end
