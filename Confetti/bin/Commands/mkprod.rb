@@ -5,7 +5,7 @@ require 'Confetti'
 module Confetti
 module Commands
 
-class MkProj
+class MkProd
 	def MkProj.command(c)
 		c.syntax = 'tt mkprod [options]'
 		c.summary = 'Create a new product'
@@ -13,7 +13,7 @@ class MkProj
 		c.example 'description', 'command example'
 		c.option '--some-switch', 'Some switch that does something'
 
-		c.action MkProj
+		c.action MkProd
 	end
 
 	def initialize(args, options)
