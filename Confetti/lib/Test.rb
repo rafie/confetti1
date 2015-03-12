@@ -4,61 +4,6 @@ require 'Bento/lib/Test'
 
 module Confetti
 
-$confetti_test_mode = true
-
-#----------------------------------------------------------------------------------------------
-
-class TestEnv
-	include Bento::Class
-
-	constructors :is, :create
-	members :root, :root_vob, :fs_source, :vob_zip
-
-	attr_reader :root, :root_vob
-
-	def is()
-		raise "unimplemented"
-	end
-
-	# opt: :keep
-	def create(*opt, make_fs: true, make_vob: true, fs_source: 'fs/', vob_zip: 'test.vob.zip')
-		@fs_source = fs_source
-		@vob_zip = vob_zip
-
-		create_fs if make_fs
-		create_vob if make_vob
-	end
-
-	def create_fs
-		@root = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S")
-		while File.directory?(@root)
-			@root = '.tests/' + Time.now.strftime("%y%m%d-%H%M%S%L")
-		end
-		FileUtils.mkdir_p(@root)
-		if File.directory?(@fs_source)
-			FileUtils.cp_r(Dir.glob(@fs_source + "/*"), @root)
-		elsif File.file?(@fs_source)
-			Bento.unzip(@fs_source, @root)
-		end
-	end
-
-	def create_vob
-		if TEST_ROOT_VOB
-			@root_vob = ClearCASE.VOB(TEST_ROOT_VOB)
-		else
-			@root_vob = ClearCASE::VOB.create('', file: @vob_zip)
-			ENV["CONFETTI_ROOT_VOB"] = @root_vob.name
-		end
-	end
-
-	#------------------------------------------------------------------------------------------
-
-	def destroy
-		# remove test FS root dir
-		# remove VOB
-	end
-end
-
 #----------------------------------------------------------------------------------------------
 
 class Test < Bento::Test
@@ -81,9 +26,9 @@ class Test < Bento::Test
 				end
 			end
 
-			if create_vob? && TEST_WITH_CLEARCASE
-				if TEST_ROOT_VOB
-					@@root_vob = ClearCASE.VOB(TEST_ROOT_VOB)
+			if create_vob? && CONFETTI_CLEARCASE
+				if Config.root_vob
+					@@root_vob = Config.root_vob
 				else
 					@@root_vob = ClearCASE::VOB.create('', file: vob_zip)
 					ENV["CONFETTI_ROOT_VOB"] = @@root_vob.name
@@ -131,7 +76,7 @@ class Test < Bento::Test
 	#------------------------------------------------------------------------------------------	
 
 	def keep?
-		KEEP_FS
+		ENV["CONFETTI_TEST_KEEP"].to_i == 1
 	end
 
 	def create_fs?

@@ -115,6 +115,7 @@ END
 	end
 
 	def cspec
+		baseline
 	end
 
 	def lspec
@@ -162,7 +163,7 @@ END
 	end
 
 	def baseline
-		Confetti.CSpec(nexp[:baseline].to_s)
+		Confetti.CSpec(nexp[:baseline].text)
 	end
 
 	def baseline=(cspec)
@@ -175,17 +176,18 @@ END
 
 	#-------------------------------------------------------------------------------------------
 
-	def state
-		byebug
-		puts "project_name: " + project_name
-		puts "lots: " + lots.to_s
-		puts "stem: " + stem
-		puts "upstream: " + upstream
-		puts "itag: " + itag.to_s
-		puts "icheck: " + icheck.to_s
-		puts "nexp: ... (ask)"
-		puts "lspec: ... (ask)"
-		puts "baseline: ... (ask)"
+	def to_s
+		return <<-END
+project_name: #{project_name}
+lots: #{lots.to_s}
+stem: #{stem}
+upstream: #{upstream}
+itag: #{itag.to_s}
+icheck: #{icheck.to_s}
+nexp: \n#{nexp.text.indent(4)}
+lspec: \n#{lspec.to_s.indent(4)}
+baseline: \n#{baseline.to_s.indent(4)}
+END
 	end
 
 	#-------------------------------------------------------------------------------------------
@@ -203,7 +205,7 @@ END
 	end
 
 	def add_to_view(view)
-		config_path = Config.path_in_view(view)
+		config_path = Config.config_path_in_view(view)
 		FileUtils.mkdir_p(config_path)
 		write(config_path)
 		view.add_files(@main_file)
