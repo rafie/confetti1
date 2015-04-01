@@ -23,7 +23,7 @@ class Database
 		begin
 			rows = ActiveRecord::Base.connection.execute("select * from sqlite_sequence")
 		rescue
-			ActiveRecord::Migrator.migrate(Config.confetti_path + "db/migrate")
+			create
 			# raise "Cannot connect to database #{Database.db_path}"
 		end
 		@@global_db = true
@@ -37,6 +37,14 @@ class Database
 
 	def self.global_db
 		@@global_db
+	end
+
+	def self.create
+		migrate
+	end
+
+	def self.migrate
+		ActiveRecord::Migrator.migrate(Config.confetti_path + "db/migrate")
 	end
 
 	def self.dumpSchema
@@ -58,7 +66,7 @@ module ConnectionHandling
 
 	@@connected = false
 
-	# TODO: check alias or alias_method
+	# TODO: consider using alias or alias_method
 		
 	def retrieve_connection
 		if !@@connected

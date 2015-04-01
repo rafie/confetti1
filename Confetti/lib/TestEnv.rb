@@ -40,7 +40,7 @@ class TestEnv
 	#------------------------------------------------------------------------------------------
 
 	# opt: :keep
-	def create(*opt, make_fs: true, make_vob: true, fs_source: 'fs/', vob_zip: 'test.vob.zip')
+	def create(*opt, make_fs: true, make_vob: true, fs_source: 'new/fs/', vob_zip: 'new/test.vob.zip')
 		
 		@id = TestEnv.make_id
 		@root = root_path
@@ -80,6 +80,10 @@ class TestEnv
 		root_path
 	end
 
+	def db_path
+		root_path/"db/confetti.db"
+	end
+		
 	#------------------------------------------------------------------------------------------
 
 	def self.make_id

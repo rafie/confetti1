@@ -18,26 +18,44 @@ class View
 	include Bento::Class
 
 	constructors :is, :create
-	members :id, :raw, :name, :view
+	members :id, :raw, :nick, :name, :view
 
 	attr_reader :name
 
-	def is(name, *opt)
+	#------------------------------------------------------------------------------------------	
+
+	def is(nick, *opt, name: nil)
 		init_flags([:raw], opt)
 		opt1 = filter_flags([:raw], opt)
 
-		raise "invalid name" if !name
+		raise "View: empty name" if nick.to_s.empty? && name.to_s.empty?
+		raise "View: conflicting name/nick" if !nick.to_s.empty? && !name.to_s.empty?
+		
+		byebug
+		
+		username = Confetti.User.name
+		if nick
+			rows = DB::View.where(nick: nick.to_s, user: username)
+			raise "View: no view nicknamed '#{nick}'" if rows.count == 0
+			raise "View: nickname '#{nick}' is not unique" if rows.count > 1
+			row = rows[0]
+		else
+			row = DB::View.find_by(name: name.to_s)
+		end
+
 		@name = name.to_s
 
-		row = DB::View.find_by(name: @name)
+		
 		from_row(row)
 
-		@view = ClearCASE.View(name, *opt1, root_vob: Config.root_vob)
+		@view = ClearCASE.View(nil, *opt1, name: name, root_vob: Config.root_vob)
 
 		@name = @view.name
 	end
 
-	def create(name, *opt, cspec: nil)
+	#------------------------------------------------------------------------------------------	
+
+	def create(nick, *opt, name: nil, cspec: nil)
 		init_flags([:raw], opt)
 		opt1 = filter_flags([:raw], opt)
 		
@@ -62,10 +80,13 @@ class View
 			raise "View: failed to add view with name='#{@name}' (already exists?)"
 	end
 
+	#------------------------------------------------------------------------------------------	
+
 	def from_row(row)
-		fail "Unknown view: #{@name}" if row == nil
+		fail "View: invalid row" if row == nil
+		@nick = row.nick
 		@user = User.new(row.user)
-		@name = row.name if !@name
+		@name = row.name
 		@cspec = Confetti.CSpec(row.cspec)
 	end
 
@@ -99,12 +120,6 @@ class View
 	end
 
 	def label(name)
-	end
-
-	#-------------------------------------------------------------------------------------------
-
-	def db
-		Confetti::DB.global
 	end
 end
 
