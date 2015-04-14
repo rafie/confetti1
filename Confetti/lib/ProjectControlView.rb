@@ -1,4 +1,5 @@
 
+require_relative 'Config'
 require_relative 'View'
 
 module Confetti
@@ -34,7 +35,7 @@ END
 
 		opt1 = filter_flags([:ready], opt)
 
-		opt1 << :raw if !Confetti::Config.is_in_testenv?
+		opt1 << :raw if !Confetti::Config.is_inside_box?
 		super(view_name, *opt1)
 	end
 
@@ -45,7 +46,7 @@ END
 		@branch = project.branch
 
 		opt1 = []
-		opt1 << :raw if !Confetti::Config.is_in_testenv?
+		opt1 << :raw if !Confetti::Config.is_inside_box?
 		super(view_name, *opt1, cspec: project.config.cspec)
 
 		if CONFETTI_CLEARCASE
@@ -61,7 +62,7 @@ END
 	end
 
 	def view_name
-		(Confetti::Config.is_in_testenv? ? "confetti" : "") + '.project_' + project_name
+		(Confetti::Config.is_inside_box? ? "confetti" : "") + '.project_' + project_name
 	end
 
 	def branch_name

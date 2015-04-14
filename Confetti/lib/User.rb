@@ -16,10 +16,20 @@ class User
 		@name
 	end
 
-	def self.current
-		User.new(System.user)
-	end
+#	def self.current
+#		User.new(System.user)
+#	end
 end # User
+
+#----------------------------------------------------------------------------------------------
+
+class CurrentUser < User
+
+	def initialize
+		super(System.user)
+	end
+
+end
 
 #----------------------------------------------------------------------------------------------
 

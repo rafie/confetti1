@@ -1,6 +1,6 @@
 
-require_relative 'Confetti'
-
+require_relative 'Common'
+require_relative 'View'
 require_relative 'Project'
 
 module Confetti

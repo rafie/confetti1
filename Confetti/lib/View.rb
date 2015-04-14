@@ -1,5 +1,9 @@
+
 require_relative 'Common'
+require_relative 'Config'
 require_relative 'Branch'
+require_relative 'CSpec'
+require_relative 'User'
 
 module Confetti
 
@@ -20,7 +24,7 @@ class View
 	constructors :is, :create
 	members :id, :raw, :nick, :name, :view
 
-	attr_reader :name
+	attr_reader :nick, :name
 
 	#------------------------------------------------------------------------------------------	
 
@@ -28,48 +32,57 @@ class View
 		init_flags([:raw], opt)
 		opt1 = filter_flags([:raw], opt)
 
-		raise "View: empty name" if nick.to_s.empty? && name.to_s.empty?
-		raise "View: conflicting name/nick" if !nick.to_s.empty? && !name.to_s.empty?
+		nick = nick.to_s
+		name = name.to_s
+		
+		no_nick = nick.empty?
+		no_name = name.empty?
+		raise "View: empty name" if no_nick && no_name
+		## raise "View: conflicting name/nick" if !no_nick && !no_name # this is ok
 		
 		byebug
 		
-		username = Confetti.User.name
-		if nick
-			rows = DB::View.where(nick: nick.to_s, user: username)
+		if !no_nick
+			rows = DB::View.where(nick: nick, user: CurrentUser.new.name)
 			raise "View: no view nicknamed '#{nick}'" if rows.count == 0
 			raise "View: nickname '#{nick}' is not unique" if rows.count > 1
 			row = rows[0]
 		else
-			row = DB::View.find_by(name: name.to_s)
+			row = DB::View.find_by(name: name)
 		end
 
-		@name = name.to_s
-
-		
 		from_row(row)
 
+		# when outside the box, root_vob is nil
+		# when inside the box, root_vob is box'es vob
 		@view = ClearCASE.View(nil, *opt1, name: name, root_vob: Config.root_vob)
-
-		@name = @view.name
 	end
 
 	#------------------------------------------------------------------------------------------	
 
 	def create(nick, *opt, name: nil, cspec: nil)
-		init_flags([:raw], opt)
-		opt1 = filter_flags([:raw], opt)
-		
-		raise "invalid cspec" if !cspec
+		init_flags([:raw, :nop], opt)
+		opt1 = filter_flags([:raw, :nop], opt)
 
-		@view = ClearCASE::View.create(name, *opt1, root_vob: Config.root_vob)
-		
-		Config.testenv.add_view @view if Config.testenv
+		raise "View: invalid cspec" if !cspec
 
-		@name = @view.name
+		nick = nick.to_s
+		name = name.to_s
+
+		nick = Bento.rand_name if nick.empty? && name.empty?
+
+		@nick = nick.empty? ? name : nick
+		@name = @raw ? nick : CurrentUser.new.name + "_" + nick if name.empty?
+
+		@view = ClearCASE::View.create(nil, *opt1, name: @name, root_vob: Config.root_vob)
+		Config.box.add_view @view if Config.box
+
+		return if @nop
 
 		row = DB::View.new do |r|
 			r.name = @name
-			r.user = User.current.to_s
+			r.nick = @nick
+			r.user = CurrentUser.new.name
 			r.cspec = @cspec.to_s
 		end
 		row.save
@@ -85,8 +98,8 @@ class View
 	def from_row(row)
 		fail "View: invalid row" if row == nil
 		@nick = row.nick
-		@user = User.new(row.user)
 		@name = row.name
+		@user = User.new(row.user)
 		@cspec = Confetti.CSpec(row.cspec)
 	end
 
@@ -100,9 +113,8 @@ class View
 		@view.root
 	end
 
-	def remove!
-		@view.remove!
-		Config.testenv.remove_view @view if Config.testenv
+	def internal
+		@view
 	end
 
 	#-------------------------------------------------------------------------------------------
@@ -120,6 +132,13 @@ class View
 	end
 
 	def label(name)
+	end
+
+	#-------------------------------------------------------------------------------------------
+
+	def remove!
+		@view.remove!
+		Config.box.remove_view @view if Config.box
 	end
 end
 

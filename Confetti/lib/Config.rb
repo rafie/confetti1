@@ -7,7 +7,7 @@ module Confetti
 
 class Config
 
-	@@testenv = nil
+	@@box = nil
 	@@pending_data_path = nil
 	@@root_vob = nil
 
@@ -27,25 +27,25 @@ class Config
 
 	# Data path determination process:
 	# (i)   CONFETTI_DATA env var
-	# (ii)  CONFETTI_TEST env var => TestEnv(CONFETTI_TEST)
-	# (iii) test=`cat tests/.test` => TestEnv(test)
-	# (iv)  new TestEnv
+	# (ii)  CONFETTI_TEST env var => Box(CONFETTI_TEST)
+	# (iii) test=`cat tests/.test` => Box(test)
+	# (iv)  new Box
 
 	def Config.data_path
 		return @@pending_data_path if @@pending_data_path
 
 		data = ENV["CONFETTI_DATA"]
 		if !data
-			if !@@testenv
+			if !@@box
 				begin
-					@@testenv = Confetti.TestEnv()
+					@@box = Confetti.Box()
 				rescue
-					@@testenv = Confetti::TestEnv.create() #make_vob: false)
+					@@box = Confetti::Box.create() #make_vob: false)
 					pedning_data_path = nil
 				end
 			end
-			data = @@testenv.data_path
-			write_default_testenv
+			data = @@box.data_path
+			write_default_box
 		end
 		Pathname.new(data)
 	end
@@ -71,38 +71,38 @@ class Config
 	end
 	
 	#------------------------------------------------------------------------------------------
-	# TestEnv (Box)
+	# Box
 	#------------------------------------------------------------------------------------------
 
-	def Config.is_in_testenv?
+	def Config.is_inside_box?
 		!ENV["CONFETTI_DATA"]
 	end
 
-	def Config.testenv
-		return nil if !is_in_testenv?
-		@@testenv
+	def Config.box
+		return nil if !is_inside_box?
+		@@box
 	end
 
-	def Config.testenv_name
+	def Config.box_name
 		name = ENV["CONFETTI_TEST"]
 		return name if name
-		fname = Config.default_testenv_filename
+		fname = Config.default_box_filename
 		name = File.read(fname) if File.exists?(fname)
 		name
 	end
 
-	def Config.default_testenv_filename
+	def Config.default_box_filename
 		Config.tests_path/".test"
 	end
 	
-	def Config.write_default_testenv
-		ENV["CONFETTI_TEST"] = @@testenv.id
-		IO.write(Config.default_testenv_filename, @@testenv.id)
+	def Config.write_default_box
+		ENV["CONFETTI_TEST"] = @@box.id
+		IO.write(Config.default_box_filename, @@box.id)
 	end
 
-	def self.remove_default_testenv
+	def self.remove_default_box
 		ENV["CONFETTI_TEST"] = nil
-		File.delete(Config.default_testenv_filename) rescue ''
+		File.delete(Config.default_box_filename) rescue ''
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ class Config
 
 	def Config.root_vob
 		return @@root_vob if @@root_vob
-		@@root_vob = @@testenv.root_vob if @@testenv
+		@@root_vob = @@box.root_vob if @@box
 		if !@@root_vob
 			vob_name = ENV["CONFETTI_ROOT_VOB"]
 			@@root_vob = ClearCASE.VOB(vob_name) if !!vob_name

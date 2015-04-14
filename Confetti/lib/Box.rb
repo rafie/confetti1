@@ -7,7 +7,7 @@ module Confetti
 
 #----------------------------------------------------------------------------------------------
 
-class TestEnv
+class Box
 	include Bento::Class
 
 	constructors :is, :create
@@ -19,8 +19,8 @@ class TestEnv
 
 	def is(id = nil)
 		if !id
-			id = Config.testenv_name
-			raise "TestEnv: cannot determine test ID" if !id
+			id = Config.box_name
+			raise "Box: cannot determine test ID" if !id
 		end
 
 		@id = id
@@ -41,12 +41,13 @@ class TestEnv
 
 	# opt: :keep
 	def create(*opt, make_fs: true, make_vob: true, fs_source: 'new/fs/', vob_zip: 'new/test.vob.zip')
-		
-		@id = TestEnv.make_id
+		init_flags([], opt)
+
+		@id = Box.make_id
 		@root = root_path
 		Config.pending_data_path = @root
 
-		raise "TestEnv @id exists: aborting" if File.exists?(@root)
+		raise "Box @id exists: aborting" if File.exists?(@root)
 		FileUtils.mkdir_p(@root)
 
 		@fs_source = Config.test_source_path/fs_source
@@ -139,24 +140,44 @@ class TestEnv
 		write_cfg
 	end
 
+	def remove_view!(view)
+		name = view.name
+		view.remove!
+		@views.delete(name)
+		write_cfg
+	end
+
 	#------------------------------------------------------------------------------------------
 	# Removal
 	#------------------------------------------------------------------------------------------
 
 	def remove!
-#			if create_fs?
-#				live_to_tell { Confetti::DB.cleanup }
-#				live_to_tell {  }
-#			end
+		abort = false
+		failed_objects = []
+
 		begin
 			FileUtils.rm_r(@root)
 		rescue
 		end
 
-		@views.each { |view| view.remove! }
-		@root_vob.remove! if @root_vob
+		while ! @views.empty? do
+			view = @views.first
+			begin
+				view.remove!
+				views.shift
+				write_cfg
+			rescue
+				failed_objects << "view #{view}"
+				abort = true
+			end
+		end
+		raise 
 
-		Config.remove_default_testenv
+		@root_vob.remove! if @root_vob
+		@root_vob = nil
+		write_cfg
+
+		Config.remove_default_box
 	end
 end
 

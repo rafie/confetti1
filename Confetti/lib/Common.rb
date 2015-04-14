@@ -20,8 +20,6 @@ CONFETTI_CLEARCASE = true
 CONFETTI_GIT = false
 CONFETTI_MULTIVIEW = false
 
-$confetti_test_mode = ENV["CONFETTI_TEST"].to_i == 1
-
 end # unless
 
 end # module Confetti

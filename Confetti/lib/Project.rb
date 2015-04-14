@@ -1,5 +1,5 @@
 
-require_relative 'Confetti'
+require_relative 'Common'
 require_relative 'Stream'
 require_relative 'CSpec'
 require_relative 'LSpec'

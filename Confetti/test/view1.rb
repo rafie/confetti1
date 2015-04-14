@@ -4,19 +4,25 @@ require 'Bento'
 
 # require 'Project.rb'
 # require 'ProjectVersion.rb'
-require 'View.rb'
-require 'Test.rb'
+require 'Confetti/lib/View.rb'
+require 'Confetti/lib/Test.rb'
 
 require 'byebug'
 
 #----------------------------------------------------------------------------------------------
 
-class ViewName < Minitest::Test
+class ViewName < Confetti::Test
 
+#	def create_box?; false; end
 #	def create_fs?; false; end
-#	def create_vob?; false; end
+	def create_vob?; false; end
 
 	def setup
+		byebug
+		super()
+	end
+		
+	def before
 		@user = System.user.downcase
 	end
 
@@ -25,55 +31,42 @@ class ViewName < Minitest::Test
 	end
 
 	def test_1_no_raw
-		view = Confetti::View.create('', :nop)
-		assert_equal u(view.nick), view.tag
-		assert_equal view.name, view.tag
-		assert_equal nil, view.root_vob
+		byebug
 
-		assert_raises(RuntimeError) do
-			view = Confetti.View('')
-		end
+		cspec = Confetti.CSpec("(cpsec)")
 
-		view = Confetti.View('foo')
+		view = Confetti::View.create('', cspec: cspec)
+		assert_equal u(view.nick), view.name
+		assert_equal view.name, view.internal.name
+
+		view = Confetti.View("foo")
 		assert_equal "foo", view.nick
 		assert_equal u("foo"), view.name
-		assert_equal u("foo"), view.tag
-		assert_equal nil, view.root_vob
+		assert_equal u("foo"), view.internal.name
 
-		view = ClearCASE.View('foo/.bar')
+		view = Confetti.View(nil, name: "foo")
+		assert_equal "foo", view.nick
+		assert_equal u("foo"), view.name
+		assert_equal u("foo"), view.internal.name
+
+		view = Confetti.View('foo/.bar')
 		assert_equal "foo", view.nick
 		assert_equal u("foo/.bar"), view.name
 		assert_equal u("foo"), view.tag
 		assert_equal ".bar", view.root_vob.name
-
-		view = ClearCASE::View.create('foo/.', :nop)
-		assert_equal "foo", view.nick
-		assert_match /^(.+)_foo\/\.(.+)/, view.name
-		refute_equal view.name, view.tag
-		assert_equal u("foo"), view.tag
-		assert view.root_vob != nil
-		assert_equal view.tag + "/" + view.root_vob.name, view.name
-
-#		assert_raises(RuntimeError) do
-#			view = ClearCASE.View('foo/.')
-#		end
-
-		view = ClearCASE::View.create('/.', :nop)
-		assert_match /^(.+)\/\.(.+)/, view.name
-		refute_equal view.tag, u(view.name)
-		assert view.root_vob != nil
-
-#		assert_raises(RuntimeError) do
-#			view = ClearCASE.View('/.')
-#		end
 	end
 
 end
 
 #----------------------------------------------------------------------------------------------
 
-# class CreateViewFromVersion < Confetti::Test
-# end
+class CreateViewFromVersion < Confetti::Test
+
+	def test_1
+#		view = COnfetti.
+	end
+
+end
 
 #----------------------------------------------------------------------------------------------
 
