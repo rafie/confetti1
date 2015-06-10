@@ -40,8 +40,6 @@ class View
 		raise "View: empty name" if no_nick && no_name
 		## raise "View: conflicting name/nick" if !no_nick && !no_name # this is ok
 		
-		byebug
-		
 		if !no_nick
 			rows = DB::View.where(nick: nick, user: CurrentUser.new.name)
 			raise "View: no view nicknamed '#{nick}'" if rows.count == 0
@@ -117,6 +115,10 @@ class View
 		@view
 	end
 
+	def to_s
+		@name
+	end
+
 	#-------------------------------------------------------------------------------------------
 
 	def checkin(glob)
@@ -141,6 +143,43 @@ class View
 		Config.box.remove_view @view if Config.box
 	end
 end
+
+#----------------------------------------------------------------------------------------------
+
+class Views
+	include Enumerable
+
+	attr_reader :names
+
+	def initialize(names)
+		@names = names
+	end
+
+	def each
+		@names.each { |name| yield Confetti.View(nil, name: name) }
+	end
+	
+	def <<(view)
+		@names << view.to_s
+	end
+	
+	def delete(view)
+		@names.delete(view.to_s)
+	end
+	
+	def empty?
+		@names.empty?
+	end
+
+	def shift
+		@names.shift
+	end
+
+#	def first
+#		Confetti.View(nil, name: @names.first)
+#	end
+
+end # Views
 
 #----------------------------------------------------------------------------------------------
 

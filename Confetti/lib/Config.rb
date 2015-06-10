@@ -27,8 +27,8 @@ class Config
 
 	# Data path determination process:
 	# (i)   CONFETTI_DATA env var
-	# (ii)  CONFETTI_TEST env var => Box(CONFETTI_TEST)
-	# (iii) test=`cat tests/.test` => Box(test)
+	# (ii)  CONFETTI_BOX env var => Box(CONFETTI_BOX)
+	# (iii) box=`cat boxes/.box` => Box(box)
 	# (iv)  new Box
 
 	def Config.data_path
@@ -41,8 +41,8 @@ class Config
 					@@box = Confetti.Box()
 				rescue
 					@@box = Confetti::Box.create() #make_vob: false)
-					pedning_data_path = nil
 				end
+				pedning_data_path = nil
 			end
 			data = @@box.data_path
 			write_default_box
@@ -62,46 +62,59 @@ class Config
 	# Tests
 	#------------------------------------------------------------------------------------------
 
-	def Config.tests_path
-		confetti_path/"tests"
-	end
-
 	def Config.test_source_path
 		confetti_path/"test"
 	end
-	
+
 	#------------------------------------------------------------------------------------------
-	# Box
+	# Boxes
 	#------------------------------------------------------------------------------------------
 
-	def Config.is_inside_box?
+	def Config.boxes_path
+		confetti_path/"boxes"
+	end
+
+	def Config.default_box_filename
+		Config.boxes_path/".box"
+	end
+
+	def Config.inside_the_box?
 		!ENV["CONFETTI_DATA"]
 	end
 
 	def Config.box
-		return nil if !is_inside_box?
+		return nil if !inside_the_box?
+		if @@box == nil
+			name = Config.box_name
+			@@box = Confetti.Box(name) if name
+		end
 		@@box
 	end
 
+	def Config.set_box(box)
+		@@box = box
+		write_default_box
+	end
+
 	def Config.box_name
-		name = ENV["CONFETTI_TEST"]
+		name = ENV["CONFETTI_BOX"]
 		return name if name
 		fname = Config.default_box_filename
 		name = File.read(fname) if File.exists?(fname)
 		name
 	end
 
-	def Config.default_box_filename
-		Config.tests_path/".test"
-	end
-	
 	def Config.write_default_box
-		ENV["CONFETTI_TEST"] = @@box.id
+		ENV["CONFETTI_BOX"] = @@box.id
 		IO.write(Config.default_box_filename, @@box.id)
 	end
 
+	def self.remove_box(name)
+		remove_default_box if name == Config.box_name
+	end
+
 	def self.remove_default_box
-		ENV["CONFETTI_TEST"] = nil
+		ENV["CONFETTI_BOX"] = nil
 		File.delete(Config.default_box_filename) rescue ''
 	end
 

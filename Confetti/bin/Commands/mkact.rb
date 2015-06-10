@@ -1,27 +1,24 @@
 
-require 'commander/import'
+require 'mercenary'
+
 require 'Confetti'
 
 module Confetti
 module Commands
 
-class MkAct
-	def MkAct.command(c)
-		c.syntax = 'tt mkact [options] name'
-		c.summary = 'Create a new activity'
-		c.description = 'Create a new activity'
+#----------------------------------------------------------------------------------------------
 
-		c.example "Create activity ACT for project PRJ", 'tt mkact --project PRJ ACT'
-		c.example "Create activity ACT for project PRJ", 'tt mkact --name ACT --project PRJ'
+def self.mkact(c)
+	c.syntax 'mkact [options] name'
+	c.description 'Create a new activity'
 
-		c.option '--name NAME', 'Activity name'
-		c.option '--project NAME', 'Project name'
-		c.option '--raw', 'Do not add username prefix'
+	c.option :__option__, '-o', '--option', 'description'
 
-		c.action MkAct
-	end
+	c.option :name, '--name NAME', 'Activity name'
+	c.option :project, '--project NAME', 'Project name'
+	c.option :raw, '--raw', 'Do not add username prefix'
 
-	def initialize(args, options)
+	c.action do |args, options|
 		flags = []
 
 		byebug
@@ -34,13 +31,15 @@ class MkAct
 
 		flags << :raw if options.raw
 
-		say "Creating activity #{name} ..."
+		puts "Creating activity #{name} ..."
 
 		act = Confetti::Activity.create(name, *flags, project: Confetti.Project(project))
 
-		say "Activity #{name} created."
+		puts "Activity #{name} created."
 	end
-end
+end # __command__
+
+#----------------------------------------------------------------------------------------------
 
 end # Commands
 end # Confetti

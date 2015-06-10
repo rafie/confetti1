@@ -17,15 +17,16 @@ class Test < Bento::Test
 	attr_reader :path, :root_vob
 
 	def _before
-		@box = nil
+		bb
+		@box = Confetti::Box.create(make_fs: create_fs?, make_vob: create_vob?) if create_box?
 		super(false)
 		live_to_tell do
-			@box = Confetti::Box.create(make_fs: create_fs?, make_vob: create_vob?) if create_box?
 			before
 		end
 	end
 
 	def _after
+		bb
 		super(false)
 		live_to_tell do
 			after

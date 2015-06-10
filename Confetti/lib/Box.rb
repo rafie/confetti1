@@ -1,6 +1,8 @@
 
 require_relative 'Common'
 require_relative 'Config'
+require_relative 'Database'
+
 require 'Bento/lib/Test'
 
 module Confetti
@@ -17,7 +19,9 @@ class Box
 
 	#------------------------------------------------------------------------------------------
 
-	def is(id = nil)
+	def is(id = nil, *opt)
+		init_flags([], opt)
+
 		if !id
 			id = Config.box_name
 			raise "Box: cannot determine test ID" if !id
@@ -25,23 +29,21 @@ class Box
 
 		@id = id
 		@root = root_path
-		json = JSON.parse(File.read(@root/'test.json'))
+		Config.pending_data_path = @root
 
+		json = JSON.parse(File.read(@root/'box.json'))
+		
 		vob_name = json['vob'].to_s
 		@root_vob = ClearCASE.VOB(vob_name) if !vob_name.empty?
 
-		@views = []
-		for view in json['views']
-			@views << ClearCASE.View(view)
-			# ClearCASE.View(view).start
-		end
+		@views = Views.new(json['views'])
 	end
 
 	#------------------------------------------------------------------------------------------
 
 	# opt: :keep
 	def create(*opt, make_fs: true, make_vob: true, fs_source: 'new/fs/', vob_zip: 'new/test.vob.zip')
-		init_flags([], opt)
+		init_flags([:nopush], opt)
 
 		@id = Box.make_id
 		@root = root_path
@@ -55,15 +57,26 @@ class Box
 
 		create_db
 
+		stage = :postvob
+
 		@vob_zip = Config.test_source_path/vob_zip
 		create_vob if make_vob
 
-		@views = []
+		@views = Views.new
 
 		write_cfg
+		Config.set_box(self)
+		
+		rescue => x
+			remove!
+			raise "Box: creation failed"
 	end
 
 	#------------------------------------------------------------------------------------------
+
+	def name
+		id
+	end
 
 	def vob_name
 		@root_vob ? @root_vob.name : ""
@@ -72,7 +85,7 @@ class Box
 	#------------------------------------------------------------------------------------------
 
 	def root_path
-		Config.tests_path/@id
+		Config.boxes_path/@id
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -89,7 +102,7 @@ class Box
 
 	def self.make_id
 		id = Time.now.strftime("%y%m%d-%H%M%S")
-		while File.directory?(Config.tests_path/id)
+		while File.directory?(Config.boxes_path/id)
 			id = Time.now.strftime("%y%m%d-%H%M%S%L")
 		end
 		id
@@ -98,7 +111,7 @@ class Box
 	#------------------------------------------------------------------------------------------
 
 	def write_cfg
-		File.write(@root/"test.json", JSON.generate({ :views => @views, :vob => vob_name }))
+		File.write(@root/"box.json", JSON.generate({ :views => @views.names, :vob => vob_name }))
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -125,18 +138,20 @@ class Box
 
 	def create_db
 		Confetti::Database.connect
-		Bento::DB.create(path: Config.db_path, data: Config.test_source_path/"db/data.sql")
+#		ActiveRecord::Base.connection.execute("INSERT INTO 'projects' (id, name, branch) VALUES(3, 'mcu-8.3',  'mcu-8.3_int');")
+#		ActiveRecord::Base.connection.execute(File.read(Config.test_source_path/"db/data.sql"))
+		Bento.DB(path: Config.db_path) << File.read(Config.test_source_path/"db/data.sql")
 	end
 
 	#------------------------------------------------------------------------------------------
 
 	def add_view(view)
-		@views << view.name
+		@views << view
 		write_cfg
 	end
 
 	def remove_view(view)
-		@views.delete(view.name)
+		@views.delete(view)
 		write_cfg
 	end
 
@@ -148,36 +163,62 @@ class Box
 	end
 
 	#------------------------------------------------------------------------------------------
+	# Open/close
+	#------------------------------------------------------------------------------------------
+
+	def open
+		if @root_vob
+			@root_vob.mount if !@root_vob.mounted?
+		end
+
+		@views.each do |v|
+			v.start rescue ''
+		end
+	end
+
+	def close
+		@views.each do |v|
+			v.stop rescue ''
+		end
+
+		if @root_vob
+			@root_vob.unmount if !@root_vob.mounted?
+		end
+	end
+
+	#------------------------------------------------------------------------------------------
 	# Removal
 	#------------------------------------------------------------------------------------------
 
 	def remove!
+		bb
 		abort = false
 		failed_objects = []
-
-		begin
-			FileUtils.rm_r(@root)
-		rescue
-		end
 
 		while ! @views.empty? do
 			view = @views.first
 			begin
 				view.remove!
-				views.shift
+				@views.shift
 				write_cfg
 			rescue
 				failed_objects << "view #{view}"
 				abort = true
 			end
 		end
-		raise 
+		raise "box #{id} was not removed: #{failed_objects}" if abort
 
 		@root_vob.remove! if @root_vob
 		@root_vob = nil
 		write_cfg
 
-		Config.remove_default_box
+		begin
+			FileUtils.rm_r(@root)
+		rescue
+			failed_objects << "directory #{@root}"
+		end
+
+		Config.remove_box(id)
 	end
 end
 

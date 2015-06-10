@@ -18,6 +18,7 @@ class Database
 
 	def self.connect
 		return if @@global_db
+
 		ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: Database.db_path)
 		raise "Cannot connect to database #{Database.db_path}" if !ActiveRecord::Base.connection.active?
 		begin
@@ -28,8 +29,6 @@ class Database
 		end
 		@@global_db = true
 	end
-
-#	Database.connect
 
 	def self.connected?
 		@@global_db != nil
