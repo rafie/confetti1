@@ -1,0 +1,10 @@
+def live_to_tell
+	yield
+	rescue => x
+		puts x
+end
+
+live_to_tell do
+	puts "hello"
+	raise "bye"
+end
