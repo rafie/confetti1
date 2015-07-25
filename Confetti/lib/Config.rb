@@ -57,15 +57,19 @@ class Config
 
 	def Config.host_data_path
 		net = Config.data_path/"net"
-		host = net/System.hostname
-		FileUtils.cp_p(net/".host", host) if !Directory.exist?(host)
+		host = net/(inside_the_box? ? "host" : System.hostname)
+		if Dir.exists?(net)
+			FileUtils.cp_r(net/".host", host) if !Dir.exist?(host)
+		end
 		host
 	end
 
 	def Config.user_data_path
 		users = Config.data_path/"usr"
-		user = user/System.username
-		FileUtils.cp_p(users/".user", user) if !Directory.exist?(user)
+		user = users/(inside_the_box? ? "user" : System.user)
+		if Dir.exists?(users)
+			FileUtils.cp_r(users/".user", user) if !Dir.exist?(user)
+		end
 		user
 	end
 

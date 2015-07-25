@@ -19,7 +19,7 @@ require_relative 'Commands/mkact'
 Mercenary.program(:tt) do |p|
 	# p.version '1.0.0'
 	p.description 'Confetti: A configuration management system'
-	p.syntax 'tt [options] command(s) [arguments]'
+	p.syntax 'tt [options] [arguments]'
 
 	p.command(:box)     do |c| Confetti::Commands::Box.commands(c) ; end
 	p.command(:mkact)   do |c| Confetti::Commands::mkact(c) ; end

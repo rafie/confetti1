@@ -124,11 +124,11 @@ class Box
 
 	def create_fs
 		# this is required to create empty directories, which git ignores
-		zip = @fs_source + ".zip"
+		zip = @fs_source.to_s + ".zip"
 		Bento.unzip(zip, @root) if File.file?(zip)
 		
 		# copy content of fs_source, not fs_source itself
-		FileUtils.cp_r(@fs_source/"."), @root) if File.directory?(@fs_source)
+		FileUtils.cp_r(@fs_source.to_s + "/.", @root) if File.directory?(@fs_source)
 		# FileUtils.cp_r(Dir.glob(@fs_source/"*"), @root) if File.directory?(@fs_source)
 	end
 
@@ -145,7 +145,7 @@ class Box
 
 	def create_db
 		Confetti::Database.create
-		scripts = Config.test_source_path/"db/data.sql"
+		script = Config.test_source_path/"db/data.sql"
 		Confetti::Database.execute_script(script) if File.exists?(script)
 	end
 
@@ -201,7 +201,6 @@ class Box
 	#------------------------------------------------------------------------------------------
 
 	def remove!
-		bb
 		abort = false
 		failed_objects = []
 
@@ -239,7 +238,7 @@ class Boxes
 	include Enumerable
 
 	def initialize
-		@names = Dir[Config.boxes_path/'*'].select {|f| File.directory?(f)}.map {|f| File.basename(f)}
+		@names = Dir[Config.boxes_path/'*'].select {|f| File.directory?(f)}.map {|f| File.basename(f)}.sort
 	end
 
 	def each

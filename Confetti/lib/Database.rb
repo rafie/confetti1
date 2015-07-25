@@ -9,8 +9,8 @@ class Database
 
 	@@db = nil
 	@@in_connect = false
-	@@log = Logger.new(Config.db_log_path/'activerecord.log')
-	@@migration_log = File.open(Config.db_log_path/'migration.log', 'a')
+	@@log = nil
+	@@migration_log = nil
 	
 	def self.db_path
 		Config.db_path
@@ -24,6 +24,9 @@ class Database
 		return if @@db
 		@@in_connect = true
 
+		@@log = Logger.new(Config.db_log_path/'activerecord.log')
+		@@migration_log = File.open(Config.db_log_path/'migration.log', 'a')
+		
 		ActiveRecord::Base.logger = @@log
 		ActiveSupport::LogSubscriber.colorize_logging = false
 		ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: Database.db_path)
@@ -78,7 +81,7 @@ class Database
 
 	private
 	
-	def self.iternal_create
+	def self.internal_create
 		begin
 			migrate
 			data_script = Config.confetti_path/"db/data.sql"
@@ -115,8 +118,12 @@ class Migration
     def write(text="")
       return if !verbose
       log = Confetti::Database.migration_log
-      log.puts(text)
-      log.flush
+      if log
+      	log.puts(text)
+      	log.flush
+      else
+      	puts text
+      end
     end 
 end
 

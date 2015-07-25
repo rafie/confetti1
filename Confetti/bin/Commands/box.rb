@@ -1,6 +1,5 @@
 
 require "mercenary"
-require 'byebug'
 
 module Confetti
 module Commands
@@ -26,7 +25,8 @@ def self.create(c)
 	c.description 'create box'
 
 	c.action do |args, options|
-		Confetti::Box.create
+		box = Confetti::Box.create
+		puts "Box #{box.name} created"
 	end
 end
 
@@ -39,6 +39,7 @@ def self.remove(c)
 	c.action do |args, options|
 		args.each do |name|
 			Confetti.Box(name).remove!
+			puts "Box #{name} removed"
 		end
 	end
 end

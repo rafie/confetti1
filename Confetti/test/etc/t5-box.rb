@@ -10,6 +10,5 @@ require 'Confetti/lib/Project.rb'
 
 bb
 
-a = Confetti::Config.root_path
 b = Confetti::Box.create()
 puts "done"
