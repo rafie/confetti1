@@ -1,7 +1,7 @@
 
 require_relative 'Common'
 
-require 'FileUtils'
+# require 'FileUtils'
 
 module Confetti
 
@@ -16,7 +16,7 @@ class Production
 	LOCK_FILENAME = "confetti.lock"
 	REPO_URL_BASE = "https://github.com/rafie"
 
-	@@repos = ['confetti1', 'confetti1-import', 'classico1-bento', 'classico1-ruby']
+	@@repos = ['confetti1', 'classico1-bento', 'classico1-ruby'] # , 'confetti1-import'
 	
 	#------------------------------------------------------------------------------------------
 	
@@ -43,7 +43,7 @@ class Production
 		end
 		@prod_dir = Pathname.new(data_dir)
 		Dir.chdir(@prod_dir) do
-			@repos.each do |repo|
+			@@repos.each do |repo|
 				System.command("git clone #{REPO_URL_BASE}/#{repo}.git -b #{tag}")
 			end
 		end
@@ -99,9 +99,8 @@ class Production
 	def deploy(tag)
 		begin
 			Dir.chdir(@prod_dir) do
-				@repos.each do |repo|
+				@@repos.each do |repo|
 					System.command("git checkout --detach #{REPO_URL_BASE}/#{repo} -b #{tag}")
-					end
 				end
 			end
 		rescue => x
@@ -116,7 +115,7 @@ class Production
 		# System.command("ruby", @prod_dir/confetti1/confetti/lib/" + scriptFileName)
 	end
 
-end # Deployment
+end # class Production
 
 #----------------------------------------------------------------------------------------------
 

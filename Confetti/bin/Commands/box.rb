@@ -38,8 +38,12 @@ def self.remove(c)
 
 	c.action do |args, options|
 		args.each do |name|
-			Confetti.Box(name).remove!
-			puts "Box #{name} removed"
+			begin
+				Confetti.Box(name).remove!
+				puts "Box #{name} removed"
+			rescue => x
+				puts "Error removing box #{name}"
+			end
 		end
 	end
 end
