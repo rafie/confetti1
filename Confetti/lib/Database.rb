@@ -7,7 +7,10 @@ module Confetti
 
 class Database
 
-	@@global_db = nil
+	@@db = nil
+	@@in_connect = false
+	@@log = Logger.new(Config.db_log_path/'activerecord.log')
+	@@migration_log = File.open(Config.db_log_path/'migration.log', 'a')
 	
 	def self.db_path
 		Config.db_path
@@ -17,39 +20,72 @@ class Database
 	end
 
 	def self.connect
-		return if @@global_db
+		return if @@in_connect
+		return if @@db
+		@@in_connect = true
 
+		ActiveRecord::Base.logger = @@log
+		ActiveSupport::LogSubscriber.colorize_logging = false
 		ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: Database.db_path)
 		raise "Cannot connect to database #{Database.db_path}" if !ActiveRecord::Base.connection.active?
-		begin
-			rows = ActiveRecord::Base.connection.execute("select * from sqlite_sequence")
-		rescue
-			create
-			# raise "Cannot connect to database #{Database.db_path}"
-		end
-		@@global_db = true
+
+		internal_create if !ready?
+
+		@@db = ActiveRecord::Base.connection
+		@@in_connect = false
 	end
 
 	def self.connected?
-		@@global_db != nil
+		@@db != nil
 	end
 
-	def self.global_db
-		@@global_db
+	def self.db
+		@@db
+	end
+
+	def self.ready?
+		begin
+			# for a pretty strange bug, we cannot use ActiveRecord::Base.connection.execute here
+			# rows = ActiveRecord::Base.connection.execute("select * from sqlite_sequence")
+			rows = Bento.DB(Database.db_path).execute("select * from sqlite_sequence")
+			true
+		rescue
+			false
+		end
 	end
 
 	def self.create
-		migrate
+		connect
 	end
 
 	def self.migrate
-		ActiveRecord::Migrator.migrate(Config.confetti_path + "db/migrate")
+		ActiveRecord::Migrator.migrate(Config.confetti_path/"db/migrate")
+	end
+
+	def self.execute_script(file)
+		Bento.DB(path: Config.db_path) << File.read(file)
 	end
 
 	def self.dumpSchema
 	end
 	
 	def self.dump
+	end
+	
+	def self.migration_log
+		@@migration_log
+	end
+
+	private
+	
+	def self.iternal_create
+		begin
+			migrate
+			data_script = Config.confetti_path/"db/data.sql"
+			execute_script(data_script) if File.exist?(data_script)
+		rescue
+			raise "Creating database #{Database.db_path} failed"
+		end
 	end
 
 end # Database
@@ -61,21 +97,31 @@ end # module Confetti
 #----------------------------------------------------------------------------------------------
 
 module ActiveRecord
+
+#----------------------------------------------------------------------------------------------
+
 module ConnectionHandling
-
-	@@connected = false
-
-	# TODO: consider using alias or alias_method
+	alias_method :old_retrieve_connection, :retrieve_connection
 		
 	def retrieve_connection
-		if !@@connected
-			@@connected = true
-			Confetti::Database.connect
-		end
-
-		connection_handler.retrieve_connection(self)
+		Confetti::Database.connect
+		old_retrieve_connection
 	end
 end
+
+#----------------------------------------------------------------------------------------------
+
+class Migration
+    def write(text="")
+      return if !verbose
+      log = Confetti::Database.migration_log
+      log.puts(text)
+      log.flush
+    end 
 end
+
+#----------------------------------------------------------------------------------------------
+
+end # module ActiveRecord
 
 #----------------------------------------------------------------------------------------------

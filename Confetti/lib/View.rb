@@ -151,7 +151,7 @@ class Views
 
 	attr_reader :names
 
-	def initialize(names)
+	def initialize(names = [])
 		@names = names
 	end
 

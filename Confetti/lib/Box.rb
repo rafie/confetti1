@@ -42,7 +42,7 @@ class Box
 	#------------------------------------------------------------------------------------------
 
 	# opt: :keep
-	def create(*opt, make_fs: true, make_vob: true, fs_source: 'new/fs/', vob_zip: 'new/test.vob.zip')
+	def create(*opt, source: 'box', make_fs: true, make_vob: true)
 		init_flags([:nopush], opt)
 
 		@id = Box.make_id
@@ -52,22 +52,26 @@ class Box
 		raise "Box @id exists: aborting" if File.exists?(@root)
 		FileUtils.mkdir_p(@root)
 
-		@fs_source = Config.test_source_path/fs_source
+		@fs_source = Config.test_source_path/source/"fs"
 		create_fs if make_fs
 
 		create_db
 
-		stage = :postvob
-
-		@vob_zip = Config.test_source_path/vob_zip
-		create_vob if make_vob
+		# stage = :postvob
 
 		@views = Views.new
-
 		write_cfg
+
+		@vob_zip = Config.test_source_path/source/"vob.zip"
+		create_vob if make_vob
+		write_cfg
+
 		Config.set_box(self)
 		
 		rescue => x
+			error x.to_s
+			puts x.backtrace.join("\n")
+			# exception x, "Box: creation failed"
 			remove!
 			raise "Box: creation failed"
 	end
@@ -119,16 +123,19 @@ class Box
 	#------------------------------------------------------------------------------------------
 
 	def create_fs
-		if File.directory?(@fs_source)
-			FileUtils.cp_r(Dir.glob(@fs_source/"*"), @root)
-		elsif File.file?(@fs_source)
-			Bento.unzip(@fs_source, @root)
-		end
+		# this is required to create empty directories, which git ignores
+		zip = @fs_source + ".zip"
+		Bento.unzip(zip, @root) if File.file?(zip)
+		
+		# copy content of fs_source, not fs_source itself
+		FileUtils.cp_r(@fs_source/"."), @root) if File.directory?(@fs_source)
+		# FileUtils.cp_r(Dir.glob(@fs_source/"*"), @root) if File.directory?(@fs_source)
 	end
 
 	#------------------------------------------------------------------------------------------
 
 	def create_vob
+		return if !File.exists?(@vob_zip)
 		@root_vob = ClearCASE::VOB.create('', file: @vob_zip)
 		ENV["CONFETTI_ROOT_VOB"] = @root_vob.name
 		write_cfg
@@ -137,13 +144,16 @@ class Box
 	#------------------------------------------------------------------------------------------
 
 	def create_db
-		Confetti::Database.connect
-#		ActiveRecord::Base.connection.execute("INSERT INTO 'projects' (id, name, branch) VALUES(3, 'mcu-8.3',  'mcu-8.3_int');")
-#		ActiveRecord::Base.connection.execute(File.read(Config.test_source_path/"db/data.sql"))
-		Bento.DB(path: Config.db_path) << File.read(Config.test_source_path/"db/data.sql")
+		Confetti::Database.create
+		scripts = Config.test_source_path/"db/data.sql"
+		Confetti::Database.execute_script(script) if File.exists?(script)
 	end
 
 	#------------------------------------------------------------------------------------------
+
+	def view_names
+		@views == nil ? [] : @views.names
+	end
 
 	def add_view(view)
 		@views << view
@@ -220,7 +230,36 @@ class Box
 
 		Config.remove_box(id)
 	end
-end
+
+end # class Box
+
+#----------------------------------------------------------------------------------------------
+
+class Boxes
+	include Enumerable
+
+	def initialize
+		@names = Dir[Config.boxes_path/'*'].select {|f| File.directory?(f)}.map {|f| File.basename(f)}
+	end
+
+	def each
+		@names.each { |name| yield Confetti.Box(name) }
+	end
+
+	def print
+		default_box = Config.box
+		default_name = default_box ? default_box.name : ""
+		each do |box|
+			name = box.name
+			puts name + (default_name == name ? " *" : "")
+		end
+	end
+	
+	def self.print
+		Boxes.new.print
+	end
+
+end # class Boxes
 
 #----------------------------------------------------------------------------------------------
 

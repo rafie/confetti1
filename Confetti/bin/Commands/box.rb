@@ -21,6 +21,17 @@ end
 
 #----------------------------------------------------------------------------------------------
 
+def self.create(c)
+	c.syntax 'create [options]'
+	c.description 'create box'
+
+	c.action do |args, options|
+		Confetti::Box.create
+	end
+end
+
+#----------------------------------------------------------------------------------------------
+
 def self.remove(c)
 	c.syntax 'remove [options] box-name'
 	c.description 'remove box'
@@ -59,13 +70,7 @@ def self.list(c)
 	c.description 'list boxes'
 
 	c.action do |args, options|
-		default_box = Confetti::Config.box
-		default_name = default_box ? default_box.name : ""
-		Dir[Confetti::Config.boxes_path/'*'].each do |f|
-			next if !File.directory?(f)
-			box = File.basename(f)
-			puts box + (default_name == box ? " *" : "")
-		end
+		Confetti::Boxes.print
 	end
 end
 
@@ -76,6 +81,7 @@ def self.commands(c)
 	c.description 'box commands'
 
 	c.command :enter do |x| enter(x) ; end
+	c.command :create do |x| create(x) ; end
 	c.command :remove do |x| remove(x) ; end
 	c.command :push do |x| push(x) ; end
 	c.command :pop do |x| pop(x) ; end

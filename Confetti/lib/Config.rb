@@ -1,5 +1,6 @@
 
 require_relative 'Common'
+require 'byebug'
 
 module Confetti
 
@@ -18,7 +19,7 @@ class Config
 	end
 
 	def Config.confetti_path
-		root_path/"confetti1/Confetti"
+		Config.root_path/"confetti1/Confetti"
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -40,7 +41,7 @@ class Config
 				begin
 					@@box = Confetti.Box()
 				rescue
-					@@box = Confetti::Box.create() #make_vob: false)
+					@@box = Confetti::Box.create()
 				end
 				pedning_data_path = nil
 			end
@@ -54,8 +55,42 @@ class Config
 		@@pending_data_path = path
 	end
 
+	def Config.host_data_path
+		net = Config.data_path/"net"
+		host = net/System.hostname
+		FileUtils.cp_p(net/".host", host) if !Directory.exist?(host)
+		host
+	end
+
+	def Config.user_data_path
+		users = Config.data_path/"usr"
+		user = user/System.username
+		FileUtils.cp_p(users/".user", user) if !Directory.exist?(user)
+		user
+	end
+
+	#------------------------------------------------------------------------------------------
+	# DB
+	#------------------------------------------------------------------------------------------
+
 	def Config.db_path
 		Config.data_path/"db/confetti.db"
+	end
+
+	def Config.db_log_path
+		Config.data_path/"db/log"
+	end
+
+	#------------------------------------------------------------------------------------------
+	# Logs
+	#------------------------------------------------------------------------------------------
+
+	def Config.user_log_path
+		Config.user_data_path/"log"
+	end
+
+	def Config.host_log_path
+		Config.host_data_path/"log"
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -63,7 +98,7 @@ class Config
 	#------------------------------------------------------------------------------------------
 
 	def Config.test_source_path
-		confetti_path/"test"
+		Config.confetti_path/"test"
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -71,7 +106,7 @@ class Config
 	#------------------------------------------------------------------------------------------
 
 	def Config.boxes_path
-		confetti_path/"boxes"
+		Config.confetti_path/"boxes"
 	end
 
 	def Config.default_box_filename
