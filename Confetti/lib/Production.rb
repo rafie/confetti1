@@ -128,7 +128,7 @@ class Production
 					System.command("git tag -a " + tag)
 					System.command("git push origin --tags")
 				end
-				System.command("git fetch production")
+				System.command("git fetch origin production")
 				current_branch = `git rev-parse --abbrev-ref HEAD`
 				System.command("git checkout production")
 				System.command("git merge production")
