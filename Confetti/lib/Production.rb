@@ -1,8 +1,6 @@
 
 require_relative 'Common'
 
-# require 'FileUtils'
-
 module Confetti
 
 #----------------------------------------------------------------------------------------------
@@ -42,6 +40,9 @@ class Production
 			fail "Data directory #{data_dir} not empty" if !Dir.empty?(data_dir)
 		end
 		@prod_dir = Pathname.new(data_dir)
+		
+		tag ||= "production"
+
 		Dir.chdir(@prod_dir) do
 			@@repos.each do |repo|
 				System.command("git clone #{REPO_URL_BASE}/#{repo}.git -b #{tag}")
@@ -76,7 +77,7 @@ class Production
 	# create a file to isolate production db. If it already exists then another 
 	# deployment is currently running.
 	
-	def lock
+	def try_lock
 		lockfname = @prod_dir/LOCK_FILENAME
 		lockfile = File.open(lockfname, File::RDWR|File::CREAT, 0644)
 		locked = lockfile.flock(File::LOCK_EX|File::LOCK_NB) != false
@@ -88,6 +89,22 @@ class Production
 		true
 	end
 
+	def lock(seconds = 0)
+		return if try_lock
+		locked = false
+		if seconds > 0
+			begin
+				sleep(500)
+				locked = try_lock
+				seconds -= 0.5
+			end while !locked && seconds > 0
+		else
+			begin
+				sleep(500)
+			end while !try_lock
+		end
+	end
+
 	def unlock
 		return if @lockfile == nil
 		@lockfile.close
@@ -96,7 +113,9 @@ class Production
 
 	#------------------------------------------------------------------------------------------
 
-	def deploy(tag)
+	def deploy(tag = nil)
+		return false if !try_lock
+		tag ||= "production"
 		begin
 			Dir.chdir(@prod_dir) do
 				@@repos.each do |repo|
@@ -106,12 +125,14 @@ class Production
 		rescue => x
 			error "Error during deploy: " + x.to_s
 		end
+		unlock
+		true
 	end
 
 	#------------------------------------------------------------------------------------------
 	# execution of the db migration script that has been added
 
-	def migrate_db(scriptFileName)
+	def migrate_db(script_fname)
 		# System.command("ruby", @prod_dir/confetti1/confetti/lib/" + scriptFileName)
 	end
 
