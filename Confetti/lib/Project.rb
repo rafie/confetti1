@@ -86,8 +86,6 @@ class Project < Stream
 		@branch = Confetti.Branch(!branch ? std_branch_name : branch)
 		@config = ProjectConfig.create(@name, branch: branch, baseline_cspec: baseline_cspec, lspec: lspec)
 
-		byebug
-		
 		ActiveRecord::Base.transaction do
 			create_control_view
 			create_config_files
@@ -114,7 +112,6 @@ class Project < Stream
 		@branch = Confetti.Branch(!branch ? std_branch_name : branch)
 		@config = ProjectConfig.create_from_config(@name, branch: branch, config: from_project.config)
 
-		byebug
 		create_control_view
 		create_config_files
 		create_db_record # should use transaction here

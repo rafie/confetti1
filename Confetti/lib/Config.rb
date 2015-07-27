@@ -1,6 +1,5 @@
 
 require_relative 'Common'
-require 'byebug'
 
 module Confetti
 
