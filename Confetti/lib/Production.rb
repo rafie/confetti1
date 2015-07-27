@@ -121,6 +121,7 @@ class Production
 		message ||= "..."
 		@@repos.each do |repo|
 			Dir.chdir(root/repo) do
+				bb
 				System.command('git commit -a -m "' + message + '"')
 				System.command("git push origin")
 				if tag
