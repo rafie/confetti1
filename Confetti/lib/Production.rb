@@ -9,7 +9,7 @@ class Production
 	include Bento::Class
 
 	constructors :is, :create
-	members :prod_dir, :lockfile
+	members :prod_dir, :filelock
 
 	LOCK_FILENAME = "confetti.lock"
 	PROD_SIGFILE = ".confetti"
@@ -35,6 +35,7 @@ class Production
 	#------------------------------------------------------------------------------------------
 
 	# tag == nil then take latest of production branch
+
 	def create(data_dir = nil, tag = nil)
 		data_dir ||= ENV["CONFETTI_DATA"]
 		raise "Cannot determine data directory" if data_dir.empty?
@@ -63,7 +64,26 @@ class Production
 
 	def ctor(data_dir)
 		@prod_dir = Pathname.new(data_dir)
-		@lockfile = Bento::LockFile.new(@prod_dir/LOCK_FILENAME)
+		@filelock = Bento::FileLock.new(@prod_dir/LOCK_FILENAME)
+	end
+
+	private :ctor
+
+	#------------------------------------------------------------------------------------------
+
+	def self.in_git_workspace?(dir)
+		Dir.chdir(dir) do
+			# check if we're inside a git repo dir
+			status = System.command("git status")
+			return status.ok?
+		end
+		false
+	end
+	
+	#------------------------------------------------------------------------------------------
+
+	def self.is_prod_dir?(dir)
+		File.exists?(Pathname.new(dir)/PROD_SIGFILE)
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -81,51 +101,27 @@ class Production
 	# deployment is currently running.
 	
 	def try_lock
-		lockfname = @prod_dir/LOCK_FILENAME
-		lockfile = File.open(lockfname, File::RDWR|File::CREAT, 0644)
-		locked = lockfile.flock(File::LOCK_EX|File::LOCK_NB) != false
-		if !locked
-			lockfile.close
-			return false
-		end
-		@lockfile = lockfile
-		true
+		@filelock.try_lock
 	end
-
-	#------------------------------------------------------------------------------------------
 
 	def lock(seconds = 0)
-		return if try_lock
-		locked = false
-		if seconds > 0
-			begin
-				sleep(500)
-				locked = try_lock
-				seconds -= 0.5
-			end while !locked && seconds > 0
-		else
-			begin
-				sleep(500)
-			end while !try_lock
-		end
+		@filelock.lock(seconds)
 	end
 
-	#------------------------------------------------------------------------------------------
-
 	def unlock
-		return if @lockfile == nil
-		@lockfile.close
-		@lockfile = nil
+		@filelock.unlock
 	end
 
 	#------------------------------------------------------------------------------------------
 	# release: commit, push, tag, and merge to production branch
 
 	def release(tag = nil, message = nil)
+		root = Pathname.new(`git rev-parse --show-toplevel`)/".."
+		root = root.realpath
 		message ||= "..."
 		@@repos.each do |repo|
-			Dir.chdir(@prod_dir/repo) do
-				System.command("git commit -a -m "\" + message + "\"")
+			Dir.chdir(root/repo) do
+				System.command('git commit -a -m "' + message + '"')
 				System.command("git push origin")
 				if tag
 					System.command("git tag -a " + tag)
@@ -165,22 +161,6 @@ class Production
 		# System.command("ruby", @prod_dir/confetti1/confetti/lib/" + scriptFileName)
 	end
 
-	#------------------------------------------------------------------------------------------
-	private
-	#------------------------------------------------------------------------------------------
-
-	def self.in_git_workspace?(dir)
-		Dir.chdir(dir) do
-			# check if we're inside a git repo dir
-			status = System.command("git status")
-			return status.ok?
-		end
-		false
-	end
-	
-	def self.is_prod_dir?(dir)
-		File.exists?(Pathname.new(dir)/PROD_SIGFILE)
-	end
 end # class Production
 
 #----------------------------------------------------------------------------------------------
