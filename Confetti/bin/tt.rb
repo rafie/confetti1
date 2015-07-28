@@ -2,8 +2,8 @@
 
 require 'mercenary'
 
-# require 'Bento'
-# require 'Confetti'
+require 'Bento'
+require 'Confetti'
 
 require_relative 'Commands/box'
 require_relative 'Commands/mkact'
@@ -15,6 +15,7 @@ require_relative 'Commands/mkact'
 #require_relative 'Commands/mkver'
 #require_relative 'Commands/nomerge'
 #require_relative 'Commands/release'
+require_relative 'Commands/dev'
 
 Mercenary.program(:tt) do |p|
 	# p.version '1.0.0'
@@ -33,6 +34,7 @@ Mercenary.program(:tt) do |p|
 	# p.command(:mkview)  do |c| Confetti::Commands::Mkview.command(c) ; end
 	# p.command(:changes) do |c| Confetti::Commands::Changes.command(c) ; end
 	# p.command(:lsch)    do |c| Confetti::Commands::LsCh.command(c) ; end
+	p.command(:dev)     do |c| Confetti::Commands::Dev.commands(c) ; end
 
  	p.command(:help) do |c|
 		c.syntax 'help'

@@ -83,7 +83,7 @@ end
 
 def self.commands(c)
 	c.syntax 'box [options]'
-	c.description 'box commands'
+	c.description 'Box commands'
 
 	c.command :enter do |x| enter(x) ; end
 	c.command :create do |x| create(x) ; end

@@ -14,6 +14,7 @@ class Production
 	LOCK_FILENAME = "confetti.lock"
 	PROD_SIGFILE = ".confetti"
 	REPO_URL_BASE = "https://github.com/rafie"
+	PRODUCTION_BRANCH = "production"
 
 	@@repos = ['confetti1', 'classico1-bento', 'classico1-ruby'] # , 'confetti1-import'
 	
@@ -51,7 +52,7 @@ class Production
 
 		File.open(@prod_dir/PROD_SIGFILE, "w").close()
 		
-		tag ||= "production"
+		tag ||= PRODUCTION_BRANCH
 
 		Dir.chdir(@prod_dir) do
 			@@repos.each do |repo|
@@ -87,16 +88,6 @@ class Production
 	end
 
 	#------------------------------------------------------------------------------------------
-	# add a db migration script
-
-#	def add_new_files(files)
-#		array = files.split(/,/)
-#		array.size.times do |i|
-#			System.command("git add " + array[i])
-#		end
-#	end
-
-	#------------------------------------------------------------------------------------------
 	# create a file to isolate production db. If it already exists then another 
 	# deployment is currently running.
 	
@@ -113,33 +104,8 @@ class Production
 	end
 
 	#------------------------------------------------------------------------------------------
-	# release: commit, push, tag, and merge to production branch
 
-	def release(tag = nil, message = nil)
-		root = Pathname.new(`git rev-parse --show-toplevel`)/".."
-		root = root.realpath
-		message ||= "..."
-		@@repos.each do |repo|
-			Dir.chdir(root/repo) do
-				bb
-				System.command('git commit -a -m "' + message + '"')
-				System.command("git push origin")
-				if tag
-					System.command("git tag -a " + tag)
-					System.command("git push origin --tags")
-				end
-				System.command("git fetch origin production")
-				current_branch = `git rev-parse --abbrev-ref HEAD`
-				System.command("git checkout production")
-				System.command("git merge production")
-				System.command("git checkout #{current_branch}")
-			end
-		end
-	end
-
-	#------------------------------------------------------------------------------------------
-
-	def deploy(tag = nil)
+	def release(tag = nil)
 		return false if !try_lock
 		tag ||= "production"
 		begin
@@ -161,8 +127,87 @@ class Production
 	def migrate_db(script_fname)
 		# System.command("ruby", @prod_dir/confetti1/confetti/lib/" + scriptFileName)
 	end
-
+	
 end # class Production
+
+#----------------------------------------------------------------------------------------------
+
+class Workspace
+	include Bento::Class
+
+	constructors :is, :create
+	members :root
+
+	INT_BRANCH = "master"
+	
+	@@repos = ['confetti1', 'confetti1-import', 'classico1-bento', 'classico1-ruby']
+
+	#------------------------------------------------------------------------------------------
+
+	def is(dir = nil)
+	end
+
+	#------------------------------------------------------------------------------------------
+
+	def create(branch, tag = nil)
+		tag ||= "master"
+			
+		Dir.chdir(root) do
+			@@repos.each do |repo|
+				System.command("git clone #{REPO_URL_BASE}/#{repo}.git -b #{tag}")
+				System.command("git checkout -b #{branch}")
+			end
+		end
+	end
+
+	#------------------------------------------------------------------------------------------
+	# add a db migration script
+
+	def new_files
+#		array = files.split(/,/)
+#		array.size.times do |i|
+#			System.command("git add " + array[i])
+#		end
+		# git ls-files --others --exclude-standard
+	end
+
+	#------------------------------------------------------------------------------------------
+	# deploy: commit, push, tag, and merge to integration branch (i.e., master)
+
+	def deploy(tag = nil, message = nil)
+		message ||= "..."
+		root_dir = root
+		@@repos.each do |repo|
+			Dir.chdir(root_dir/repo) do
+				bb
+				System.command('git commit -a -m "' + message + '"')
+				System.command("git push origin")
+				if tag
+					System.command("git tag -a " + tag)
+					System.command("git push origin --tags")
+				end
+				System.command("git fetch origin #{INT_BRANCH}")
+				current_branch = `git rev-parse --abbrev-ref HEAD`.strip
+				System.command("git checkout #{INT_BRANCH}")
+				merge = System.command("git merge #{current_branch}")
+				System.command("git checkout #{current_branch}")
+			end
+		end
+	end
+
+	#------------------------------------------------------------------------------------------
+
+	def rebase
+	end
+
+	#------------------------------------------------------------------------------------------
+
+	def root
+		@root = Pathname.new(`git rev-parse --show-toplevel`.strip)/".." if !@root
+		@root
+	end
+
+end # class Workspace
 
 #----------------------------------------------------------------------------------------------
 

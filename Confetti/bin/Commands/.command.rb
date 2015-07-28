@@ -16,6 +16,7 @@ def self.__command__(c)
 	c.option :__option__, '-o', '--option', 'description'
 
 	c.action do |args, options|
+	end
 end # __command__
 
 #----------------------------------------------------------------------------------------------
