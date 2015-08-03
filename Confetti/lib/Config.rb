@@ -1,3 +1,4 @@
+
 require_relative 'Common'
 require 'byebug'
 
@@ -18,8 +19,7 @@ class Config
 	end
 
 	def Config.confetti_path
-		#Config.root_path/"confetti1/Confetti"
-		Config.root_path/"Confetti"
+		Config.root_path/"confetti1/Confetti"
 	end
 
 	#------------------------------------------------------------------------------------------

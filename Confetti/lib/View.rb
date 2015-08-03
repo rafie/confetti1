@@ -19,6 +19,8 @@ class ProjectVersions < ActiveRecord::Base
 end
 end # module DB
 
+end # module DB
+
 #----------------------------------------------------------------------------------------------
 
 class View

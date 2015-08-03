@@ -1,3 +1,4 @@
+
 require_relative 'Common'
 
 module Confetti
@@ -61,7 +62,6 @@ class Database
 	end
 
 	def self.migrate
-		bb
 		ActiveRecord::Migrator.migrate(Config.confetti_path/"db/migrate")
 	end
 

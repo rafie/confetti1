@@ -10,7 +10,7 @@ require 'Confetti/lib/Project.rb'
 
 bb
 
-b = Confetti.Box()
+b = Confetti::Box.create()
 b.remove!
 
 v = ClearCASE.View(nil, name: "confetti.project_test1", root_vob: ".beguwaba")
