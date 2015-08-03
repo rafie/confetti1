@@ -43,7 +43,7 @@ class CSpec
 	:itag 0
 	:icheck 0
 	(lots 
-		<%for lot in @lots %> <%= lot %> <% end %>))
+		<%for lot in lots %> <%= lot %> <% end %>))
 END
 
 	@@configspec_t = <<END
@@ -56,8 +56,8 @@ END
 )
 END
 
-	constructors :is, :from_file
-	members :ne, [:lspec, :opt]
+	constructors :is, :from_file, :from_configspec
+	members :ne, :vobs_cfg, [:lspec, :opt]
 
 	attr_accessor :lspec
 
@@ -73,7 +73,9 @@ END
 
 	def from_configspec(configspec, *opt)
 		vobs_cfg = configspec.vobs_cfg
-		cspec_s = Bento.mold(@@config_t, binding)
+		@vobs_cfg=vobs_cfg
+		#cspec_s = Bento.mold(@@config_t, binding)
+		cspec_s = Bento.mold(@@configspec_t, binding)
 		@ne = NExp.from_s(cspec_s, :single)
 		ctor(*opt, nil)
 	end
@@ -153,6 +155,7 @@ END
 	end
 
 	def lots
+		return [] if !@lspec	
 		Confetti::Lots.new(nexp.nodes(:lots).map {|x| ~x.car }, lspec: @lspec)
 	end
 

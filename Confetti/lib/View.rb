@@ -13,6 +13,11 @@ module DB
 
 class View < ActiveRecord::Base
 end
+class Project < ActiveRecord::Base
+end
+class ProjectVersions < ActiveRecord::Base
+end
+end # module DB
 
 end # module DB
 
@@ -57,8 +62,57 @@ class View
 	end
 
 	#------------------------------------------------------------------------------------------	
+	def create(name,project: nil,version: nil,cspec: nil,lspec: nil)
+		
+		if !project && !cspec
+			raise ("Missing project or cspec")
+		end
+		if !!project && !!cspec
+			raise ("create view from a project OR a cspec")
+		end
+		if !!version && !!cspec
+			raise("option version not allowed for cspec")
+		end
+		
+		if !!name
+			pname=name
+		else
+			if !!version
+				pname=version 
+			else
+				pname=nil
+			end
+		end
+		
+		pproject=project if !!project
+		pversion=version if !!version
+		bb
+		if !!cspec 
+			pcspec=cspec 
+		else
+			pcspec=get_cspec(pproject,pversion)
+		end
+		
+		plspec=lspec if !!lspec
+		
+		#vcreate(nick: pname,name: pname, cspec: pcspec)
+		vcreate("",cspec: pcspec)
+	end
+	
+	def get_cspec(proj, ver)
+	
+		if !ver		
+			project = ConfettiImport::Project.is(proj)
+			ver=project.versions.last
+		end
+		projectversion=ProjectVersions.Find_by(project_id:project , version: ver)
+		projectversion.cspec
+		
+	end
 
-	def create(nick, *opt, name: nil, cspec: nil)
+	
+	def vcreate(nick, *opt, name: nil, cspec: nil)
+		bb
 		init_flags([:raw, :nop], opt)
 		opt1 = filter_flags([:raw, :nop], opt)
 
@@ -66,15 +120,16 @@ class View
 
 		nick = nick.to_s
 		name = name.to_s
-
+		
 		nick = Bento.rand_name if nick.empty? && name.empty?
-
+		@cspec=cspec
 		@nick = nick.empty? ? name : nick
 		@name = @raw ? nick : CurrentUser.new.name + "_" + nick if name.empty?
-
-		@view = ClearCASE::View.create(nil, *opt1, name: @name, root_vob: Config.root_vob)
+		
+		@view = ClearCASE::View.create(nil, *opt1, name: @name, root_vob: Config.root_vob) #we need to give cspec and lspec here
+		
 		Config.box.add_view @view if Config.box
-
+	
 		return if @nop
 
 		row = DB::View.new do |r|

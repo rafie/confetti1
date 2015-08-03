@@ -13,6 +13,8 @@ require_relative 'Commands/mkact'
 #require_relative 'Commands/merge'
 #require_relative 'Commands/build'
 #require_relative 'Commands/mkver'
+#require_relative 'Commands/mkproj'
+#require_relative 'Commands/mkprod'
 #require_relative 'Commands/nomerge'
 #require_relative 'Commands/release'
 

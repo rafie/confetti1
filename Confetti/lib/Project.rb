@@ -114,7 +114,30 @@ class Project < Stream
 		@branch = Confetti.Branch(!branch ? std_branch_name : branch)
 		@config = ProjectConfig.create_from_config(@name, branch: branch, config: from_project.config)
 
-		byebug
+		create_control_view
+		create_config_files
+		create_db_record # should use transaction here
+
+		assert_good
+
+		rescue Exception => x
+			rollback
+			raise "failed to create project #{name}: " + x.to_s
+	end
+
+	#------------------------------------------------------------------------------------------
+
+	def create_from_version(name, *opt, branch: nil, from_project: nil, from_version: nil)
+		raise "invalid project name" if name.to_s.strip.empty?
+		@name = name
+
+		raise "Project #{name} exists." if exist?
+
+		raise "invalid source project version specification" if !from_version
+
+		@branch = Confetti.Branch(!branch ? std_branch_name : branch)
+		@config = ProjectConfig.create_from_config(@name, branch: branch, config: from_version.project.config)
+
 		create_control_view
 		create_config_files
 		create_db_record # should use transaction here
