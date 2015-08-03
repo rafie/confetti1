@@ -1,0 +1,13 @@
+
+require 'rake/testtask'
+
+ENV["TESTCASE_WHAT"] = ENV["WHAT"] + "a"
+
+task :do do
+    puts "Gonna do " + ENV["WHAT"]
+end
+
+Rake::TestTask.new("jojo") do |t|
+	puts "Jojo is " + ENV["TESTCASE_WHAT"]
+end
+
