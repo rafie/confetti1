@@ -1,5 +1,5 @@
 
-require_relative 'Confetti'
+require_relative 'Common'
 
 module Confetti
 

@@ -1,9 +1,19 @@
 
-require_relative 'Confetti'
-
+require_relative 'Common'
+require_relative 'View'
 require_relative 'Project'
 
 module Confetti
+
+#----------------------------------------------------------------------------------------------
+
+module DB
+
+class Activity < ActiveRecord::Base
+	has_one :view
+end
+
+end # module DB
 
 #----------------------------------------------------------------------------------------------
 
@@ -23,8 +33,8 @@ class Activity
 		raise "invalid name" if !name
 		@name = name.to_s
 		
-		row = db.one("select a.id, a.name, view, a.branch, user, p.name as project, project_id from activities as a join projects as p on p.id = a.project_id where a.name=?", @name)
-		fail "Unknown activity: #{@name}" if row == nil
+#		row = db.one("select a.id, a.name, view, a.branch, user, p.name as project, project_id from activities as a join projects as p on p.id = a.project_id where a.name=?", @name)
+		row = DB::Activity.find_by(name: @name)
 		from_row(row)
 	end
 
@@ -47,11 +57,26 @@ class Activity
 		@cspec.tag = @name
 		@view = Confetti::View.create(@name, :raw, cspec: @cspec)
 
-		@id = db.insert(:activities, %w(name view branch project_id user cspec icheck),
-			@name, @view.name, @branch.name, @project.id, @user, @cspec.text, @icheck)
+#		@id = db.insert(:activities, %w(name view branch project_id user cspec icheck),
+#			@name, @view.name, @branch.name, @project.id, @user, @cspec.text, @icheck)
+
+		row = DB::Activity.new do |r|
+			r.name = @name
+			r.view = @view.name
+			r.branch = @branch.name
+			r.project_id = @project.id
+			r.user = @user.to_s
+			r.cspec = @cspec.to_s
+			r.icheck = @icheck
+		end
+		row.save
+
+		rescue
+			raise "Activity: failed to add check with name='#{@name}' (already exists?)"
 	end
 	
 	def from_row(row)
+		fail "Activity: invalid row (name='#{@name}')" if row == nil
 		@id = row[:id]
 		@view = Confetti.View(row[:view])
 		@branch = Confetti.Branch(row[:branch])
@@ -66,7 +91,8 @@ class Activity
 	#------------------------------------------------------------------------------------------
 
 	def self.exists?(name)
-		Confetti::DB.global.val("select count(*) from activities where name=?", name) == 1
+#		Confetti::DB.global.val("select count(*) from activities where name=?", name) == 1
+		DB::Activity.find_by(name: @name) != nil
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -82,12 +108,18 @@ class Activity
 	#------------------------------------------------------------------------------------------
 
 	def icheck
-		db.val("select icheck from activities where name=?", @name)
+		row = DB::Activity.find_by(name: @name)
+		row.icheck
+#		db.val("select icheck from activities where name=?", @name)
 	end
 
 	def inc_check
-		db.execute("update activities set icheck = icheck + 1 where name=?", @name)
-		icheck
+		row = DB::Activity.find_by(name: @name)
+		n = row.icheck + 1
+		row.update(icheck: n)
+		n
+#		db.execute("update activities set icheck = icheck + 1 where name=?", @name)
+#		icheck
 	end
 
 	def icheck_name
@@ -133,9 +165,9 @@ class Activity
 
 	#------------------------------------------------------------------------------------------
 	
-	def db
-		Confetti::DB.global
-	end
+#	def db
+#		Confetti::DB.global
+#	end
 
 end # Activity
 

@@ -1,26 +1,37 @@
 
-require 'commander/import'
+require 'mercenary'
+
 require 'Confetti'
 
 module Confetti
 module Commands
+module __Commands__
 
-class __Commnad__
-	def __Commnad__.command(c)
-		c.syntax = 'tt command [options]'
-		c.summary = ''
-		c.description = c.summary
+#----------------------------------------------------------------------------------------------
 
-		c.example 'description', 'command'
+def self.__command__(c)
+	c.syntax '__command__ [options] [arguments]'
+	c.description '...'
 
-		c.option '--option', 'description'
+	c.option :__option__, '-o', '--option', 'description'
 
-		c.action __Commnad__
-	end
+	c.action do |args, options|
+end # __command__
 
-	def initialize(args, options)
-	end
+#----------------------------------------------------------------------------------------------
+
+def self.commands(c)
+	c.syntax '__commands__ [options] command [arguments]'
+	c.description 'box commands'
+
+	c.option :__option__, '-o', '--option', 'description'
+
+	c.command :__command__ do |c| __command__(c) ; end
+
 end
 
+#----------------------------------------------------------------------------------------------
+
+end # __Command__
 end # Commands
 end # Confetti

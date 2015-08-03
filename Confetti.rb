@@ -1,13 +1,2 @@
 
 require_relative 'Confetti/lib/Confetti.rb'
-require_relative 'Confetti/lib/Branch.rb'
-require_relative 'Confetti/lib/View.rb'
-require_relative 'Confetti/lib/CSpec.rb'
-require_relative 'Confetti/lib/LSpec.rb'
-require_relative 'Confetti/lib/Stream.rb'
-require_relative 'Confetti/lib/Lot.rb'
-require_relative 'Confetti/lib/Check.rb'
-require_relative 'Confetti/lib/Activity.rb'
-require_relative 'Confetti/lib/Project.rb'
-require_relative 'Confetti/lib/ProjectVersion.rb'
-require_relative 'Confetti/lib/Product.rb'

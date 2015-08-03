@@ -5,6 +5,15 @@ module Confetti
 
 #----------------------------------------------------------------------------------------------
 
+module DB
+
+class ProjectVersions < ActiveRecord::Base
+end
+
+end # DB
+
+#----------------------------------------------------------------------------------------------
+
 class ProjectVersion
 	include Bento::Class
 

@@ -1,9 +1,13 @@
 
-require_relative 'Confetti'
+require_relative 'Common'
 
 module Confetti
 
 #----------------------------------------------------------------------------------------------
+
+# In non-ClearCase environments (e.g., Git, Zeta), a branch is associated with a specific 
+# repository (that is, no global branches). Therefore, branches should probably be associated
+# with streams.
 
 class Branch
 	include Bento::Class
@@ -19,17 +23,8 @@ class Branch
 
 		raise "invalid branch name" if name.to_s.empty?
 
-		if !Confetti.test_mode?
-			@branch = ClearCASE.Branch(name, *opt1)
-			@name = @branch.name
-
-		elsif TEST_WITH_CLEARCASE
-			raise "no active test" if !Test.current
-			@branch = ClearCASE.Branch(name, *opt1)
-			@name = @branch.name
-		else
-			fix_name(name)
-		end
+		@branch = ClearCASE.Branch(name, *opt1)
+		@name = @branch.name
 	end
 
 	def create(name, *opt, stream: nil)
@@ -38,22 +33,15 @@ class Branch
 
 		raise "invalid branch name" if name.to_s.empty?
 
-		if !Confetti.test_mode?
-			@branch = ClearCASE::Branch.create(name, *opt1)
-			@name = @branch.name
-
-		elsif TEST_WITH_CLEARCASE
-			raise "no active test" if !Test.current
-			@branch = ClearCASE::Branch.create(name, *opt1, root_vob: Test.root_vob)
-			@name = @branch.name
+		if Config.root_vob
+			@branch = ClearCASE::Branch.create(name, *opt1, root_vob: Config.root_vob)
 		else
-			fix_name(name)
+			@branch = ClearCASE::Branch.create(name, *opt1)
 		end
+		@name = @branch.name
 
 		# we should implement lazy branch creation, as we cannot create a branch without knowing
 		# its associated project, and specifying a project here would be inappropriate.
-
-		# raise "invalid stream specification" if !stream
 	end
 
 	def fix_name(name)
@@ -66,7 +54,7 @@ class Branch
 	def to_s; name; end
 	def to_str; name; end
 
-end # class Stream
+end # class Branch
 
 #----------------------------------------------------------------------------------------------
 
