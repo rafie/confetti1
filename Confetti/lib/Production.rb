@@ -180,15 +180,16 @@ class Workspace
 		@@repos.each do |repo|
 			Dir.chdir(root_dir/repo) do
 				bb
+				current_branch = `git rev-parse --abbrev-ref HEAD`.strip
+
 				System.command('git commit -a -m "' + message + '"')
-				System.command("git push origin")
+				System.command("git push origin #{current_branch}")
 				if tag
 					System.command("git tag -a " + tag)
 					System.command("git push origin --tags")
 				end
-				System.command("git fetch origin #{INT_BRANCH}")
-				current_branch = `git rev-parse --abbrev-ref HEAD`.strip
 				System.command("git checkout #{INT_BRANCH}")
+				System.command("git fetch origin #{INT_BRANCH}")
 				merge = System.command("git merge #{current_branch}")
 				System.command("git checkout #{current_branch}")
 			end
