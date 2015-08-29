@@ -12,8 +12,6 @@ def self.mkact(c)
 	c.syntax 'mkact [options] name'
 	c.description 'Create a new activity'
 
-	c.option :__option__, '-o', '--option', 'description'
-
 	c.option :name, '--name NAME', 'Activity name'
 	c.option :project, '--project NAME', 'Project name'
 	c.option :raw, '--raw', 'Do not add username prefix'

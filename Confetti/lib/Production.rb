@@ -145,6 +145,7 @@ class Workspace
 	#------------------------------------------------------------------------------------------
 
 	def is(dir = nil)
+		@root = dir
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -203,8 +204,18 @@ class Workspace
 
 	#------------------------------------------------------------------------------------------
 
+	def shell
+		ENV['CONFETTI_BASE'] = nil
+		ENV['CONFETTI_DATA'] = nil
+		puts "cmd /k " + (root/"Confetti/bin/tt.bat").to_win
+		system("cmd /k " + (root/"confetti1/Confetti/bin/env.bat").to_win)
+	end
+
+	#------------------------------------------------------------------------------------------
+
 	def root
 		@root = Pathname.new(`git rev-parse --show-toplevel`.strip)/".." if !@root
+		#@@ check if it's a confetti repo
 		@root
 	end
 
@@ -214,5 +225,5 @@ end # class Workspace
 
 end # Confetti
 
-# tt dev deploy --initial
-# tt dev deploy
+# tt dev release --initial
+# tt dev release

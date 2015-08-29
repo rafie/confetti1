@@ -15,7 +15,11 @@ require_relative 'Project.rb'
 require_relative 'ProjectVersion.rb'
 require_relative 'ProjectControlView.rb'
 require_relative 'Product.rb'
+
+#--- dev
 require_relative 'Box.rb'
+require_relative 'Production.rb'
+# require_relative 'Workspace.rb'
 
 module Confetti
 

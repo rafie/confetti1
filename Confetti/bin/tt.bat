@@ -2,13 +2,9 @@
 
 setlocal
 
-set RUBY_ROOT=%CONFETTI_DATA%\classico1-ruby
-set BENTO_ROOT=%CONFETTI_DATA%\classico1-bento
-set CONFETTI_ROOT=%CONFETTI_DATA%\confetti1
+for /f %%x in ('tempfile.bat') do set _TT_POSTEXEC=%%x.bat
 
-set GEM_HOME=c:\rvdev\ruby\localgems
-set GEM_PATH=%RUBY_ROOT%\Gems;%GEM_HOME%
-set RUBYLIB=%BENTO_ROOT%\Classico;%CONFETTI_ROOT%;%RUBYLIB%
-set PATH=%RUBY_ROOT%\Gems\bin;%RUBY_ROOT%\Ruby\bin;%CONFETTI_ROOT%\Confetti\bin;%PATH%
-
+call %~dp0\env.bat
 ruby %~dp0\tt.rb %*
+
+if exist %_TT_POSTEXEC% call %_TT_POSTEXEC%
