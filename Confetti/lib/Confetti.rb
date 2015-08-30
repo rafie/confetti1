@@ -18,8 +18,8 @@ require_relative 'Product.rb'
 
 #--- dev
 require_relative 'Box.rb'
+require_relative 'Workspace.rb'
 require_relative 'Production.rb'
-# require_relative 'Workspace.rb'
 
 module Confetti
 
