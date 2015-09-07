@@ -8,9 +8,11 @@ module Confetti
 class Database
 
 	@@db = nil
+	@@db1 = nil
 	@@in_connect = false
 	@@log = nil
 	@@migration_log = nil
+	@@migration_scripts = []
 
 	#------------------------------------------------------------------------------------------
 		
@@ -54,12 +56,23 @@ class Database
 		ActiveRecord::Base.logger = @@log
 		ActiveSupport::LogSubscriber.colorize_logging = false
 		ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: Database.db_path)
+		bb
 		raise "Cannot connect to database #{Database.db_path}" if !ActiveRecord::Base.connection.active?
 
 		internal_create if !ready?
 
 		@@db = ActiveRecord::Base.connection
 		@@in_connect = false
+	end
+
+	def self.close
+		bb
+		@@migration_log.close if @@migration_log
+		@@log.close
+		db1.close
+		@@db1 = nil
+		ActiveRecord::Base.connection_pool.disconnect!
+		@@db = nil
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -72,11 +85,16 @@ class Database
 		@@db
 	end
 
+	def self.db1
+		return @@db1 if @@db1
+		@@db1 = Bento.DB(path: Database.db_path)
+	end
+
 	def self.ready?
 		begin
 			# for a pretty strange bug, we cannot use ActiveRecord::Base.connection.execute here
 			# rows = ActiveRecord::Base.connection.execute("select * from sqlite_sequence")
-			rows = Bento.DB(Database.db_path).execute("select * from sqlite_sequence")
+			rows = db1.execute("select * from sqlite_sequence")
 			true
 		rescue
 			false
@@ -93,12 +111,20 @@ class Database
 	
 	def self.migrate
 		ActiveRecord::Migrator.migrate(db_source/"migrate")
+		@@migration_scripts.each do |file|
+			execute_script(file)
+		end
+	end
+
+	def self.migration_sql_script(schema_path)
+		sql_script_path = Pathname.new(schema_path).newext(".sql")
+		@@migration_scripts << sql_script_path if sql_script_path.exist?
 	end
 
 	#------------------------------------------------------------------------------------------
 	
 	def self.execute_script(file)
-		Bento.DB(path: Config.db_path) << File.read(file)
+		db1 << File.read(file)
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -116,8 +142,8 @@ class Database
 	def self.internal_create
 		begin
 			migrate
-			data_script = db_source/"data.sql"
-			execute_script(data_script) if File.exist?(data_script)
+#			data_script = db_source/"data.sql"
+#			execute_script(data_script) if File.exist?(data_script)
 		rescue
 			raise "Creating database #{Database.db_path} failed"
 		end

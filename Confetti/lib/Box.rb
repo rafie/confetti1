@@ -49,6 +49,8 @@ class Box
 		@root = Box.root_path(@id)
 		Config.pending_data_path = root
 
+		@views = Views.new
+
 		raise "Box @id exists: aborting" if File.exists?(root)
 		FileUtils.mkdir_p(root)
 
@@ -57,9 +59,11 @@ class Box
 
 		create_db
 
+		remove!
+		return
+
 		# stage = :postvob
 
-		@views = Views.new
 		write_cfg
 
 		@vob_zip = Config.test_source_path/source/"vob.zip"
@@ -115,7 +119,7 @@ class Box
 	#------------------------------------------------------------------------------------------
 
 	def write_cfg
-		File.write(@root/"box.json", JSON.generate({ :views => @views.names, :vob => vob_name }))
+		File.write(@root/"box.json", JSON.generate({ :views => view_names, :vob => vob_name }))
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -201,6 +205,7 @@ class Box
 	#------------------------------------------------------------------------------------------
 
 	def remove!
+		bb
 		abort = false
 		failed_objects = []
 
@@ -222,8 +227,16 @@ class Box
 		write_cfg
 
 		begin
+			Database.close
+		rescue => x
+			bb
+			puts x.to_s
+		end
+		
+		begin
 			FileUtils.rm_r(@root)
-		rescue
+		rescue => x
+			bb
 			failed_objects << "directory #{@root}"
 		end
 

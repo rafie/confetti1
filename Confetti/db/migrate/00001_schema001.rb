@@ -1,7 +1,10 @@
 
 require 'active_record'
 
+require 'Confetti/lib/Database'
+
 class Schema001 < ActiveRecord::Migration
+
 	def up
 		#--------------------------------------------------------------------------------------
 
@@ -74,5 +77,8 @@ class Schema001 < ActiveRecord::Migration
 		add_index :product_versions, [:product_id, :name], unique: true
 
 		#--------------------------------------------------------------------------------------
+		
+		Confetti::Database.migration_sql_script(__FILE__)
 	end
+
 end

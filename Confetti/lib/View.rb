@@ -73,7 +73,7 @@ class View
 		@name = @raw ? nick : CurrentUser.new.name + "_" + nick if name.empty?
 
 		@view = ClearCASE::View.create(nil, *opt1, name: @name, root_vob: Config.root_vob)
-		Config.box.add_view @view if Config.box
+		Config.box.add_view self if Config.box
 
 		return if @nop
 
@@ -152,6 +152,7 @@ class Views
 	attr_reader :names
 
 	def initialize(names = [])
+		raise "wrong view names type" if !names.kind_of?(Array)
 		@names = names
 	end
 

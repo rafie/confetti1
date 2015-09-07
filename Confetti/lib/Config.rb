@@ -13,13 +13,13 @@ class Config
 
 	#------------------------------------------------------------------------------------------
 
-	def Config.confetti_base # confetti_root
+	def Config.confetti_base
 		base = ENV["CONFETTI_BASE"]
 		base = File.expand_path("../../../..", __FILE__) if !base
 		Pathname.new(base)
 	end
 
-	def Config.confetti_root # confetti_path
+	def Config.confetti_root
 		Config.confetti_base/"confetti1/Confetti"
 	end
 

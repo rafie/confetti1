@@ -20,38 +20,38 @@ class Production
 	
 	#------------------------------------------------------------------------------------------
 
-	def is(data_dir = nil)
-		data_dir ||= ENV["CONFETTI_DATA"] 
-		raise "Cannot determine data directory" if data_dir.empty?
-		raise "Data directory #{data_dir} does not exist" if ! Dir.exists?(data_dir)
-		raise "Directory #{data_dir} is not a Confetti production directory" if !Production.is_prod_dir?(data_dir)
+	def is(base_dir = nil)
+		base_dir ||= ENV["CONFETTI_PROD"] 
+		raise "Cannot determine production base directory" if base_dir.empty?
+		raise "Production base directory #{data_dir} does not exist" if ! Dir.exists?(base_dir)
+		raise "Directory #{base_dir} is not a Confetti production directory" if !Production.is_prod_dir?(base_dir)
 
-		ENV["CONFETTI_DATA"] = data_dir
+		# ENV["CONFETTI_DATA"] = data_dir
 
 		# @source_repo_url_base = REPO_URL_BASE
 		
-		ctor(data_dir)
+		ctor(base_dir)
 	end
 
 	#------------------------------------------------------------------------------------------
 
 	# tag == nil then take latest of production branch
 
-	def create(data_dir = nil, tag = nil)
-		data_dir ||= ENV["CONFETTI_DATA"]
-		raise "Cannot determine data directory" if data_dir.empty?
-		if !Dir.exists?(data_dir)
-			FileUtils.mkdir_p(data_dir) or fatal "Cannot create #{data_dir}"
+	def create(base_dir = nil, tag = nil)
+		base_dir ||= ENV["CONFETTI_PROD"]
+		raise "Cannot determine production base directory" if base_dir.empty?
+		if !Dir.exists?(base_dir)
+			FileUtils.mkdir_p(base_dir) or fatal "Cannot create #{base_dir}"
 		else
-			raise "Data directory #{data_dir} not empty" if !Dir.empty?(data_dir)
+			raise "Production base directory #{base_dir} not empty" if !Dir.empty?(base_dir)
 		end
 		
-		raise "Directory #{data_dir} is in a git workspace and cannot be used as a production directory" if Production.in_git_workspace?(data_dir)
+		raise "Directory #{base_dir} is in a git workspace and cannot be used as a production directory" if Production.in_git_workspace?(base_dir)
 		
-		ctor(data_dir)
+		ctor(base_dir)
 
-		File.open(@prod_dir/PROD_SIGFILE, "w").close()
-		
+		IO.write(@prod_dir/PROD_SIGFILE, "")
+
 		tag ||= PRODUCTION_BRANCH
 
 		Dir.chdir(@prod_dir) do
@@ -63,8 +63,8 @@ class Production
 
 	#------------------------------------------------------------------------------------------
 
-	def ctor(data_dir)
-		@prod_dir = Pathname.new(data_dir)
+	def ctor(base_dir)
+		@prod_dir = Pathname.new(base_dir).realpath
 		@filelock = Bento::FileLock.new(@prod_dir/LOCK_FILENAME)
 	end
 
