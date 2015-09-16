@@ -16,16 +16,38 @@ class Database
 		Config.db_path
 	end
 
+	def self.db_source
+		Config.confetti_root/"db"
+	end
+
+	#------------------------------------------------------------------------------------------
+
+	def self.activerecord_log_path
+		Config.db_log_path/'activerecord.log'
+	end
+
+	def self.migration_log_path
+		Config.db_log_path/'migration.log'
+	end
+
+	def self.migration_log
+		@@migration_log
+	end
+
+	#------------------------------------------------------------------------------------------
+	
 	def self.cleanup
 	end
 
+	#------------------------------------------------------------------------------------------
+	
 	def self.connect
 		return if @@in_connect
 		return if @@db
 		@@in_connect = true
 
-		@@log = Logger.new(Config.db_log_path/'activerecord.log')
-		@@migration_log = File.open(Config.db_log_path/'migration.log', 'a')
+		@@log = Logger.new(activerecord_log_path)
+		@@migration_log = File.open(migration_log_path, 'a')
 		
 		ActiveRecord::Base.logger = @@log
 		ActiveSupport::LogSubscriber.colorize_logging = false
@@ -38,6 +60,8 @@ class Database
 		@@in_connect = false
 	end
 
+	#------------------------------------------------------------------------------------------
+	
 	def self.connected?
 		@@db != nil
 	end
@@ -57,35 +81,41 @@ class Database
 		end
 	end
 
+	#------------------------------------------------------------------------------------------
+	
 	def self.create
 		connect
 	end
 
+	#------------------------------------------------------------------------------------------
+	
 	def self.migrate
-		ActiveRecord::Migrator.migrate(Config.confetti_path/"db/migrate")
+		ActiveRecord::Migrator.migrate(db_source/"migrate")
 	end
 
+	#------------------------------------------------------------------------------------------
+	
 	def self.execute_script(file)
 		Bento.DB(path: Config.db_path) << File.read(file)
 	end
 
+	#------------------------------------------------------------------------------------------
+	
 	def self.dumpSchema
 	end
 	
 	def self.dump
 	end
 	
-	def self.migration_log
-		@@migration_log
-	end
-
+	#------------------------------------------------------------------------------------------
+	
 	private
 	
 	def self.internal_create
 		begin
 			migrate
-			data_script = Config.confetti_path/"db/data.sql"
-			execute_script(data_script) if File.exist?(data_script)
+#			data_script = db_source/"data.sql"
+#			execute_script(data_script) if File.exist?(data_script)
 		rescue
 			raise "Creating database #{Database.db_path} failed"
 		end

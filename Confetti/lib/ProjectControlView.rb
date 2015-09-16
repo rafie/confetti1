@@ -1,6 +1,7 @@
 
 require_relative 'Config'
 require_relative 'View'
+require_relative 'User'
 
 module Confetti
 
@@ -20,7 +21,7 @@ class ProjectControlView < View
 element * CHECKEDOUT
 element * .../<%= branch_name %>/LATEST
 mkbranch <%= branch_name %>
-element /<%= @view.root_vob %>/nbu.meta/... /main/0
+# element /<%= @view.root_vob %>/nbu.meta/... /main/0
 element * /main/LATEST
 end mkbranch
 END
@@ -34,12 +35,13 @@ END
 		@branch = project.branch
 
 		opt1 = filter_flags([:ready], opt)
-
+		
 		opt1 << :raw if !Confetti::Config.inside_the_box?
-		super(view_name, *opt1)
+		super(view_name, *opt1,name: CurrentUser.new.name + '_' + view_name)
 	end
 
 	def create(project, *opt)
+		
 		raise "invalid project specification" if !project
 
 		@project_name = project.name
@@ -50,6 +52,7 @@ END
 		super(view_name, *opt1, cspec: project.config.cspec)
 
 		if CONFETTI_CLEARCASE
+		
 			@configspec = Bento.mold(@@configspec_t, binding)
 			@view.configspec = @configspec
 		end
@@ -66,7 +69,7 @@ END
 	end
 
 	def branch_name
-		@branch.name
+		@branch.tag
 	end
 end
 

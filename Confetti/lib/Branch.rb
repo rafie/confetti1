@@ -13,18 +13,28 @@ class Branch
 	include Bento::Class
 
 	constructors :is, :create
-	members :raw, :name, :branch
+	members :raw, :name, :branch, :create_if_not_exists, :tag
 
 	attr_reader :name, :tag
 
 	def is(name, *opt)
-		init_flags([:raw], opt)
-		opt1 = filter_flags([:raw], opt)
+	
+		init_flags([:raw, :create_if_not_exists], opt)
+		opt1 = filter_flags([:raw, :create_if_not_exists], opt)
 
 		raise "invalid branch name" if name.to_s.empty?
-
-		@branch = ClearCASE.Branch(name, *opt1)
+		
+		@branch = ClearCASE.Branch(name, *opt1,root_vob: Config.root_vob)
+		if !@branch.exists? && @create_if_not_exists
+			if Config.root_vob
+				@branch = ClearCASE::Branch.create(name, root_vob: Config.root_vob)
+			else
+				@branch = ClearCASE::Branch.create(name)
+			end
+			@name = @branch.name
+		end
 		@name = @branch.name
+		@tag=@branch.tag
 	end
 
 	def create(name, *opt, stream: nil)
@@ -39,7 +49,7 @@ class Branch
 			@branch = ClearCASE::Branch.create(name, *opt1)
 		end
 		@name = @branch.name
-
+		@tag=@branch.tag
 		# we should implement lazy branch creation, as we cannot create a branch without knowing
 		# its associated project, and specifying a project here would be inappropriate.
 	end

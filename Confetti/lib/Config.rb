@@ -1,6 +1,5 @@
 
 require_relative 'Common'
-require 'byebug'
 
 module Confetti
 
@@ -12,14 +11,16 @@ class Config
 	@@pending_data_path = nil
 	@@root_vob = nil
 
-	def Config.root_path
-		root = ENV["CONFETTI_ROOT"]
-		root = File.expand_path("../../../..", __FILE__) if !root
-		Pathname.new(root)
+	#------------------------------------------------------------------------------------------
+
+	def Config.confetti_base
+		base = ENV["CONFETTI_BASE"]
+		base = File.expand_path("../../../..", __FILE__) if !base
+		Pathname.new(base)
 	end
 
-	def Config.confetti_path
-		Config.root_path/"confetti1/Confetti"
+	def Config.confetti_root
+		Config.confetti_base/"confetti1/Confetti"
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -102,7 +103,7 @@ class Config
 	#------------------------------------------------------------------------------------------
 
 	def Config.test_source_path
-		Config.confetti_path/"test"
+		Config.confetti_root/"test"
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -110,7 +111,7 @@ class Config
 	#------------------------------------------------------------------------------------------
 
 	def Config.boxes_path
-		Config.confetti_path/"boxes"
+		Config.confetti_root/"boxes"
 	end
 
 	def Config.default_box_filename

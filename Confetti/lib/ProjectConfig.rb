@@ -197,9 +197,16 @@ END
 	end
 
 	def write(path)
+		
 		@main_file = ProjectConfig.main_config_file(path)
 		@lspec_file = ProjectConfig.lspec_file(path)
-
+		
+		cocmd = System.command("cleartool checkout -nc #{@main_file}")
+		#raise "Cannot checkout #{@main_file}" if cocmd.failed?
+		cocmd = System.command("cleartool checkout -nc #{@lspec_file}")
+		#raise "Cannot checkout #{@lspec_file}" if cocmd.failed?
+		
+		
 		File.write(@main_file, nexp.text)
 		File.write(@lspec_file, @lspec.to_s)
 	end

@@ -7,6 +7,9 @@ require_relative 'ProjectConfig'
 require_relative 'ProjectControlView'
 require_relative 'View'
 require_relative 'Lot'
+require_relative 'Database'
+require_relative 'Box'
+require 'byebug'
 
 module Confetti
 
@@ -31,7 +34,7 @@ class Project < Stream
 	# constructors
 	#------------------------------------------------------------------------------------------
 	
-	constructors :is, :from_id, :from_row, :create, :create_from_project
+	constructors :is, :from_id, :from_row, :create, :create_from_project, :import
 	## later: :create_from_version
 	
 	members :row, :id, :name, :branch, :ctl_view, :config
@@ -42,10 +45,12 @@ class Project < Stream
 	# :verify - verify project existence
 	def is(name, *opt)
 		init_flags([:verify], opt)
-
+		@name=name
 #		from_row(db.one("select * from projects where name=?", name))
-		row = DB::Project.find_by(name: @name)
-		from_row(row)
+		
+		
+		
+		from_row(DB::Project.find_by(name: @name))
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -61,8 +66,8 @@ class Project < Stream
 		# what for? can this be removed?
 		# @cspec = Confetti.CSpec(row.cspec) if !row.cspec.empty?
 
-		@ctl_view = Confetti.ProjectControlView(self)
-
+		# @ctl_view = Confetti.ProjectControlView(self)
+		
 		@config = Confetti::ProjectConfig.from_path(config_path)
 
 		assert_good
@@ -83,13 +88,15 @@ class Project < Stream
 		@name = name.to_s
 		raise "Project #{name} exists." if exist?
 
-		@branch = Confetti.Branch(!branch ? std_branch_name : branch)
+		@branch = Confetti.Branch(!branch ? std_branch_name : branch, :create_if_not_exists)
+		
 		@config = ProjectConfig.create(@name, branch: branch, baseline_cspec: baseline_cspec, lspec: lspec)
 
-		byebug
+		#byebug
 		
 		ActiveRecord::Base.transaction do
 			create_control_view
+			#byebug
 			create_config_files
 			create_db_record # should use transaction here
 
@@ -99,6 +106,24 @@ class Project < Stream
 		# 	rescue Exception => x
 			# should rollback ctl_view and db work
 		#		raise "failed to create project #{name}: " + x.to_s
+	end
+
+	#------------------------------------------------------------------------------------------
+
+	def import(name, *opt, branch: nil)
+		raise "invalid project name" if name.to_s.strip.empty?
+		
+		@name = name.to_s
+		raise "Project #{name} exists." if exist?
+		@branch = Confetti.Branch(!branch ? std_branch_name : branch)
+		
+		ActiveRecord::Base.transaction do
+			#create_control_view
+			#create_config_files
+			create_db_record # should use transaction here
+
+			#assert_good
+		end
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -162,14 +187,14 @@ class Project < Stream
 
 	def create_db_record
 #		@id = db.insert(:projects, %w(name branch cspec), @name, @branch.name, @cspec.to_s)
-
+		
 		row = DB::Project.new do |r|
 			r.name = @name
 			r.branch = @branch.name
-			r.cspec = @cspec.to_s
+			#r.cspec = @cspec.to_s
 		end
 		row.save
-
+		@id=row.id
 		rescue
 			raise "Project: failed to add check with name='#{@name}' (already exists?)"
 	end
@@ -185,7 +210,7 @@ class Project < Stream
 	def create_config_files
 		FileUtils.mkdir_p(config_path)
 		@config.write(config_path)
-		@config.add_to_view(@ctl_view)
+		@config.add_to_view(ctl_view)
 	end
 
 	#------------------------------------------------------------------------------------------
@@ -199,9 +224,7 @@ class Project < Stream
 		return if \
 			   @id \
 			&& @name \
-			&& row \
 			&& @branch \
-			&& @ctl_view \
 			&& @config
 		raise "Project no good"
 	end

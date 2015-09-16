@@ -54,7 +54,7 @@ class Schema001 < ActiveRecord::Migration
 			t.column :cspec, :string
 		end
 
-		add_index :project_versions, [:project_id, :version], unique: true
+		#add_index :project_versions, [:project_id, :version], unique: true
 
 		#--------------------------------------------------------------------------------------
 

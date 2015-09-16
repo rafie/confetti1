@@ -28,10 +28,10 @@ class Box
 		end
 
 		@id = id
-		@root = root_path
-		Config.pending_data_path = @root
+		@root = Box.root_path(@id)
+		Config.pending_data_path = root
 
-		json = JSON.parse(File.read(@root/'box.json'))
+		json = JSON.parse(File.read(root/'box.json'))
 		
 		vob_name = json['vob'].to_s
 		@root_vob = ClearCASE.VOB(vob_name) if !vob_name.empty?
@@ -46,11 +46,13 @@ class Box
 		init_flags([:nopush], opt)
 
 		@id = Box.make_id
-		@root = root_path
-		Config.pending_data_path = @root
+		@root = Box.root_path(@id)
+		Config.pending_data_path = root
 
-		raise "Box @id exists: aborting" if File.exists?(@root)
-		FileUtils.mkdir_p(@root)
+		@views = Views.new
+
+		raise "Box @id exists: aborting" if File.exists?(root)
+		FileUtils.mkdir_p(root)
 
 		@fs_source = Config.test_source_path/source/"fs"
 		create_fs if make_fs
@@ -59,7 +61,6 @@ class Box
 
 		# stage = :postvob
 
-		@views = Views.new
 		write_cfg
 
 		@vob_zip = Config.test_source_path/source/"vob.zip"
@@ -88,18 +89,18 @@ class Box
 
 	#------------------------------------------------------------------------------------------
 
-	def root_path
-		Config.boxes_path/@id
+	def self.root_path(id)
+		Config.boxes_path/id
 	end
-
+	
 	#------------------------------------------------------------------------------------------
 
 	def data_path
-		root_path
+		root
 	end
 
 	def db_path
-		root_path/"db/confetti.db"
+		root/"db/confetti.db"
 	end
 		
 	#------------------------------------------------------------------------------------------
@@ -115,7 +116,7 @@ class Box
 	#------------------------------------------------------------------------------------------
 
 	def write_cfg
-		File.write(@root/"box.json", JSON.generate({ :views => @views.names, :vob => vob_name }))
+		File.write(@root/"box.json", JSON.generate({ :views => view_names, :vob => vob_name }))
 	end
 
 	#------------------------------------------------------------------------------------------

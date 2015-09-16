@@ -4,6 +4,7 @@ require_relative 'Config'
 require_relative 'Branch'
 require_relative 'CSpec'
 require_relative 'User'
+#require_relative 'Project'
 
 module Confetti
 
@@ -13,11 +14,8 @@ module DB
 
 class View < ActiveRecord::Base
 end
-class Project < ActiveRecord::Base
-end
-class ProjectVersions < ActiveRecord::Base
-end
-end # module DB
+
+
 
 end # module DB
 
@@ -26,7 +24,7 @@ end # module DB
 class View
 	include Bento::Class
 
-	constructors :is, :create
+	constructors :is, :create_from_project, :create
 	members :id, :raw, :nick, :name, :view
 
 	attr_reader :nick, :name
@@ -58,11 +56,13 @@ class View
 
 		# when outside the box, root_vob is nil
 		# when inside the box, root_vob is box'es vob
+		
 		@view = ClearCASE.View(nil, *opt1, name: name, root_vob: Config.root_vob)
 	end
 
-	#------------------------------------------------------------------------------------------	
-	def create(name,project: nil,version: nil,cspec: nil,lspec: nil)
+	#------------------------------------------------------------------------------------------
+	
+	def create_from_project(name,project: nil,version: nil,cspec: nil,lspec: nil)
 		
 		if !project && !cspec
 			raise ("Missing project or cspec")
@@ -86,33 +86,39 @@ class View
 		
 		pproject=project if !!project
 		pversion=version if !!version
-		bb
+		
 		if !!cspec 
 			pcspec=cspec 
-		else
+		else		
 			pcspec=get_cspec(pproject,pversion)
 		end
 		
 		plspec=lspec if !!lspec
 		
 		#vcreate(nick: pname,name: pname, cspec: pcspec)
-		vcreate("",cspec: pcspec)
+		create(pname,cspec: pcspec)
 	end
 	
-	def get_cspec(proj, ver)
+	#------------------------------------------------------------------------------------------
+
+	def get_cspec(project, version)
 	
-		if !ver		
-			project = ConfettiImport::Project.is(proj)
-			ver=project.versions.last
+		if !version		
+			
+			versions_list=Confetti::ProjectVersions.find(project.name)
+			version=versions_list.latest
 		end
-		projectversion=ProjectVersions.Find_by(project_id:project , version: ver)
+		
+		projectversion=ProjectVersion.is(version,project:project)
 		projectversion.cspec
 		
 	end
 
 	
-	def vcreate(nick, *opt, name: nil, cspec: nil)
-		bb
+	#------------------------------------------------------------------------------------------
+
+	def create(nick, *opt, name: nil, cspec: nil, lspec: nil)
+		
 		init_flags([:raw, :nop], opt)
 		opt1 = filter_flags([:raw, :nop], opt)
 
@@ -126,9 +132,12 @@ class View
 		@nick = nick.empty? ? name : nick
 		@name = @raw ? nick : CurrentUser.new.name + "_" + nick if name.empty?
 		
-		@view = ClearCASE::View.create(nil, *opt1, name: @name, root_vob: Config.root_vob) #we need to give cspec and lspec here
+		@view = ClearCASE::View.create(nil, *opt1, name: @name, root_vob: Config.root_vob) 
 		
-		Config.box.add_view @view if Config.box
+		view_configspec=Confetti.CSpec(cspec).configspec
+		
+		@view.configspec=view_configspec.to_s
+		Config.box.add_view self if Config.box
 	
 		return if @nop
 
@@ -207,6 +216,7 @@ class Views
 	attr_reader :names
 
 	def initialize(names = [])
+		raise "wrong view names type" if !names.kind_of?(Array)
 		@names = names
 	end
 
