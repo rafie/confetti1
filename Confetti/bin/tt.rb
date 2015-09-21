@@ -7,7 +7,8 @@ require 'mercenary'
 
 require_relative 'Commands/box'
 require_relative 'Commands/mkact'
-## require_relative 'Commands/mkview'
+require_relative 'Commands/mkview'
+
 #require_relative 'Commands/lsact'
 #require_relative 'Commands/check'
 #require_relative 'Commands/merge'
@@ -32,7 +33,7 @@ Mercenary.program(:tt) do |p|
 #	p.command(:release) do |c| Confetti::Commands::Release.command(c) ; end
 #	p.command(:mkver)   do |c| Confetti::Commands::MkVer.command(c) ; end
 	# p.command(:nomerge) do |c| Confetti::Commands::NoMerge.command(c) ; end
-	# p.command(:mkview)  do |c| Confetti::Commands::Mkview.command(c) ; end
+	p.command(:mkview)  do |c| Confetti::Commands::mkview(c) ; end
 	# p.command(:changes) do |c| Confetti::Commands::Changes.command(c) ; end
 	# p.command(:lsch)    do |c| Confetti::Commands::LsCh.command(c) ; end
 

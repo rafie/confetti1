@@ -62,7 +62,7 @@ END
 	attr_accessor :lspec
 
 	def is(text, *opt, lspec: nil)
-		@ne = NExp.from_s(text, :single)
+		@ne = NExp.from_s(text.to_s, :single)
 		ctor(*opt, lspec)
 	end
 

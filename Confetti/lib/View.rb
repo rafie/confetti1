@@ -24,7 +24,7 @@ end # module DB
 class View
 	include Bento::Class
 
-	constructors :is, :create_from_project, :create
+	constructors :is, :create_from_project, :create, :create_from_command
 	members :id, :raw, :nick, :name, :view
 
 	attr_reader :nick, :name
@@ -97,6 +97,47 @@ class View
 		
 		#vcreate(nick: pname,name: pname, cspec: pcspec)
 		create(pname,cspec: pcspec)
+	end
+	
+	def create_from_command(name,project: nil,version: nil,cspec: nil,lspec: nil)
+		
+		if !project && !cspec
+			raise ("Missing project or cspec")
+		end
+		if !!project && !!cspec
+			raise ("create view from a project OR a cspec")
+		end
+		if !!version && !!cspec
+			raise("option version not allowed for cspec")
+		end
+		
+		if !!name
+			pname=name
+		else
+			if !!version
+				pname="#{project.name}.#{version}" 
+			else
+				if !!project
+					pname=project.name
+				else
+					pname=nil
+				end
+			end
+		end
+		
+		pproject=project if !!project
+		pversion=version if !!version
+		
+		if !!cspec 
+			pcspec=cspec 
+		else		
+			pcspec=get_cspec(pproject,pversion)
+		end
+		plspec=nil
+		plspec=lspec if !!lspec
+		
+		#vcreate(nick: pname,name: pname, cspec: pcspec)
+		create(pname,cspec: pcspec, lspec:plspec)
 	end
 	
 	#------------------------------------------------------------------------------------------
